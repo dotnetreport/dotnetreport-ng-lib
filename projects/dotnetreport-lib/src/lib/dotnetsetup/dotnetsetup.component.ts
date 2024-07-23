@@ -79,19 +79,19 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
  private renderKOTemplates() {
   
   this.reportTemplates = this.sanitizer.bypassSecurityTrustHtml(`
-  <!-- Dotnet Report HTML Templates -->
+<!-- Dotnet Report HTML Templates -->
 <script type="text/html" id="report-filter">
     <div class="form-group">
         <!-- ko if: !hasForeignKey-->
         <!-- ko if: fieldType=='DateTime'-->
         <!-- ko if: ['=','>','<','>=','<=', 'not equal'].indexOf($parent.Operator()) != -1 -->
-        <input class="form-control" data-bind="datepicker: $parent.Value" required />
+        <input class="form-control" data-bind="datepicker: $parent.fmtValue, datepickerOptions: {value: $parent.Value, dateFormat: dateFormat() === 'Custom' ? customDateFormat().replace(/yyyy/g, 'yy') : $root.dateFormatMappings[dateFormat()]}" required />
         <!-- /ko -->
         <!-- ko if: ['between'].indexOf($parent.Operator()) != -1 -->
         From
-        <input required class="form-control" data-bind="datepicker: $parent.Value" />
+        <input required class="form-control" data-bind="datepicker: $parent.fmtValue, datepickerOptions: {value: $parent.Value, dateFormat: dateFormat() === 'Custom' ? customDateFormat().replace(/yyyy/g, 'yy') : $root.dateFormatMappings[dateFormat()]}" />
         to
-        <input data-bind="datepicker: $parent.Value2" class="form-control" required />
+        <input data-bind="datepicker: $parent.fmtValue2, datepickerOptions: {value: $parent.Value2, dateFormat: dateFormat() === 'Custom' ? customDateFormat().replace(/yyyy/g, 'yy') : $root.dateFormatMappings[dateFormat()]}" class="form-control" required />
         <!-- /ko -->
         <!-- ko if: ['range'].indexOf($parent.Operator()) != -1 -->
         <select data-bind="value: $parent.Value" class="form-control" required>
@@ -110,6 +110,20 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
             <option>This Month To Date</option>
             <option>This Year To Date</option>
             <option>Last 30 Days</option>
+            <!--<option>This Month Last Year</option>
+            <option>Last Month Last Year</option>
+            <option>This Quarter</option>
+            <option>Last Quarter</option>
+            <option>First Quarter</option>
+            <option>Second Quarter</option>
+            <option>Third Quarter</option>
+            <option>Fourth Quarter</option>
+            <option>Next 6 Months</option>
+            <option>Last 6 Months</option>
+            <option>2 Years ago</option>
+            <option>3 Years ago</option>
+            <option>4 Years ago</option>
+            <option>5 Years ago</option>-->
             <optgroup label="Comparison Options">
                 <option>>= Today</option>
                 <option><= Today</option>
@@ -128,12 +142,6 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
         <!-- ko if: ['=','>','<','>=','<=', 'not equal'].indexOf($parent.Operator()) != -1 && ['is blank', 'is not blank', 'is null', 'is not null'].indexOf($parent.Operator()) == -1 -->
         <input class="form-control" type="number" data-bind="value: $parent.Value, disable: $parent.Operator() == 'is default'" required />
         <!-- /ko -->
-        <!-- ko if: ['between'].indexOf($parent.Operator()) != -1 -->
-        From
-        <input class="form-control" type="number" data-bind="value: $parent.Value" required />
-        to
-        <input class="form-control" type="number" data-bind="value: $parent.Value2" required />
-        <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: fieldType=='Boolean' && ['is blank', 'is not blank', 'is null', 'is not null'].indexOf($parent.Operator()) == -1 -->
         <select required class="form-control" data-bind="value: $parent.Value, disable: $parent.Operator() == 'is default'">
@@ -150,7 +158,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
         <select multiple class="form-control" data-bind="select2: { placeholder: 'Please Choose', allowClear: true }, options: $parent.ParentList, optionsText: 'text', optionsValue: 'id', selectedOptions: $parent.ParentIn"></select>
         <!-- /ko -->
         <!-- ko if: $parent.Operator()=='='-->
-        <select required class="form-control" data-bind="options: $parent.LookupList, optionsText: 'text', optionsValue: 'id', value: $parent.Value, optionsCaption: 'Please Choose'"></select>
+        <select required class="form-control" data-bind="select2: { placeholder: 'Please Choose', allowClear: true }, options: $parent.LookupList, optionsText: 'text', optionsValue: 'id', value: $parent.Value, optionsCaption: 'Please Choose'"></select>
         <!-- /ko -->
         <!-- ko if: $parent.Operator()=='in' || $parent.Operator()=='not in'-->
         <select required multiple class="form-control" data-bind="select2: { placeholder: 'Please Choose', allowClear: true }, options: $parent.LookupList, optionsText: 'text', optionsValue: 'id', selectedOptions: $parent.ValueIn"></select>
@@ -159,13 +167,13 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
     </div>
 </script>
 <script type="text/html" id="pager-template">
-    <div class="pager-container">
+    <div class="pager-container d-flex flex-row align-items-center flex-wrap">
         <a href="" title="first" data-bind="click: first, enable: !isFirstPage()"><i class="fa fa-backward report-pager-btn" style="font-size: 18px;"></i></a>&nbsp;
         <a href="" title="previous" data-bind="click: previous, enable: !isFirstPage()"><i class="fa fa-caret-left fa-2x report-pager-btn"></i></a>
-        <select class="form-control form-control-sm" data-bind="options: [10,30,50,100,150,200,500], value: pageSize"></select>
-        <span class="pager-pageinfo">
+        <select class="form-control form-control-sm" data-bind="options: [10,30,50,100,150,200,500], value: pageSize" style="width:auto"></select>
+        <span class="pager-pageinfo d-flex flex-row align-items-center flex-wrap">
             <span>Page</span>&nbsp;
-            <input type="number" min="1" pattern="[0-9]*" class="form-control form-control-sm text-center" data-bind="
+            <input type="number" min="1" pattern="[0-9]*" class="form-control form-control-sm text-center" style="width:auto" data-bind="
                                 value: currentPage,
                                 attr: { max: pages() }" />&nbsp;
             <span>of</span>&nbsp;
@@ -179,22 +187,22 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 
 <script type="text/html" id="report-column-header">
     <!-- ko foreach: Columns -->
-    <th data-bind="attr: { id: fieldId }, css: {'right-align': IsNumeric}, style: {'width': fieldWidth, 'background-color': headerBackColor }, hidden: outerGroup" style="border-right: 1px solid;">
+    <th data-bind="attr: { id: fieldId }, style: {'text-align': fieldAlign ? fieldAlign : (IsNumeric ? 'right' : 'left'), 'width': fieldWidth, 'background-color': headerBackColor }, hidden: outerGroup" style="border-right: 1px solid;">
         <!-- ko if: $parents[3].useStoredProc ? $parents[3].useStoredProc() : ($parents[5].useStoredProc ? $parents[5].useStoredProc() : false) -->
         <span data-bind="text: fieldLabel() ? fieldLabel() : fieldName, style: {'color': headerFontColor, 'font-weight': headerFontBold() ? 'bold' : 'normal'}"></span>
         <!-- /ko -->
         <!-- ko ifnot: $parents[3].useStoredProc ? $parents[3].useStoredProc() : ($parents[5].useStoredProc ? $parents[5].useStoredProc() : false)  -->
         <a href="" data-bind="click: function(){ $parents[pagerIndex($parents)].changeSort(SqlField) }, style: {'color': headerFontColor, 'font-weight': headerFontBold() ? 'bold' : 'normal'}">
-            <span data-bind="text: fieldLabel() ? fieldLabel() : ColumnName"></span>
+            <span data-bind="text: $parent.IsDrillDown() && fieldLabel2() ? fieldLabel2() : (fieldLabel() ? fieldLabel() : fieldName)"></span>
             <span data-bind="text: $parents[pagerIndex($parents)].pager.sortColumn() === SqlField ? ($parents[pagerIndex($parents)].pager.sortDescending() ? '&#9660;' : '&#9650;') : ''"></span>
         </a>
         <!-- /ko -->
 
         <div class="pull-right" data-bind="if: !$parent.IsDrillDown() && !IsNumeric">
             <div class="dropup">
-            <a href="#" data-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
-                <span class="fa fa-ellipsis-v"></span>
-            </a>
+                <a href="#" data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
+                    <span class="fa fa-ellipsis-v"></span>
+                </a>
                 <ul class="dropdown-menu" style="z-index: 1001;">
                     <li class="dropdown-item small">
                         <a href="#" data-bind="click: toggleOuterGroup">
@@ -216,7 +224,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 
 <script type="text/html" id="report-column">
     <!-- ko foreach: Items -->
-    <td data-bind="hidden: outerGroup, style: {'background-color': backColor, 'color': fontColor, 'font-weight': fontBold() ? 'bold' : 'normal', 'text-align': $parents[4].pager && $parents[4].ReportType()=='Single' ? 'center' : (fieldAlign ? fieldAlign : (Column.IsNumeric ? 'right' : 'left')), 'font-size':$parents[4].pager && $parents[4].ReportType()=='Single' ? '48px' : ''}">
+    <td data-bind="hidden: outerGroup, style: {'background-color': _backColor ?? backColor(), 'color': _fontColor ?? fontColor(), 'font-weight': fontBold() || _fontBold ? 'bold' : 'normal', 'text-align': $parents[4].pager && $parents[4].ReportType()=='Single' ? 'center' : (fieldAlign ? fieldAlign : (Column.IsNumeric ? 'right' : 'left')), 'font-size':$parents[4].pager && $parents[4].ReportType()=='Single' ? '48px' : ''}">
         <div data-bind="style: {'width': fieldWidth }">
         <!-- ko if: LinkTo-->
         <a data-bind="attr: {href: LinkTo}" target="_blank"><span data-bind="html: formattedVal"></span></a>
@@ -263,7 +271,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 
 <script type="text/html" id="report-table">
     <div class="table-responsive" >
-        <table class="table table-hover table-condensed" data-bind="attr: {class: 'table table-striped table-hover table-condensed ' + $parents[2].selectedStyle()}">        
+        <table class="table table-hover table-condensed" data-bind="attr: {class: 'table table-striped table-hover table-condensed ' + $parents[2].selectedStyle()}">
             <thead data-bind="if: $parents[2].ReportType() != 'Single'">
                 <tr class="no-highlight">
                     <!-- ko if: $parentContext.$parentContext.$parent.canDrilldown() && !IsDrillDown() && !CanExpandOption() -->
@@ -298,6 +306,9 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                 <tr>
                     <td style="width: 30px;"></td>
                     <td data-bind="attr:{colspan: $parent.Columns.length }" style="padding-left: 0px;">
+                        <div data-bind="visible: !DrillDownData()">
+                            <div class="report-spinner"></div>
+                        </div>
                         <!-- ko if: DrillDownData -->
                         <table class="table table-striped table-hover table-condensed" data-bind="with: DrillDownData">
                             <thead>
@@ -341,7 +352,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
             </tbody>
             <!-- ko if: $parentContext.$parent.SubTotals().length == 1 && $parentContext.$parentContext.$parent.OuterGroupColumns().length == 0 -->
             <tfoot data-bind="foreach: $parentContext.$parent.SubTotals">
-                <tr>
+                <tr class="sub-total">
                     <!-- ko if: $parentContext.$parentContext.$parentContext.$parent.canDrilldown() && !$parent.IsDrillDown() -->
                     <td></td>
                     <!-- /ko -->
@@ -367,7 +378,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 
     <!-- ko if: $parent.ReportType() != 'Pivot' && (!$parent.isChart() || $parent.ShowDataWithGraph()) -->
     <div class="pull-right" data-bind="if: $parent.OuterGroupColumns().length > 0">
-        <a href="#" data-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
+        <a href="#" data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
             Manage Groups <span class="fa fa-ellipsis-v"></span>
         </a>
         <ul class="dropdown-menu" style="z-index: 1001;" data-bind="foreach: $parent.OuterGroupColumns">
@@ -412,7 +423,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                 <input class="form-control text-box single-line" type="text" data-bind="value: manageAccess.clientId">
             </div>
             <div class="col-md-1 col-sm-1">
-                <span data-toggle="tooltip" data-placement="right" class="fa fa-question-circle helptip" title="Leave blank to give all clients access (Global Reports)"></span>
+                <span data-bs-toggle="tooltip" data-placement="right" class="fa fa-question-circle helptip" title="Leave blank to give all clients access (Global Reports)"></span>
             </div>
         </div>
         <div class="alert alert-info">
@@ -532,7 +543,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
             <div class="rules-group-header">
                 <div data-bind="visible: !isRoot">
                     <div class="pull-left">
-                        <div class="btn-group btn-group-toggle btn-group-sm" data-toggle="buttons" role="group">
+                        <div class="btn-group btn-group-toggle btn-group-sm" data-bs-toggle="buttons" role="group">
                         <label class="btn btn-primary active" style="margin-right: 0px;" >
                             <input type="radio" name="andoroption" data-bind="checked: AndOr, checkedValue: 'And'"> And
                         </label>
@@ -560,7 +571,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 <script type="text/html" id="fly-filter-template">
     <div class="card" data-bind="visible: FlyFilters().length>0">
         <div class="card-header">
-            <a data-toggle="collapse" data-bind="attr: {'data-target': '#filter-panel-' + ReportID() }" href="#">
+            <a data-bs-toggle="collapse" data-bind="attr: {'data-bs-target': '#filter-panel-' + ReportID() }" href="#">
                 <i class="fa fa-filter"></i> Choose Filters
             </a>
         </div>
@@ -622,13 +633,13 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                         <div class="col-md-3">
                             <div class="form-group">
                                 <select class="form-control" style="width: 100%;" data-bind="
-                                        options: $parents[$parents.length-2].selectedFieldsCanFilter != undefined 
+                                        options: $parents[$parents.length-2].selectedFieldsCanFilter != undefined
                                                     ? $parents[$parents.length-2].selectedFieldsCanFilter
                                                     : $parents[$parents.length-1].selectedFieldsCanFilter,
-                                        optionsText: 'selectedFieldName', 
-                                        optionsCaption: 'Please Choose', 
-                                        value: Field, 
-                                        attr: {required: Field()==null?'required':false}, 
+                                        optionsText: 'selectedFieldName',
+                                        optionsCaption: 'Please Choose',
+                                        value: Field,
+                                        attr: {required: Field()==null?'required':false},
                                         disable: Field() && Field().forced"></select>
                                 </div>
                         </div>
@@ -730,32 +741,52 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
              </label>
         </div>
         <div data-bind="if: hasSchedule">
-                <div class="form-inline form-group">
-                   <div class="row col-sm-12">
+                  <div class="form-inline form-group">
+                    <div class="row col-sm-12">
                         <span data-bind="text: selectedOption() != 'once' ? 'Every ' : ''"></span>&nbsp;
                         <select class="form-control" required data-bind="options: options, value: selectedOption"></select>
                         <div data-bind="if: selectedOption() == 'once'">
-                            &nbsp;on&nbsp;<input data-bind="datepicker: selectedDate" class="form-control" required />
+                            <div class="form-inline">
+                                &nbsp;on&nbsp;<input data-bind="datepicker: selectedDate" class="form-control" required />
+                            </div>
                         </div>
-                        <div data-bind="if: showDays">
-                           &nbsp;on&nbsp;<select multiple class="form-control" required data-bind="select2: { placeholder: 'Choose Days', allowClear: true }, options: days, selectedOptions: selectedDays"></select>
-                        </div>
-                        <div data-bind="if: showDates">
-                           &nbsp;on&nbsp;<select multiple class="form-control" required data-bind="select2: { placeholder: 'Choose Dates', allowClear: true }, options: dates, selectedOptions: selectedDates"></select>
-                        </div>
-                        <div data-bind="if: showMonths">
-                          &nbsp;of&nbsp;<select multiple class="form-control" required data-bind="select2: { placeholder: 'Choose Months', allowClear: true }, options: months, selectedOptions: selectedMonths"></select>
-                        </div>
+                        <p>
+                            <div class="form-inline" data-bind="if: showDays">
+                                &nbsp;on&nbsp;
+                            </div>
+                            <div class="form-inline" data-bind="if: showDays">
+                                <select multiple class="form-control" required data-bind="select2: { placeholder: 'Choose Days', allowClear: true }, options: days, selectedOptions: selectedDays"></select>
+                            </div>
+                        </p>
+                        <p>
+                            <div class="form-inline" data-bind="if: showDates">
+                                &nbsp;on&nbsp;
+                            </div>
+                            <div class="form-inline" data-bind="if: showDates">
+                                <select multiple class="form-control" required data-bind="select2: { placeholder: 'Choose Dates', allowClear: true }, options: dates, selectedOptions: selectedDates"></select>
+                            </div>
+                        </p>
+                        <p>
+                            <div class="form-inline" data-bind="if: showMonths">
+                                &nbsp;of&nbsp;
+                            </div>
+                            <div class="form-inline" data-bind="if: showMonths">
+                                <select multiple class="form-control" required data-bind="select2: { placeholder: 'Choose Months', allowClear: true }, options: months, selectedOptions: selectedMonths"></select>
+                            </div>
+                        </p>
                         <div data-bind="if: showAtTime">
-                            &nbsp;at&nbsp;<select class="form-control" data-bind="options: hours, value: selectedHour"></select>
-                            <select class="form-control" data-bind="options: minutes, value: selectedMinute"></select>
-                            <select class="form-control" data-bind="value: selectedAmPm">
-                                <option>AM</option>
-                                <option>PM</option>
-                            </select>
+                            <div class="form-inline">
+                                &nbsp;at&nbsp;<select class="form-control" data-bind="options: hours, value: selectedHour"></select>
+                                <select class="form-control" data-bind="options: minutes, value: selectedMinute"></select>
+                                <select class="form-control" data-bind="value: selectedAmPm">
+                                    <option>AM</option>
+                                    <option>PM</option>
+                                </select>
+                            </div>
                         </div>
-                   </div>
-               </div>
+                    </div>
+                </div>
+
               <div class="alert alert-info">
                   Report will be run and emailed <span data-bind="text: selectedOption() != 'once' ? 'every' : ''"></span> <span data-bind="text: selectedOption"></span>
                  <span data-bind="if: selectedOption() == 'once'">
@@ -766,7 +797,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                   </span>
                   <span data-bind="if: showDates">
                      on <span class="error" data-bind="visible: selectedDates().length == 0">Please pick Date(s)</span>
-                     <span data-bind="foreach: selectedDates"><span data-bind="visible: $index()>0">, </span><span data-bind="text: $data == 1 ? '1st': ($data == 2 ? '2nd' : ($data == 3 ? '3rd' : $data+'th'))"></span></span>
+                     <span data-bind="foreach: selectedDates"><span data-bind="visible: $index()>0">, </span><span data-bind="text: $data == 1 ? '1st': ($data == 2 ? '2nd' : ($data == 3 ? '3rd' : ($data == 31 ? '31st' : $data+'th')))"></span></span>
                 </span>
                 <span data-bind="if: showMonths">
                         of <span class="error" data-bind="visible: selectedMonths().length == 0">Please pick Month(s)</span> <span data-bind="text: selectedMonths"></span>
@@ -785,9 +816,12 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                      <div class="col-sm-2">
                         <select class="form-control" data-bind="value: format">
                             <option value="EXCEL">Excel</option>
-                                <option value="CSV">CSV</option>
-                               <option value="PDF">PDF</option>
-                           </select>
+                            <option data-bind="visible: $parent.canDrilldown()" value="EXCEL-SUB">Excel (Expanded)</option>
+                            <option value="CSV">CSV</option>
+                            <option value="PDF">PDF</option>
+                            <option value="WORD">Word</option>
+                            <option value="LINK">Link</option>
+                        </select>
                       </div>
                  </div>
             </div>
@@ -822,6 +856,17 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                       </div>
                   </div>
              </div>
+            <div class="form-horizontal form-group">
+               <div class="form-group row">
+                <label class="col-sm-2 control-label">Pick Time Zone</label>
+                    <div class="col-sm-10">
+                     <select class="form-control" data-bind="options: timezonOption,
+                                                   optionsText: 'displayName',
+                                                   optionsValue: 'timeZoneId',
+                                                   value: selectedTimezone,
+                                                   select2: {allowClear: true, placeholder: 'Set a time zone to send report'}" />
+                 </div>
+            </div>
          </div>
     </div>
 </script>
@@ -833,115 +878,219 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                 <h5 class="modal-title"><span data-bind="text: fieldName"></span> - Setup Additional Field Options</h5>
             </div>
             <div class="modal-body needs-validation">
-                <div class="form-group row">
-                    <label class="col-sm-5 col-md-5 control-label">Pick Data Format</label>
-                    <div class="col-sm-7 col-md-7">
-                        <select class="form-control" required data-bind="options: $parent.fieldFormatTypes, value: fieldFormat"></select>
-                    </div>
-                </div>
-                <div class="form-group row" data-bind="visible: $parent.decimalFormatTypes.indexOf($data.fieldFormat())>=0">
-                    <label class="col-sm-5 col-md-5 control-label">Pick Decimal Places</label>
-                    <div class="col-sm-7 col-md-7">
-                        <input type="number" class="form-control" data-bind="value: decimalPlaces" placeholder="" />
-                    </div>
-                </div>
-                  <div class="form-group row" data-bind="visible: $parent.dateFormatTypes.indexOf($data.fieldFormat())>=0">
-                    <label class="col-sm-5 col-md-5 control-label">Pick Date Format</label>
-                    <div class="col-sm-7 col-md-7">
-                        <select class="form-control" required data-bind="options: $parent.dateFormats, value: dateFormat"></select>
-                    </div>
-                </div>
-                   <div class="form-group row" data-bind="visible: dateFormat()==='Custom'">
-                     <label class="col-sm-5 col-md-5 control-label">Enter Custom Date Format</label>
-                    <div class="col-sm-7 col-md-7">
-                        <input type="text" class="form-control" data-bind="value: customDateFormat" placeholder="dd/mm/yyyy" />
-                    </div>
-                 </div>
-                <div class="form-group row">
-                    <label class="col-sm-5 col-md-5 control-label">Choose Column Label</label>
-                    <div class="col-sm-7 col-md-7">
-                        <input type="text" class="form-control" required data-bind="value: fieldLabel" />
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-5 col-md-5 control-label">Choose Text Alignment</label>
-                    <div class="col-sm-7 col-md-7">
-                        <select class="form-control" required data-bind="options: $parent.fieldAlignments, value: fieldAlign"></select>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-5 col-md-5 control-label">Pick Header Text Color</label>
-                    <div class="col-sm-7 col-md-7">
-                        <input type="color" style="width: 50px" class="form-control pull-left" required data-bind="value: headerFontColor" />
-                        <input type="text" style="width: 100px" class="form-control pull-left" required data-bind="value: headerFontColor" />
-                        <button class="btn btn-sm pull-left" title="Apply to all columns" data-bind="click: function(){applyAllHeaderFontColor(!applyAllHeaderFontColor()); }">
-                            <span class="fa" data-bind="css: applyAllHeaderFontColor() ? 'fa-check' : 'fa-paste'"></span>
-                        </button>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-5 col-md-5 control-label">Pick Header Background Color</label>
-                    <div class="col-sm-7 col-md-7">
-                        <input type="color" style="width: 50px" class="form-control pull-left" required data-bind="value: headerBackColor" />
-                        <input type="text" style="width: 100px" class="form-control pull-left" required data-bind="value: headerBackColor" />
-                        <button class="btn btn-sm pull-left" title="Apply to all columns" data-bind="click: function(){applyAllHeaderBackColor(!applyAllHeaderBackColor()); }">
-                            <span class="fa" data-bind="css: applyAllHeaderBackColor() ? 'fa-check' : 'fa-paste'"></span>
-                        </button>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-5 col-md-5 control-label">Pick Text Color</label>
-                    <div class="col-sm-7 col-md-7">
-                        <input type="color" style="width: 50px" class="form-control pull-left" required data-bind="value: fontColor" />
-                        <input type="text" style="width: 100px" class="form-control pull-left" data-bind="value: fontColor" />
-                        <button class="btn btn-sm pull-left" title="Apply to all columns" data-bind="click: function(){applyAllFontColor(!applyAllFontColor()); }">
-                            <span class="fa" data-bind="css: applyAllFontColor() ? 'fa-check' : 'fa-paste'"></span>
-                        </button>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-5 col-md-5 control-label">Pick Background Color</label>
-                    <div class="col-sm-7 col-md-7">
-                        <input type="color" style="width: 50px" class="form-control pull-left" required data-bind="value: backColor" />
-                        <input type="text" style="width: 100px" class="form-control pull-left" data-bind="value: backColor" />
-                        <button class="btn btn-sm pull-left" title="Apply to all columns" data-bind="click: function(){applyAllBackColor(!applyAllBackColor()); }">
-                            <span class="fa" data-bind="css: applyAllBackColor() ? 'fa-check' : 'fa-paste'"></span>
-                        </button>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-5 col-md-5 control-label">Choose Width (leave blank for auto)</label>
-                    <div class="col-sm-7 col-md-7">
-                        <input type="text" class="form-control" required data-bind="value: fieldWidth" />
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-sm-12">
-                        <div class="checkbox pull-left" style="padding-top: 5px;">
-                            <label>
-                                <input type="checkbox" data-bind="checked: headerFontBold" />
-                                Make Header Text Bold
-                            </label>
+                 <div class="card card-body">
+                     <b>Column Format Settings</b>
+                    <div class="form-group row">
+                        <label class="col-sm-5 col-md-5 control-label">Pick Data Format</label>
+                        <div class="col-sm-7 col-md-7">
+                            <select class="form-control" data-bind="options: $parents[1].fieldFormatTypes, value: fieldFormat"></select>
                         </div>
-                        <button class="btn btn-sm pull-left" title="Apply to all columns" data-bind="click: function(){applyAllHeaderBold(!applyAllHeaderBold()); }">
-                            <span class="fa" data-bind="css: applyAllHeaderBold() ? 'fa-check' : 'fa-paste'"></span>
-                        </button>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-sm-12">
-                        <div class="checkbox pull-left" style="padding-top: 5px;">
-                            <label>
-                                <input type="checkbox" data-bind="checked: fontBold" />
-                                Make Text Bold
-                            </label>
+                    <div class="form-group row" data-bind="visible: $parents[1].decimalFormatTypes.indexOf($data.fieldFormat())>=0">
+                        <label class="col-sm-5 col-md-5 control-label">Pick Decimal Places</label>
+                        <div class="col-sm-7 col-md-7">
+                            <input type="number" class="form-control" data-bind="value: decimalPlaces" placeholder="" />
                         </div>
-                        <button class="btn btn-sm pull-left" title="Apply to all columns" data-bind="click: function(){applyAllBold(!applyAllBold()); }">
-                            <span class="fa" data-bind="css: applyAllBold() ? 'fa-check' : 'fa-paste'"></span>
-                        </button>
+                    </div>
+                     <div class="form-group row" data-bind="visible: fieldFormat()=='Currency'">
+                        <label class="col-sm-5 col-md-5 control-label">Pick Currency Format</label>
+                        <div class="col-sm-7 col-md-7">
+                            <select class="form-control" required data-bind="options: $parents[1].currencyFormats, optionsText: 'display',optionsValue: 'value', value: currencyFormat"></select>
+                        </div>
+                    </div>
+                      <div class="form-group row" data-bind="visible: fieldFormat()=='Date'">
+                        <label class="col-sm-5 col-md-5 control-label">Pick Date Format</label>
+                        <div class="col-sm-7 col-md-7">
+                            <select class="form-control" data-bind="options: $parents[1].dateFormats, value: dateFormat"></select>
+                        </div>
+                    </div>
+                       <div class="form-group row" data-bind="visible: dateFormat()==='Custom'">
+                         <label class="col-sm-5 col-md-5 control-label">Enter Custom Date Format</label>
+                        <div class="col-sm-7 col-md-7">
+                            <input type="text" class="form-control" data-bind="value: customDateFormat" placeholder="dd/mm/yyyy" />
+                        </div>
+                     </div>
+                    <div class="form-group row">
+                        <label class="col-sm-5 col-md-5 control-label">Choose Column Label</label>
+                        <div class="col-sm-7 col-md-7">
+                            <input type="text" class="form-control" data-bind="value: fieldLabel" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-5 col-md-5 control-label">Inner Column Label</label>
+                        <div class="col-sm-7 col-md-7">
+                            <input type="text" class="form-control" data-bind="value: fieldLabel2" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-5 col-md-5 control-label">Choose Text Alignment</label>
+                        <div class="col-sm-7 col-md-7">
+                            <select class="form-control" data-bind="options: $parents[1].fieldAlignments, value: fieldAlign"></select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-5 col-md-5 control-label">Choose Width (leave blank for auto)</label>
+                        <div class="col-sm-7 col-md-7">
+                            <input type="text" class="form-control" data-bind="value: fieldWidth" />
+                        </div>
                     </div>
                 </div>
-                <div class="form-group row" data-bind="if: $parent.useStoredProc() || $parent.ReportType() == 'List'">
+                <br />
+                <div class="card card-body">
+                    <div class="form-row align-items-center">
+                        <div class="col-auto">
+                            <b>Header Settings</b>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label class="control-label">Pick Text Color</label>
+                                <div>
+                                    <input type="color" style="width: 50px" class="form-control pull-left" data-bind="value: headerFontColor" />
+                                    <input type="text" style="width: 100px" class="form-control pull-left" data-bind="value: headerFontColor" />
+                                    <button class="btn btn-sm pull-left" title="Apply to all columns" data-bind="click: function(){applyAllHeaderFontColor(!applyAllHeaderFontColor()); }">
+                                        <span class="fa" data-bind="css: applyAllHeaderFontColor() ? 'fa-check' : 'fa-paste'"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label class="control-label">Pick Background Color</label>
+                                <div>
+                                    <input type="color" style="width: 50px" class="form-control pull-left" data-bind="value: headerBackColor" />
+                                    <input type="text" style="width: 100px" class="form-control pull-left" data-bind="value: headerBackColor" />
+                                    <button class="btn btn-sm pull-left" title="Apply to all columns" data-bind="click: function(){applyAllHeaderBackColor(!applyAllHeaderBackColor()); }">
+                                        <span class="fa" data-bind="css: applyAllHeaderBackColor() ? 'fa-check' : 'fa-paste'"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col d-flex align-items-center">
+                            <div class="form-group d-flex align-items-center">
+                                <div class="checkbox" style="padding-top: 5px; margin-right: 10px;">
+                                    <label>
+                                        <input type="checkbox" data-bind="checked: headerFontBold" /> Bold Text
+                                    </label>
+                                </div>
+                                <button class="btn btn-sm" title="Apply to all columns" data-bind="click: function(){applyAllHeaderBold(!applyAllHeaderBold()); }">
+                                    <span class="fa" data-bind="css: applyAllHeaderBold() ? 'fa-check' : 'fa-paste'"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="card card-body">
+                    <div class="form-row align-items-center">
+                        <div class="col-auto">
+                            <b>Text Settings</b>
+                        </div>
+                    </div>
+                     <div class="form-row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label class="control-label">Pick Text Color</label>
+                                <div>
+                                    <input type="color" style="width: 50px" class="form-control pull-left" data-bind="value: fontColor" />
+                                    <input type="text" style="width: 100px" class="form-control pull-left" data-bind="value: fontColor" />
+                                    <button class="btn btn-sm pull-left" title="Apply to all columns" data-bind="click: function(){applyAllFontColor(!applyAllFontColor()); }">
+                                        <span class="fa" data-bind="css: applyAllFontColor() ? 'fa-check' : 'fa-paste'"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label class="control-label">Pick Background Color</label>
+                                <div>
+                                    <input type="color" style="width: 50px" class="form-control pull-left" data-bind="value: backColor" />
+                                    <input type="text" style="width: 100px" class="form-control pull-left" data-bind="value: backColor" />
+                                    <button class="btn btn-sm pull-left" title="Apply to all columns" data-bind="click: function(){applyAllBackColor(!applyAllBackColor()); }">
+                                        <span class="fa" data-bind="css: applyAllBackColor() ? 'fa-check' : 'fa-paste'"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col d-flex align-items-center">
+                            <div class="form-group d-flex align-items-center">
+                                <div class="checkbox" style="padding-top: 5px; margin-right: 10px;">
+                                    <label>
+                                        <input type="checkbox" data-bind="checked: fontBold" /> Bold Text
+                                    </label>
+                                </div>
+                                <button class="btn btn-sm" title="Apply to all columns" data-bind="click: function(){applyAllBold(!applyAllBold()); }">
+                                    <span class="fa" data-bind="css: applyAllBold() ? 'fa-check' : 'fa-paste'"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="padded-div">
+                    <button class="btn btn-sm btn-primary" data-bind="click: function() {addConditionalFormatSetting(null)}">Add Conditional Formatting</button>
+                </div>
+                <div data-bind="foreach: fieldCondtionalFormats" style="padding-left: 40px;">
+                    <div class="card card-body">
+                        <div class="row m-2">
+                            <div class="col d-flex justify-content-start">
+                                <b>Conditional Format #<span data-bind="text: $index()+1"></span></b>
+                            </div>
+                            <div class="col d-flex justify-content-end">
+                                <button class="btn btn-sm btn-secondary" data-bind="click: $parent.removeSetting">Remove</button>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="control-label">Pick Text Color</label>
+                                    <div>
+                                        <input type="color" style="width: 50px" class="form-control pull-left" data-bind="value: fontColor" />
+                                        <input type="text" style="width: 100px" class="form-control pull-left" data-bind="value: fontColor" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="control-label">Pick Background Color</label>
+                                    <div>
+                                        <input type="color" style="width: 50px" class="form-control pull-left" data-bind="value: backColor" />
+                                        <input type="text" style="width: 100px" class="form-control pull-left" data-bind="value: backColor" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col d-flex align-items-center">
+                                <div class="form-group d-flex align-items-center">
+                                    <div class="checkbox" style="padding-top: 5px; margin-right: 10px;">
+                                        <label>
+                                            <input type="checkbox" data-bind="checked: fontBold" /> Bold Text
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row m-2" data-bind="foreach: filter.Filters">
+                            <div class="col-md-2">
+                                 Value
+                            </div>
+                            <div class="col-md-4">
+                                <div data-bind="with: Field">
+                                    <div class="form-group">
+                                        <select class="form-control" style="width: 100%;" data-bind="options: fieldFilter, value: $parent.Operator" required></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div data-bind="with: Field">
+                                    <div data-bind="template: 'report-filter', data: $data"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="form-group row" data-bind="if: $parents[1].useStoredProc()">
                     <div class="col-sm-12">
                         <div class="checkbox pull-left" style="padding-top: 5px;">
                             <label>
@@ -1030,9 +1179,9 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                 <h5 class="modal-title" id="myModalLabel">
                     <a title="Need help setting up a report?" target="_blank" href="https://dotnetreport.com/blogs/docs/designing-reports">
                         <span class="fa fa-question-circle"></span>
-                    </a>Design your Report
+                    </a> Design your Report
                 </h5>
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body needs-validation">
                 <div class="card card-body">
@@ -1060,6 +1209,12 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                             <div class="button-box" tabindex="0" data-bind="click: function(){ setReportType('Pie'); }, css: {active: ReportType()=='Pie'}">
                                 <span class="fa fa-2x fa-pie-chart"></span>
                                 <p>Pie</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-xs-6" style="display: none;">
+                            <div class="button-box" tabindex="0" data-bind="click: function(){ setReportType('Treemap'); }, css: {active: ReportType()=='Treemap'}">
+                                <span class="fa fa-2x fa-window-restore"></span>
+                                <p>Treemap</p>
                             </div>
                         </div>
                     </div>
@@ -1092,20 +1247,30 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                 </div>
                 <br />
                 <div class="card card-body">
-                    <h5 class="pull-left"><span class="fa fa-database"></span>&nbsp;Choose Data for Report</h5>
-                    <div class="pull-right" role="group" data-bind="if: ReportID() <= 0">
-                        <label class="btn btn-sm btn-primary active" style="margin-right: 0px;" title="You can change the Data source only when creating a new report, changing this will clear all selections">
-                            <input type="radio" name="dataoption" id="table" checked data-bind="checked: useStoredProc, checkedValue: false"> Dynamic
-                        </label>
-                        <label class="btn btn-sm btn-primary">
-                            <input type="radio" name="dataoption" id="proc" value="1" data-bind="checked: useStoredProc, checkedValue: true"> Predefined
-                        </label>
+                    <h5><span class="fa fa-database"></span>&nbsp;Choose Data for Report</h5>
+                    <div>
+                        <div class="pull-left" role="group" data-bind="if: ReportID() <= 0">
+                            <label class="btn btn-sm btn-primary active" style="margin-right: 0px;" title="You can change the Data source only when creating a new report, changing this will clear all selections">
+                                <input type="radio" name="dataoption" id="table" checked data-bind="checked: useStoredProc, checkedValue: false"> Dynamic
+                            </label>
+                            <label class="btn btn-sm btn-primary">
+                                <input type="radio" name="dataoption" id="proc" value="1" data-bind="checked: useStoredProc, checkedValue: true"> Predefined
+                            </label>
+                        </div>
+                        <div class="pull-right">
+                            <a href="#" class="btn btn-sm" title="Add Custom Field using Formula" data-bind="hidden: isFunctionField() || useStoredProc(), click: function(){isFormulaField(!isFormulaField())}, text: isFormulaField()? 'Cancel': 'Custom Field', css: {'btn-primary': !isFormulaField(), 'btn-danger': isFormulaField}"></a>
+                            <a href="#" class="btn btn-sm" title="Add Custom Field using Function" data-bind="hidden: true || isFormulaField() || useStoredProc(), click: function(){designFunctionField()}, text: isFunctionField()? 'Cancel': 'Function Field', css: {'btn-primary': !isFunctionField(), 'btn-danger': isFunctionField}"></a>
+                        </div>
                     </div>
                     <div class="clearfix"></div>
                     <div class="row">
                         <div class="col-md-6">
-                            <select class="form-control" data-bind="options: Procs, optionsCaption: 'Choose Section...', optionsText: 'DisplayName', value: SelectedProc, disable: isFormulaField, visible: useStoredProc"></select>
-                            <select class="form-control" data-bind="options: Tables, optionsCaption: 'Choose Section...', optionsText: 'tableName', value: SelectedTable, disable: isFormulaField, hidden: useStoredProc"></select>
+                            <div data-bind="visible: useStoredProc">
+                            <select class="form-control" data-bind="select2Value: {}, options: Procs, optionsCaption: 'Choose Section...', optionsText: 'DisplayName', value: SelectedProc, visible: useStoredProc"></select>
+                            </div>
+                            <div data-bind="hidden: useStoredProc">
+                            <select class="form-control" data-bind="select2Value: {}, options: Tables, optionsCaption: 'Choose Section...', optionsText: 'tableName', value: SelectedTable, hidden: useStoredProc"></select>
+                            </div>
                         </div>
 
                         <div class="col-md-6" data-bind="disable: isFormulaField, hidden: useStoredProc">
@@ -1119,14 +1284,13 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                                 Check the fields you would like to use in the Report
                             </div>
                             <div class="pull-right btn-toolbar">
-                                <a href="#" class="btn btn-sm" title="Custom Field using Formula" data-bind="click: function(){isFormulaField(!isFormulaField())}, text: isFormulaField()? 'Cancel': 'Customize', css: {'btn-primary': !isFormulaField(), 'btn-danger': isFormulaField}"></a>
 
                                 <a href="#" class="btn btn-secondary btn-sm" data-bind="click: MoveAllFields, visible: !isFormulaField()">Select all</a>
                                 <a href="#" class="btn btn-secondary btn-sm" data-bind="click: RemoveSelectedFields, visible: !isFormulaField()">Remove all</a>
                             </div>
                         </div>
                         <div class="row container-fluid" data-bind="foreach: ChooseFields">
-                            <div class="col-md-3 col-sm-4 col-xs-6">
+                            <div class="col-md-3 col-sm-4 col-xs-6 list-group">
                                 <div class="list-group-item">
                                     <div class="checkbox">
                                         <label>
@@ -1139,6 +1303,94 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                         </div>
                     </div>
 
+                    <div data-bind="if: isFunctionField" class="custom-field-design">
+                        <br />
+                        <br />
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 pull-right">
+                                        <a href="#" class="btn btn-primary btn-sm" title="Save Custom Function Field" data-bind="click: saveFunctionField, visible: isFunctionField">Save</a>
+                                        <a href="#" class="btn btn-sm" title="Custom Field using Function" data-bind="click: function(){isFunctionField(!isFunctionField())}, text: isFunctionField()? 'Cancel': 'Function', css: {'btn-primary': !isFunctionField(), 'btn-danger': isFunctionField}"></a>
+
+                                    </div>
+                                    <div class="col-md-12 padded-div" data-bind="visible: ChooseFields().length>0 && isFunctionField()">
+                                        <div class="alert alert-info">
+                                            You are now creating a Customized Field using Functions available.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-sm-2 control-label">Field Label</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control form-control-sm" data-bind="value: formulaFieldLabel" required placeholder="Custom Field Label" />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 control-label">Data Format</label>
+                                    <div class="col-sm-10">
+                                        <select class="form-control form-control-sm" data-bind="value: formulaDataFormat" required>
+                                            <option>String</option>
+                                            <option>Integer</option>
+                                            <option>Decimal</option>
+                                            <option>Currency</option>
+                                            <option>Date</option>
+                                            <option value="DateTime">Date and Time</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row" data-bind="visible: formulaDataFormat() == 'Decimal' || formulaDataFormat() == 'Currency'">
+                                    <label class="col-sm-2 control-label">Round to Decimal Places</label>
+                                    <div class="col-sm-10">
+                                        <input type="number" class="form-control" data-bind="value: formulaDecimalPlaces" placeholder="Choose Decimal places (leave blank to not use rounding)" title="Choose Decimal places (leave blank to not use rounding)" />
+                                    </div>
+                                </div>
+
+                                <div data-bind="visible: !simpleFunction()">
+                                    Define your Function:
+                                    <textarea id="function-code"></textarea>
+                                </div>
+
+                                <div data-bind="visible: simpleFunction()">
+                                <div class="form-group row">
+                                    <label class="col-sm-2 control-label">Select Function</label>
+                                    <div class="col-sm-10" >
+                                        <div data-bind="with: textQuery.searchFunctions">
+                                            <select id="search-function" class="form-control" data-bind="select2: {placeholder: 'Search for a Function...', ajax: { url: url, dataType: 'json', data: query, processResults: processResults, headers: headers}, templateResult: templateResult, minimumInputLength: 2, allowClear: true }, select2Value: selectedOption"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div data-bind="with: selectedFunction">
+                                    <div class="form-group row" >
+                                        <label class="col-sm-2 control-label"></label>
+                                        <div class="col-sm-10" >
+                                            <p data-bind="text: description"></p>
+                                            <p>
+                                                <b>Pick values to pass for Parameters below</b>
+                                            </p>
+                                            <!-- ko foreach: parameters -->
+                                            <div class="form-group row" >
+                                                <label class="col-sm-6 control-label">
+                                                    <span data-bind="text: DisplayName"></span><span data-bind="visble: Required"> (Required)</span><br />
+                                                    <span data-bind="text: Description"></span>
+
+                                                </label>
+                                                <div class="col-sm-6" >
+                                                    <select class="form-control" data-bind="required: Required, options: $parentContext.$parent.ChooseFields, optionsText: 'fieldName', value: selectedField, optionsCaption: 'Pick a field...'"></select>
+                                                </div>
+                                            </div>
+                                            <!-- /ko -->
+                                        </div>
+                                    </div>
+
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+
                     <div data-bind="if: lastPickedField() && lastPickedField().fieldType == 'Json'">
                         <br />
                         <div class="card">
@@ -1147,7 +1399,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                             </div>
                             <div class="card-body">
                                 <div class="row container-fluid" data-bind="foreach: jsonFields">
-                                    <div class="col-md-3 col-sm-4 col-xs-6">
+                                    <div class="col-md-3 col-sm-4 col-xs-6 list-group">
                                         <div class="list-group-item">
                                             <div class="checkbox">
                                                 <label>
@@ -1162,7 +1414,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                         </div>
                     </div>
 
-                    <div data-bind="if: isFormulaField" id="custom-field-design">
+                    <div data-bind="if: isFormulaField" class="custom-field-design">
                         <br />
                         <br />
                         <div class="card">
@@ -1186,6 +1438,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                                     </div>
                                     <div class="col-sm-6 right-align">
                                         <a href="#" class="btn btn-secondary btn-sm" data-bind="click: addFormulaParentheses">Add ( )</a>
+                                        <a href="#" class="btn btn-secondary btn-sm" title="Add Today" data-bind="visible: formulaOnlyHasDateFields() || formulaFields().length == 0, click: addFormulaDateToday">Add Today</a>
                                         <a href="#" class="btn btn-secondary btn-sm" title="Add a Constant Value" data-bind="click: addFormulaConstantValue">Add Value</a>
                                         <a href="#" class="btn btn-secondary btn-sm" data-bind="click: clearFormulaField">Clear</a>
                                     </div>
@@ -1234,12 +1487,16 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                                     <div class="col-sm-10">
                                         <div data-bind="foreach: formulaFields">
                                             <h3 class="pull-left" data-bind="visible: setupFormula.isParenthesesStart" style="margin-top: 0;">(</h3>
-                                            <div data-bind="if: !setupFormula.isParenthesesStart() && !setupFormula.isParenthesesEnd()">
-                                                <div class="list-group-item pull-left" style="margin-left: 15px; padding: 5px 15px">
+                                            <div data-bind="if: !setupFormula.isParenthesesStart() && !setupFormula.isParenthesesEnd()" class="list-group">
+                                                <div class="list-group-item pull-left formula-field-item" style="margin-left: 15px; padding: 5px 15px">
                                                     <span data-bind="text: fieldName, visible: !setupFormula.isConstantValue()"></span>
                                                     <div data-bind="if: setupFormula.isConstantValue">
-                                                        <input data-bind="value: setupFormula.constantValue" class="form-control form-control-sm" required />
+                                                        <input data-bind="value: setupFormula.constantValue, visible: setupFormula.constantValue()!='|Today|'" class="form-control form-control-sm" required />
+                                                        <span data-bind="visible: setupFormula.constantValue() == '|Today|'"><b>Today</b></span>
                                                     </div>
+                                                    <button class="btn btn-danger btn-sm delete-btn" data-bind="click: $parent.removeField">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
                                                 </div>
                                             </div>
                                             <h3 class="pull-left" data-bind="visible: setupFormula.isParenthesesEnd" style="margin-top: 0;">)</h3>
@@ -1285,6 +1542,9 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                                     </div>
                                 </div>
                             </div>
+                            <div class="alert alert-info" data-bind="visible: ReportType()=='Treemap'">
+                                <span class="fa fa-lightbulb-o fa-2x"></span>&nbsp;For Treemap, the data must be in a hierarchical format with 2nd column having parent and third column having a numeric value. The data must have a single root node having null as its parent as well.
+                            </div>
                             <div class="alert alert-info" data-bind="visible: ReportType()=='Line'">
                                 <span class="fa fa-lightbulb-o fa-2x"></span>&nbsp;For Line Graph, the first field below will show on the x-axis and it needs to be numeric.
                             </div>
@@ -1309,7 +1569,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                                             <span class="fa fa-columns"></span>
                                             <span data-bind="text: selectedFieldName"></span>
                                             <span data-bind="text: isFormulaField() ? '(' + fieldFormat() + ')' : ''"></span>
-                                            <span data-bind="visible: !$parent.isFieldValidForYAxis($index(), fieldType, selectedAggregate())">
+                                            <span data-bind="visible: !$parent.isFieldValidForYAxis($index(), fieldType, selectedAggregate()) && $parent.ReportType() !='Treemap'">
                                                 <span class="badge badge-danger" data-bind="visible: !groupInGraph()">Will not show in <span data-bind="text: $parent.ReportType"></span>Chart</span>
                                             </span>
                                         </div>
@@ -1505,6 +1765,17 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                                     <input type="number" style="width: 150px;" class="form-control" required placeholder="Only top n..." data-bind="value: OnlyTop, visible: maxRecords">
                                 </div>
                             </div>
+                            <div class="form-group row">
+                                <div class="checkbox col-md-4">
+                                   <label>
+                                        <input type="checkbox" data-bind="checked: changePageSize" />
+                                        Change Page Size
+                                    </label>
+                                </div>
+                                <div class="col-md-6" data-bind="visible: changePageSize">
+                                    <select style="width: 150px;" class="form-control" data-bind="options: [10,30,50,100,150,200,500], value: DefaultPageSize"></select>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <h5><span class="fa fa-paint-brush"></span>&nbsp;Pick Report Format</h5>
@@ -1542,7 +1813,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
         <div class="modal-content" data-bind="with: ChartDrillDownData">
             <div class="modal-header">
                 <h4 class="modal-title">Drilldown Data</h4>
-                <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close pull-right" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <!-- ko if: DrillDownData -->
             <div class="modal-body">
@@ -1551,8 +1822,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                         <tr class="no-highlight">
                             <!-- ko foreach: Columns -->
                             <th data-bind="attr: { id: fieldId }, css: {'right-align': IsNumeric}, style: {'width': fieldWidth, 'background-color': headerBackColor }, hidden: outerGroup" style="border-right: 1px solid;">
-                                <span data-bind="text: fieldLabel() ? fieldLabel() : fieldName, style: {'color': headerFontColor, 'font-weight': headerFontBold() ? 'bold' : 'normal'}"></span>
-                               
+                                <span data-bind="text: fieldLabel2() ? fieldLabel2() : (fieldLabel() ? fieldLabel() : fieldName), style: {'color': headerFontColor, 'font-weight': headerFontBold() ? 'bold' : 'normal'}"></span>
                             </th>
                             <!-- /ko -->
                         </tr>
@@ -1577,7 +1847,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                                 </div>
                             </td>
                             <!-- /ko-->
-                        </tr> 
+                        </tr>
                         <!-- /ko -->
                     </tbody>
                 </table>
@@ -1606,7 +1876,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 <h4 class="modal-title">Account not Setup</h4>
             </div>
             <div class="modal-body">
@@ -1615,7 +1885,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                 <p>Please view the <a href="https://dotnetreport.com/blogs/getting-started-with-dotnet-report/" target="_blank">Getting Started Guide</a> to correctly configure dotnet Report.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
