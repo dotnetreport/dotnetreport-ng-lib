@@ -476,7 +476,7 @@
                                 </div>
                             </div>
                             <br />
-                            <span>Report ran on: @DateTime.Now.ToShortDateString() @DateTime.Now.ToShortTimeString()</span>
+                            <span>Report ran on: <script>document.write(new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString());</script></span>
                         </div>
                     </div>
                     <div data-bind="if: HasError">
