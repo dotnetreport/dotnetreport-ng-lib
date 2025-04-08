@@ -1,9 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../out-tsc/lib",
     "target": "ES2022",
-    "module": "ES2022",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -14,13 +12,8 @@
   },
   "angularCompilerOptions": {
     "enableIvy": true,
-    "compilationMode": "partial",
-    "generateNgFactoryShims": true,
-    "generateNgSummaryShims": true
+    "compilationMode": "partial"
   },
-  "files": [
-    "src/typings.d.ts"
-  ],
   "exclude": [
     "src/test.ts",
     "**/*.spec.ts"
