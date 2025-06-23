@@ -204,13 +204,13 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
         <!-- /ko -->
         <!-- ko if: hasForeignKey && $parent.Operator() != 'all' -->
         <!-- ko if: hasForeignParentKey && $parent.showParentFilter() -->
-        <select multiple class="form-control" data-bind="select2: { dropdownParent: $parent.inModal ? '#filter-'+uiId : '', placeholder: 'Please Choose', allowClear: true }, options: $parent.ParentList, optionsText: 'text', optionsValue: $parent.IsConditionalFilter ? 'text': 'id', selectedOptions: $parent.ParentIn"></select>
+        <select multiple class="form-control" data-bind="select2: { dropdownParent: '#filter-'+uiId, placeholder: 'Please Choose', allowClear: true }, options: $parent.ParentList, optionsText: 'text', optionsValue: $parent.IsConditionalFilter ? 'text': 'id', selectedOptions: $parent.ParentIn"></select>
         <!-- /ko -->
         <!-- ko if: $parent.Operator()=='='-->
-        <select required class="form-control" data-bind="select2: { dropdownParent: $parent.inModal ? '#filter-'+uiId : '', placeholder: 'Please Choose', allowClear: true }, options: $parent.LookupList, optionsText: 'text', optionsValue:   $parent.IsConditionalFilter ? 'text': 'id', value: $parent.Value, optionsCaption: 'Please Choose'"></select>
+        <select required class="form-control" data-bind="select2: { dropdownParent: '#filter-'+uiId, placeholder: 'Please Choose', allowClear: true }, options: $parent.LookupList, optionsText: 'text', optionsValue:   $parent.IsConditionalFilter ? 'text': 'id', value: $parent.Value, optionsCaption: 'Please Choose'"></select>
         <!-- /ko -->
         <!-- ko if: $parent.Operator()=='in' || $parent.Operator()=='not in'-->
-        <select required multiple class="form-control" data-bind="select2: { dropdownParent: $parent.inModal ? '#filter-'+uiId : '', placeholder: 'Please Choose', allowClear: true }, options: $parent.LookupList, optionsText: 'text', optionsValue: $parent.IsConditionalFilter ? 'text': 'id', selectedOptions: $parent.ValueIn"></select>
+        <select required multiple class="form-control" data-bind="select2: { dropdownParent: '#filter-'+uiId, placeholder: 'Please Choose', allowClear: true }, options: $parent.LookupList, optionsText: 'text', optionsValue: $parent.IsConditionalFilter ? 'text': 'id', selectedOptions: $parent.ValueIn"></select>
         <!-- /ko -->
         <!-- /ko -->
     </div>
@@ -241,7 +241,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 
 <script type="text/html" id="report-column-header">
     <!-- ko foreach: Columns -->
-    <th data-bind="attr: { id: !IsPivotField ? fieldId : 'pivot--' + fieldName }, style: {'text-align': fieldAlign ? fieldAlign : (IsNumeric ? 'right' : 'left'), 'background-color': headerBackColor }, hidden: outerGroup" style="border-right: 1px solid;">
+    <th data-bind="attr: { id: !IsPivotField ? fieldId : 'pivot--' + fieldName }, style: {'text-align': fieldAlign() ? fieldAlign() : (IsNumeric ? 'right' : 'left'), 'background-color': headerBackColor }, hidden: outerGroup" style="border-right: 1px solid;">
 
         <div class="pull-left" data-bind="if: !$parent.IsDrillDown()" style="padding-right: 5px;">
             <div class="dropup">
@@ -303,7 +303,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 
 <script type="text/html" id="report-column">
     <!-- ko foreach: Items -->
-    <td data-bind="hidden: outerGroup, style: {'background-color': _backColor ?? backColor(), 'color': _fontColor ?? fontColor(), 'font-weight': fontBold() || _fontBold ? 'bold' : 'normal', 'text-align': fieldAlign ? fieldAlign : (Column.IsNumeric ? 'right' : 'left')}">
+    <td data-bind="hidden: outerGroup, style: {'background-color': _backColor ?? backColor(), 'color': _fontColor ?? fontColor(), 'font-weight': fontBold() || _fontBold ? 'bold' : 'normal', 'text-align': fieldAlign() ? fieldAlign() : (Column.IsNumeric ? 'right' : 'left')}">
         <div data-bind="style: {'width': fieldWidth }">
             <!-- ko if: LinkTo-->
             <a data-bind="attr: {href: LinkTo}" target="_blank"><span data-bind="html: formattedVal"></span></a>
@@ -353,7 +353,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
         <table class="table table-hover table-condensed" data-bind="attr: {class: 'table table-striped table-hover table-condensed ' + $parents[2].selectedStyle()}">
             <thead style="position: sticky; top: -1px; z-index: 2;" data-bind="if: !$parents[2].noHeaderRow()">
                 <tr class="no-highlight" data-bind="sortableColumns: { handle: '.sortable', cursor: 'move', placeholder: 'drop-highlight',selectedFields: $parents[2].SelectedFields }">
-                    <!-- ko if: $parentContext.$parentContext.$parent.canDrilldown() && !IsDrillDown() && !CanExpandOption() && !$parents[2].hasPivotColumn() -->
+                    <!-- ko if: $parentContext.$parentContext.$parent.canDrilldown() && !IsDrillDown() && !CanExpandOption() && (!$parents[2].hasPivotColumn() || ($parents[2].hasPivotColumn() && $parents[2].appSettings.useAltPivot)) -->
                     <th style="width: 30px; border-left: 1px solid;"></th>
                     <!-- /ko -->
                     <!-- ko template: 'report-column-header', data: $data -->
@@ -362,12 +362,12 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
             </thead>
             <tbody data-bind="attr: {id: 'report-table-body' + $parents[2].ReportID()}">
                 <tr style="display: none;" data-bind="visible: Rows.length < 1">
-                    <td class="text-info" data-bind="attr:{colspan: Columns.length}">
+                    <td data-bind="attr:{colspan: Columns.length + 1}">
                         No records found
                     </td>
                 </tr>
 
-                <!-- ko if: !$parents[2].hasPivotColumn() && (!$parents[2].ShowExpandOption() || $parents[2].ReportType() == 'List') -->
+                <!-- ko if: !$parents[2].useRenderTable() -->
                 <!-- ko foreach: $parent.rows  -->
                 <tr>
                     <!-- ko if: $parentContext.$parentContext.$parentContext.$parent.canDrilldown() && !$parent.IsDrillDown() && !$parent.CanExpandOption() && $parentContext.$parentContext.$parentContext.$parent.ReportType() != 'Single' -->
@@ -393,7 +393,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                             </thead>
                             <tbody>
                                 <tr style="display: none;" data-bind="visible: Rows && Rows.length < 1">
-                                    <td class="text-info" data-bind="attr:{colspan: Columns.length}">
+                                    <td data-bind="attr: {colspan: Columns.length}">
                                         No records found
                                     </td>
                                 </tr>
@@ -428,13 +428,15 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
             <!-- ko if: $parentContext.$parent.SubTotals().length == 1 && $parentContext.$parentContext.$parent.OuterGroupColumns().length == 0 -->
             <tfoot data-bind="foreach: $parentContext.$parent.SubTotals">
                 <tr class="sub-total">
-                    <!-- ko if: $parentContext.$parentContext.$parentContext.$parent.canDrilldown() && !$parent.IsDrillDown() -->
+                    <!-- ko if: $parentContext.$parentContext.$parentContext.$parent.canDrilldown() && !$parent.IsDrillDown() && !$parent.CanExpandOption() -->
                     <td></td>
                     <!-- /ko -->
                     <!-- ko foreach: Items -->
                     <!-- ko if: Value != 'NA' && Value != 'NaN' && !outerGroup() -->
-                    <td data-bind="style: {'background-color': backColor, 'color': fontColor, 'font-weight': fontBold() ? 'bold' : 'normal', 'text-align': $parents[4].pager && $parents[4].ReportType()=='Single' ? 'center' : (fieldAlign ? fieldAlign : (Column.IsNumeric ? 'right' : 'left')), 'font-size':$parents[4].pager && $parents[4].ReportType()=='Single' ? '48px' : ''}">
-                        <span data-bind="html: formattedVal, css: {'right-align': true}"></span>
+                    <td data-bind="style: {'background-color': _backColor ?? backColor(), 'color': _fontColor ?? fontColor(), 'font-weight': fontBold() || _fontBold ? 'bold' : 'normal', 'text-align': fieldAlign() ? fieldAlign() : 'right'}">
+                        <div data-bind="style: {'width': fieldWidth }">
+                        <span data-bind="html: formattedVal"></span>
+                        </div>
                     </td>
                     <!-- /ko -->
                     <!-- /ko -->
@@ -990,14 +992,14 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                             <select class="form-select" data-bind="options: $parents[1].dateFormats, value: dateFormat"></select>
                         </div>
                     </div>
-                    <div class="form-group row" data-bind="visible: fieldFormat()=='Date'">
-                        <label class="col-sm-5 col-md-5 control-label">Drilldown Date Format</label>
+                    <div class="form-group row" data-bind="visible:selectedAggregate()=='Pivot' && fieldFormat()=='Date'">
+                        <label class="col-sm-5 col-md-5 control-label">Pivot Drilldown Date Format</label>
                         <div class="col-sm-7 col-md-7">
                             <select class="form-select" data-bind="options: ['', 'Day', 'Month', 'Year', 'Month/Year'], value: drillDataFormat"></select>
                         </div>
                     </div>
 
-                    <div class="form-group row" data-bind="visible: dateFormat()==='Custom'">
+                    <div class="form-group row" data-bind="visible: fieldFormat()=='Date' && dateFormat()==='Custom'">
                         <label class="col-sm-5 col-md-5 control-label">Enter Custom Date Format</label>
                         <div class="col-sm-7 col-md-7">
                             <input type="text" class="form-control" data-bind="value: customDateFormat" placeholder="dd/mm/yyyy" />
@@ -1263,7 +1265,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 </script>
 
 <script type="text/html" id="report-designer">
-    <div class="modal-dialog modal-dialog-scrollable" style="height: 100vh;">
+    <div class="modal-dialog modal-dialog-scrollable" style="height: 100vh;" id="report-designer-modal">
         <div class="modal-content" style="display: flex; flex-direction: column; height: 100%;">
 
             <div class="modal-header">
@@ -1616,19 +1618,22 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                                         <label class="form-label">Select the Data Field to use:</label>
                                                         <select class="form-select"
                                                                 data-bind="select2: {
-                                                dropdownParent: $('#choose-data-card'),
-                                                placeholder: 'Select Field...',
-                                                ajax: {
-                                                    url: $parent.textQuery.searchFields.url,
-                                                    dataType: 'json',
-                                                    data: $parent.textQuery.searchFields.query,
-                                                    processResults: $parent.textQuery.searchFields.processResults,
-                                                    headers: $parent.textQuery.searchFields.headers
-                                                },
-                                                minimumInputLength: 2,
-                                                allowClear: true
-                                            }, select2Text: selectedField"></select>
-                                            </div>
+                                                                    dropdownParent: $('#choose-data-card'),
+                                                                    placeholder: 'Search Field...',
+                                                                    ajax: {
+                                                                        url: $parent.textQuery.searchFields.url,
+                                                                        dataType: 'json',
+                                                                        data: $parent.textQuery.searchFields.query,
+                                                                        processResults: $parent.textQuery.searchFields.processResults,
+                                                                        headers: $parent.textQuery.searchFields.headers
+                                                                    },
+                                                                    minimumInputLength: 2,
+                                                                    allowClear: true
+                                                                }, select2Text: selectedField,select2TableId:selectedFieldTableId"></select>
+                                                        <div data-bind="with: selectedField" class="small">
+                                                             Selected: <span class="highlight" data-bind="text: $data"></span>
+                                                        </div>
+                                                    </div>
 
                                                     <div class="mb-3" data-bind="if: requiresValue">
                                                         <label for="inputValue" class="form-label">Provide the relevant value to use:</label>
@@ -1795,6 +1800,12 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                                 <span data-bind="visible: !$parent.isFieldValidForYAxis($index(), fieldType || fieldFormat(), selectedAggregate()) && $parent.ReportType() !='Treemap' && $parent.isChart()">
                                                     <span class="badge bg-danger" data-bind="visible: !groupInGraph()">Will not show in <span data-bind="text: $parent.ReportType"></span>Chart</span>
                                                 </span>
+                                                <span data-bind="visible: $parent.IsPivotFieldLastColumn($index(),selectedAggregate())">
+                                                    <span class="badge bg-danger" >Pivot field cannot be the last column.</span>
+                                                </span>
+                                                <span data-bind="visible: $parent.IsDynamicFieldFirstColumn($index())">
+                                                    <span class="badge bg-danger" >Dynamic cannot be first column.</span>
+                                                </span>
                                             </div>
                                             <div class="col-7">
                                                 <div class="pull-right" style="margin-top: -5px;" data-bind="if: $parent.AggregateReport() && !$parent.useStoredProc()">
@@ -1857,7 +1868,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                             </div>
                         </div>
                         <br />
-                        <div class="card card-body">
+                        <div class="card card-body" data-bind="if: isModalOpen">
                             <h5><span class="fa fa-filter"></span>&nbsp;Choose Filters</h5>
 
                             <div class="row" style="padding: 10px 10px; overflow-x: auto;">
@@ -2216,7 +2227,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                         </thead>
                         <tbody>
                             <tr style="display: none;" data-bind="visible: Rows && Rows.length < 1">
-                                <td class="text-info" data-bind="attr:{colspan: Columns.length}">
+                                <td data-bind="attr:{colspan: Columns.length}">
                                     No records found
                                 </td>
                             </tr>
