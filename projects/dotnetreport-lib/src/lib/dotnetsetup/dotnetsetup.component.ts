@@ -54,13 +54,16 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
             deleteScheduleUrl: '/ReportApi/DeleteSchedule',
             saveCategoriesUrl: '/ReportApi/SaveCategoriesData',
             getCategoriesUrl: '/ReportApi/GetCategories',
+            getAppSettingUrl: '/ReportApi/GetAccountSettings',
+            saveAppSettingUrl: '/ReportApi/ChangeAccountSettings',
             reportsApiUrl:  this.baseServiceUrl + '/DotNetReportApi/CallReportApi',
             getUsersAndRoles: this.baseServiceUrl + '/DotNetReportApi/GetUsersAndRoles',
             searchProcUrl:  this.baseServiceUrl + '/DotNetReportApi/SearchProcedure',
             getSchemaFromSql:  this.baseServiceUrl + '/DotNetReportApi/GetSchemaFromSql',
             apiUrl:  this.baseServiceUrl + '/DotNetReportApi/CallPostReportApi',
             getPreviewFromSqlUrl: this.baseServiceUrl + '/DotNetReportApi/GetPreviewFromSql',
-            onlyApi: onlyApi
+            onlyApi: onlyApi,
+            loadSchemaUrl: loadSetupSchemaUrl
         };
 
         this.renderKOTemplates();
@@ -880,7 +883,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                     <div class="col-sm-2">
                         <select class="form-select" data-bind="value: format">
                             <option value="EXCEL">Excel</option>
-                            <option data-bind="visible: $parent.canDrilldown()" value="EXCEL-SUB">Excel (Expanded)</option>
+                            <option data-bind="visible: $parent.canDrilldown && $parent.canDrilldown()" value="EXCEL-SUB">Excel (Expanded)</option>
                             <option value="CSV">CSV</option>
                             <option value="PDF">PDF</option>
                             <option value="WORD">Word</option>

@@ -778,24 +778,24 @@
                             <tbody data-bind="foreach: schedules">
                                 <tr>
                                     <td colspan="7">
-                                        For <span class="text-muted" data-bind="text: DashboardId === 0 ? 'Report' : 'Dashboard'"></span> <b><span data-bind="text: Name"></span></b>
+                                        For&nbsp;
+                                        <span class="text-muted" data-bind="text: DashboardId === 0 ? 'Report' : 'Dashboard'"></span>&nbsp;
+                                        <b><span data-bind="text: Name"></span></b>
                                     </td>
                                 </tr>
-                                <!-- ko foreach: Schedules -->
-                                <tr>
-                                    <td data-bind="text: ScheduleDisplay"></td>
-                                    <td data-bind="text: EmailTo"></td>
-                                    <td data-bind="text: Format"></td>
-                                    <td data-bind="text: LastRun"></td>
-                                    <td data-bind="text: UserId ? UserId : 'N/A'"></td>
-                                    <td data-bind="text: Timezone ? Timezone : 'N/A'"></td>
+                                <tr data-bind="foreach: { data: Schedules, as: 'item' }">
+                                    <td data-bind="text: item.ScheduleDisplay"></td>
+                                    <td data-bind="text: item.EmailTo"></td>
+                                    <td data-bind="text: item.Format"></td>
+                                    <td data-bind="text: item.LastRun"></td>
+                                    <td data-bind="text: item.UserId ? item.UserId : 'N/A'"></td>
+                                    <td data-bind="text: item.Timezone ? item.Timezone : 'N/A'"></td>
                                     <td>
                                         <button class="btn btn-sm btn-danger" data-bind="click: $root.deleteSchedule">
                                             <i class="fa fa-trash"></i> Delete
                                         </button>
                                     </td>
                                 </tr>
-                                <!-- /ko -->
                             </tbody>
                         </table>
                     </div>
@@ -1532,24 +1532,18 @@
                 <div style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
                     <table class="table table-striped table-hover table-condensed">
                         <thead style="position: sticky; top: -1px; z-index: 2; background-color: #f8f9fa;">
-                            <tr>
-                                <!-- ko foreach: Columns -->
+                            <tr data-bind="foreach: Columns">
                                 <th>
                                     <span data-bind="text: ColumnName, attr: { title: DataType.replace('System.', '') }"></span>
                                 </th>
-                                <!-- /ko -->
                             </tr>
                         </thead>
-                        <tbody>
-                            <!-- ko foreach: Rows  -->
-                            <tr>
-                                <!-- ko foreach: Items -->
+                        <tbody data-bind="foreach: Rows">
+                            <tr data-bind="foreach: Items">
                                 <td>
                                     <span data-bind="html: FormattedValue"></span>
                                 </td>
-                                <!-- /ko-->
                             </tr>
-                            <!-- /ko -->
                         </tbody>
                     </table>
                 </div>
