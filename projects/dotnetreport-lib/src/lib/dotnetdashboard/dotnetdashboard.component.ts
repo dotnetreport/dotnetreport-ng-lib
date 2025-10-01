@@ -7,7 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 declare var ko: any;
 declare var dashboardViewModel: any;
 declare var $: any;
-declare var gridstack: any;
+declare var GridStack: any;
 declare var _: any;
 
 @Component({
@@ -35,9 +35,9 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
   
     ngOnInit() {
         var reports: { reportSql: any; reportId: any; reportFilter: any; connectKey: any; x: any; y: any; width: any; height: any; }[] = [];
-        var dashboards: { id: any; name: any; description: any; selectedReports: any; userId: any; userRoles: any; viewOnlyUserId: any; viewOnlyUserRoles: any; }[] | { id: number; }[] = [];
-              
-        let getDashboardsUrl = this.baseServiceUrl + "/DotNetReportApi/GetDashboards";
+        var dashboards: { id: any; name: any; description: any; selectedReports: any; schedule:any; userId: any; userRoles: any; viewOnlyUserId: any; viewOnlyUserRoles: any;clientId:any; }[] | { id: number; }[] = [];
+        var adminMode = localStorage.getItem('reportAdminMode') ?? false;     
+        let getDashboardsUrl = this.baseServiceUrl + "/DotNetReportApi/GetDashboards?adminMode=" + adminMode;
         let loadSavedDashboard = this.baseServiceUrl + "/DotNetReportApi/LoadSavedDashboard";
         let getUsersAndRolesUrl = this.baseServiceUrl + "/DotNetReportApi/GetUsersAndRoles";
         getUsersAndRolesUrl = getUsersAndRolesUrl.replace(/[?&]$/, "");
@@ -45,7 +45,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
         
         this.http.get(getDashboardsUrl).subscribe((dashboardData: any) => {
             dashboardData.forEach((d:any)=> {
-                dashboards.push({ id: d.Id, name: d.Name, description: d.Description, selectedReports: d.SelectedReports, userId: d.UserId, userRoles: d.UserRoles, viewOnlyUserId: d.ViewOnlyUserId, viewOnlyUserRoles: d.ViewOnlyUserRoles });
+                dashboards.push({ id: d.Id, name: d.Name, description: d.Description, selectedReports: d.SelectedReports,schedule:d.Schedule, userId: d.UserId, userRoles: d.UserRoles, viewOnlyUserId: d.ViewOnlyUserId, viewOnlyUserRoles: d.ViewOnlyUserRoles,clientId:d.ClientId });
             });
 
             this.queryParams = this.route.snapshot.queryParams;
@@ -191,6 +191,12 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
              <!-- ko if: ['in', 'not in'].indexOf($parent.Operator()) != -1 -->
             <input class="form-control" type="text" data-bind="value: $parent.Value" required />
             <!-- /ko -->
+            <!-- ko if: ['between'].indexOf($parent.Operator()) != -1 -->
+            From
+            <input class="form-control" type="number" data-bind="value: $parent.Value" required />
+            To
+            <input class="form-control" type="number" data-bind="value: $parent.Value2" required />
+        <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: fieldType=='Boolean' && ['is blank', 'is not blank', 'is null', 'is not null'].indexOf($parent.Operator()) == -1 -->
         <select required class="form-select" data-bind="value: $parent.Value, disable: $parent.Operator() == 'is default'">
@@ -217,26 +223,51 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 </script>
 
 <script type="text/html" id="pager-template">
-    <div class="pager-container d-flex align-items-center gap-2">
-        <a href="" title="First" data-bind="click: first, enable: !isFirstPage()" class="pager-btn btn btn-light"><i class="fa fa-backward"></i></a>
-        <a href="" title="Previous" data-bind="click: previous, enable: !isFirstPage()" class="pager-btn btn btn-light"><i class="fa fa-caret-left"></i></a>
+    <div class="pager-container d-flex align-items-center flex-wrap gap-2">
 
-        <select class="form-control form-control-sm pager-control"
-                data-bind="options: [10,30,50,100,150,200,500], value: pageSize">
-        </select>
-
-        <div class="d-flex align-items-center gap-1">
-            <span>Page</span>
-            <input type="number" min="1" pattern="[0-9]*" class="form-control form-control-sm pager-control text-center"
-                   data-bind="value: currentPage, attr: { max: pages() }">
-            <span>of</span>
-            <span data-bind="text: pages"></span>
+        <!-- Rows per page -->
+        <div class="d-flex align-items-center gap-1 ms-1">
+            <span class="text-muted small">Page size:</span>
+            <select class="form-select form-select-sm w-auto"
+                    data-bind="options: pageSizeOptions, value: pageSize">
+            </select>
         </div>
 
-        <a href="" title="Next" data-bind="click: next, enable: !isLastPage()" class="pager-btn btn btn-light"><i class="fa fa-caret-right"></i></a>
-        <a href="" title="Last" data-bind="click: last, enable: !isLastPage()" class="pager-btn btn btn-light"><i class="fa fa-forward"></i></a>
+        <!-- Inner border block for page navigation controls -->
+        <div class="d-flex align-items-center gap-1 ms-3">
+            <a href="#" title="First" data-bind="click: first, enable: !isFirstPage()"
+               class="btn btn-outline-secondary btn-sm pager-btn ms-1" aria-label="First Page">
+                <i class="fa fa-angle-double-left"></i>
+            </a>
+
+            <a href="#" title="Previous" data-bind="click: previous, enable: !isFirstPage()"
+               class="btn btn-outline-secondary btn-sm pager-btn" aria-label="Previous Page">
+                <i class="fa fa-angle-left"></i>
+            </a>
+
+            <div class="d-flex align-items-center gap-1">
+                <span class="text-muted small">Page</span>
+                <input type="number" min="1" pattern="[0-9]*"
+                       class="form-control form-control-sm text-center pager-input"
+                       style="width: 60px;"
+                       data-bind="value: currentPage, attr: { max: pages() }">
+                <span class="text-muted small">of</span>
+                <span class="text-muted small" data-bind="text: pages"></span>
+            </div>
+
+            <a href="#" title="Next" data-bind="click: next, enable: !isLastPage()"
+               class="btn btn-outline-secondary btn-sm pager-btn" aria-label="Next Page">
+                <i class="fa fa-angle-right"></i>
+            </a>
+
+            <a href="#" title="Last" data-bind="click: last, enable: !isLastPage()"
+               class="btn btn-outline-secondary btn-sm pager-btn" aria-label="Last Page">
+                <i class="fa fa-angle-double-right"></i>
+            </a>
+        </div>
     </div>
 </script>
+
 
 
 <script type="text/html" id="report-column-header">
@@ -422,6 +453,42 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                     </td>
                 </tr>
                 <!-- /ko -->
+                <!-- ko if: subReportsRan().length > 0 -->
+                <tr>                    
+                    <td data-bind="attr:{colspan: $parent.Columns.length }" style="padding-left: 0px;">
+                        <div data-bind="foreach: subReportsRan">
+                            <div class="">
+                                <div class="" style="padding-bottom: 20px;" >
+                                    <h2 class="pull-left" data-bind="text: ReportName"></h2>
+
+                                    <div class="clearfix"></div>
+                                    <div class="list-overflow-auto" style="padding-top: 0; margin-top: 0;">                                       
+                                        <p data-bind="html: ReportDescription, visible: ReportDescription"></p>
+
+                                        <div data-bind="with: ReportResult" class="small">
+                                            <div data-bind="visible: !ReportData()">
+                                                <div class="report-spinner"></div>
+                                            </div>
+                                            <div data-bind="template: 'report-template', data: $data"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-inline">
+                                        <div class="small" data-bind="with: pager">
+                                            <div class="form-group pull-left total-records" data-bind="if: totalRecords()>1 && $parent.ReportType() != 'Single'">
+                                                <span data-bind="text: 'Total Records: ' + totalRecords()"></span><br />
+                                            </div>
+                                            <div class="form-group pull-right" data-bind="if: pages()>1 && $parent.ReportType() != 'Single'">
+                                                <div data-bind="template: 'pager-template', data: $data"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <!-- /ko -->
                 <!-- /ko -->
                 <!-- /ko-->
             </tbody>
@@ -447,12 +514,58 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
     </div>
 </script>
 
+<script type="text/html" id="report-render">
+    <div data-bind="with: ReportData">
+      <div data-bind="foreach: Rows">
+        <div data-bind="html: renderedHtml, css: { 'card-view': $parents[$parents.length-1].cardView }"></div>
+
+        <div data-bind="foreach: subReportsRan">
+            <div class="">
+                <div class="" style="padding-bottom: 20px;" >
+                    <h2 class="pull-left" data-bind="text: ReportName"></h2>
+
+                    <div class="clearfix"></div>
+                    <div class="list-overflow-auto" style="padding-top: 0; margin-top: 0;">
+                        <p data-bind="html: ReportDescription, visible: ReportDescription"></p>
+
+                        <div data-bind="with: ReportResult" class="small">
+                            <div data-bind="visible: !ReportData()">
+                                <div class="report-spinner"></div>
+                            </div>
+                            <div data-bind="template: 'report-template', data: $data"></div>
+                        </div>
+                    </div>
+                    <div class="form-inline">
+                        <div class="small" data-bind="with: pager">
+                            <div class="form-group pull-left total-records" data-bind="if: totalRecords()>1 && $parent.ReportType() != 'Single'">
+                                <span data-bind="text: 'Total Records: ' + totalRecords()"></span><br />
+                            </div>
+                            <div class="form-group pull-right" data-bind="if: pages()>1 && $parent.ReportType() != 'Single'">
+                                <div data-bind="template: 'pager-template', data: $data"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="clearfix"></div>
+</script>
+
+
 <script type="text/html" id="report-template">
     <div class="report-chart" data-bind="attr: {id: 'chart_div_' + $parent.ReportID()}, visible: $parent.isChart"></div>
     <!-- ko if: $parent.ReportType() == 'Pivot' -->
     <div data-bind="template: {name: 'report-pivot', data: $data }"></div>
     <!-- /ko -->
-    <!-- ko if: $parent.ReportType() != 'Pivot' && (!$parent.isChart() || $parent.ShowDataWithGraph()) -->
+
+    <!-- ko if: $parent.ReportType() == 'Html' -->
+    <div data-bind="template: {name: 'report-render', data: $data }"></div>
+    <!-- /ko -->
+
+    <!-- ko if: $parent.ReportType() != 'Pivot' && $parent.ReportType() != 'Html' && (!$parent.isChart() || $parent.ShowDataWithGraph()) -->
     <div class="pull-right" data-bind="if: $parent.OuterGroupColumns().length > 0">
         <a href="#" data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
             Manage Groups <span class="fa fa-ellipsis-v"></span>
@@ -910,7 +1023,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                     <select class="form-select" required data-bind="options: options, value: selectedOption" style="min-width: 80px;"></select>
                 </div>
                 <div data-bind="if: selectedOption() == 'once'" class="me-3 d-flex align-items-center">
-                    &nbsp;on&nbsp;<input data-bind="datepicker: selectedDate,datepickerOptions: {value: selectedDate}" class="form-control" required />
+                    &nbsp;on&nbsp;<input data-bind="datepicker: selectedDate, datepickerOptions: {value: selectedDate}" class="form-control" required />
                 </div>
                 <div class="d-flex align-items-center">
                     <div data-bind="if: showDays" class="d-flex align-items-center">
@@ -966,7 +1079,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                     <div class="col-sm-2">
                         <select class="form-select" data-bind="value: format,event: { change: onFormatChange }">
                             <option value="EXCEL">Excel</option>
-                            @* <option data-bind="visible: $parent.canDrilldown()" value="EXCEL-SUB">Excel (Expanded)</option> *@
+                            <option data-bind="visible: $parent.canDrilldown && $parent.canDrilldown()" value="EXCEL-SUB">Excel (Expanded)</option>
                             <option value="CSV">CSV</option>
                             <option value="PDF">PDF</option>
                             <option value="WORD">Word</option>
@@ -999,7 +1112,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                         </div>
                     </div>
                     <div class="col-sm-4" data-bind="if: hasScheduleStart">
-                        <input type="text" class="form-control" data-bind="datepicker: scheduleStart,datepickerOptions: {value: scheduleStart}" title="Scheduled Report will not be sent before this date" required />
+                        <input type="text" class="form-control" data-bind="datepicker: scheduleStart, datepickerOptions: {value: scheduleStart}" title="Scheduled Report will not be sent before this date" required />
                     </div>
                 </div>
             </div>
@@ -1014,7 +1127,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                         </div>
                     </div>
                     <div class="col-sm-4" data-bind="if: hasScheduleEnd">
-                        <input type="text" class="form-control" data-bind="datepicker: scheduleEnd,datepickerOptions: {value: scheduleEnd}" title="Scheduled Report will not be sent after this date" required />
+                        <input type="text" class="form-control" data-bind="datepicker: scheduleEnd, datepickerOptions: {value: scheduleEnd}" title="Scheduled Report will not be sent after this date" required />
                     </div>
                 </div>
             </div>
@@ -1340,94 +1453,125 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" data-bind="click: onModalCloseClicked" aria-label="Close"></button>
             </div>
             <div class="modal-body needs-validation" style="overflow-y: auto; flex-grow: 1;">
-                <div class="row">
-               <div class="col-md-4 sticky-column">
-                    <div class="card card-body" id="choose-data-card">
-                        <h5><span class="fa fa-database"></span>&nbsp;Choose Data for Report</h5>
-                        <div>
-                            <div class="pull-left btn-group btn-group-toggle" role="group" data-bind="if: ReportID() <= 0">
-                                <label class="btn btn-sm btn-light active" style="margin-right: 0px;" title="You can change the Data source only when creating a new report, changing this will clear all selections">
-                                    <input type="radio" name="dataoption" id="table" checked data-bind="checked: useStoredProc, checkedValue: false"> Dynamic
+               <div class="row">
+                    <div class="col-md-4">
+                        <div class="card card-body" id="choose-data-card"  style="min-height: calc(100vh - 200px);">
+                            <div class="form-group row align-items-center">
+                                <label class="col-sm-4 col-form-label h6">
+                                    <i class="fa fa-file"></i> Report Name
                                 </label>
-                                <label class="btn btn-sm btn-light active">
-                                    <input type="radio" name="dataoption" id="proc" value="1" data-bind="checked: useStoredProc, checkedValue: true"> Predefined
-                                </label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" required placeholder="Report Name" data-bind="value: ReportName">
+                                </div>
                             </div>
-                            <div class="pull-right">
-                                <a href="#" class="btn btn-secondary btn-sm" title="Add Custom Field using Formula" data-bind="hidden: isFunctionField() || useStoredProc(), click: cancelFormulaField, text: isFormulaField()? 'Cancel': 'Custom Field', css: {'btn-primary': !isFormulaField(), 'btn-danger': isFormulaField}"></a>
-                                <a href="#" class="btn btn-secondary btn-sm" title="Add Custom Field using Function" data-bind="hidden: true || isFormulaField() || useStoredProc(), click: function(){designFunctionField()}, text: isFunctionField()? 'Cancel': 'Function Field', css: {'btn-primary': !isFunctionField(), 'btn-danger': isFunctionField}"></a>
+                            <hr />
+                            <h5><span class="fa fa-database"></span>&nbsp;Choose Data for Report</h5>
+                            <div>
+                                <div class="pull-left btn-group btn-group-toggle" role="group" data-bind="if: ReportID() <= 0">
+                                    <label class="btn btn-sm btn-light active" style="margin-right: 0px;" title="You can change the Data source only when creating a new report, changing this will clear all selections">
+                                        <input type="radio" name="dataoption" id="table" checked data-bind="checked: useStoredProc, checkedValue: false"> Dynamic
+                                    </label>
+                                    <label class="btn btn-sm btn-light active">
+                                        <input type="radio" name="dataoption" id="proc" value="1" data-bind="checked: useStoredProc, checkedValue: true"> Predefined
+                                    </label>
+                                </div>
+                                <div class="pull-right">
+                                    <a href="#" class="btn btn-secondary btn-sm" title="Add Custom Field using Formula" data-bind="hidden: isFunctionField() || useStoredProc(), click: cancelFormulaField, text: isFormulaField()? 'Cancel': 'Custom Field', css: {'btn-primary': !isFormulaField(), 'btn-danger': isFormulaField}"></a>
+                                    <a href="#" class="btn btn-secondary btn-sm" title="Add Custom Field using Function" data-bind="hidden: true || isFormulaField() || useStoredProc(), click: function(){designFunctionField()}, text: isFunctionField()? 'Cancel': 'Function Field', css: {'btn-primary': !isFunctionField(), 'btn-danger': isFunctionField}"></a>
+                                </div>
                             </div>
-                        </div>
-                        <div class="clearfix"></div>
-                        <div class="row">
+                            <div class="clearfix"></div>
+                            <div class="row">
+                                <div class="col-md-12" data-bind="disable: isFormulaField, hidden: useStoredProc">
+                                    <div data-bind="with: textQuery.searchFields">
+                                        <select id="search-field" class="form-control" data-bind="select2: {dropdownParent: $('#choose-data-card'), placeholder: 'Search for a Data Field...', ajax: { url: url, dataType: 'json', data: query, processResults: processResults, headers: headers }, minimumInputLength: 2, allowClear: true }, value: selectedOption"></select>
+                                    </div>
+                                </div>
 
-                                    <div class="col-md-12" data-bind="disable: isFormulaField, hidden: useStoredProc">
-                                        <div data-bind="with: textQuery.searchFields">
-                                            <select id="search-field" class="form-control" data-bind="select2: {dropdownParent: $('#choose-data-card'), placeholder: 'Search for a Data Field...', ajax: { url: url, dataType: 'json', data: query, processResults: processResults, headers: headers }, minimumInputLength: 2, allowClear: true }, value: selectedOption"></select>
-                                        </div>
+                                <div class="col-md-12" data-bind="visible: useStoredProc">
+                                    <div>
+                                        <select class="form-control" data-bind="select2Value: {dropdownParent: $('#choose-data-card')}, options: Procs, optionsCaption: 'Choose Section...', optionsText: 'DisplayName', value: SelectedProc, visible: useStoredProc"></select>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" data-bind="hidden: useStoredProc">
+                                    <div class="d-flex justify-content-between align-items-center mb-2" style="padding-top: 15px;">
+                                        <span>
+                                            Select Data to use in Report
+                                            <i class="fa fa-info-circle text-muted" data-toggle="tooltip" title="Choose a table to show fields to select."></i>
+                                        </span>
                                     </div>
 
-                                    <div class="col-md-12" data-bind="visible: useStoredProc">
+                                    <div id="table-tree-view" style="max-height: 500px; overflow-y: auto;">
                                         <div>
-                                            <select class="form-control" data-bind="select2Value: {dropdownParent: $('#choose-data-card')}, options: Procs, optionsCaption: 'Choose Section...', optionsText: 'DisplayName', value: SelectedProc, visible: useStoredProc"></select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12" data-bind="hidden: useStoredProc">
-                                        <!-- Heading with Tooltip -->
-                                        <div class="d-flex justify-content-between align-items-center mb-2" style="padding-top: 15px;">
-                                            <span>
-                                                Select Data to use in Report
-                                                <i class="fa fa-info-circle text-muted" data-toggle="tooltip" title="Choose a table to show fields to select."></i>
-                                            </span>
-                                        </div>
+                                            <!-- ko foreach: CategorizedTables -->
+                                            <div class="mb-3">
+                                                <div data-bind="click: function() { isExpanded(!isExpanded()); }, visible: categoryName" style="cursor: pointer;">
+                                                    <i class="fa" data-bind="css: isExpanded() ? 'fa-chevron-down text-secondary' : 'fa-chevron-right text-secondary'"></i>
+                                                    <i class="fa" data-bind="css: isExpanded() ? 'fa-folder-open' : 'fa-folder'"></i>
+                                                    <span data-bind="text: categoryName" class="ml-2"></span>
+                                                </div>
+                                                <div class="report-list" data-bind="visible: isExpanded(), foreach: tables" style="padding-left: 15px;">
+                                                    <div class="row border-bottom py-2 w-100">
+                                                        <div class="col-md-12">
+                                                            <div class="pull-left" data-bind="click: function() { selectTable($data); }, css: {'text-muted': !isEnabled()}, style: {cursor: isEnabled() ? 'pointer' : ''}, attr: {title: !isEnabled() ? 'Cannot use table as joins do not exist': ''}">
+                                                                <span class="text-secondary fa" data-bind="css: isEnabled() ? ($data === $parents[2].SelectedTable() ? 'fa-chevron-down' : 'fa-chevron-right') : 'fa-ban'"></span>&nbsp;
+                                                                <span class="fa fa-table"></span>&nbsp;<span data-bind="text: tableName" class=""></span>
+                                                            </div>
+                                                            <div class="pull-right" data-bind="visible: $data === $parents[2].SelectedTable() && !$parents[2].isFormulaField() && !$parents[2].SelectedTable().dynamicColumns">
+                                                                <a href="#" class="small text-muted" data-bind="click: $parents[2].MoveAllFields">Select all</a> |
+                                                                <a href="#" class="small text-muted" data-bind="click: $parents[2].RemoveSelectedFields">Remove all</a>
+                                                            </div>
+                                                        </div>
 
-                                        <div id="table-tree-view" style="max-height: 500px; overflow-y: auto;">
-                                            <div class="">
-                                                <!-- ko foreach: CategorizedTables -->
-                                                <div class="mb-3">
-                                                    <div data-bind="click: function() { isExpanded(!isExpanded()); }, visible: categoryName" style="cursor: pointer;">
-                                                        <i class="fa" data-bind="css: isExpanded() ? 'fa-chevron-down text-secondary' : 'fa-chevron-right text-secondary'"></i>
-                                                        <i class="fa" data-bind="css: isExpanded() ? 'fa-folder-open' : 'fa-folder'"></i>
-                                                        <span data-bind="text: categoryName" class="ml-2"></span>
-                                                    </div>
-                                                    <div class="report-list" data-bind="visible: isExpanded(), foreach: tables" style="padding-left: 15px;">
-                                                        <div class="row border-bottom py-2 w-100">
-                                                            <div class="col-md-12">
-                                                                <div class="pull-left" data-bind="click: function() { selectTable($data); }, css: {'text-muted': !isEnabled()}, style: {cursor: isEnabled() ? 'pointer' : ''}, attr: {title: !isEnabled() ? 'Cannot use table as joins do not exist': ''}">
-                                                                    <span class="text-secondary fa" data-bind="css: isEnabled() ? ($data === $parents[2].SelectedTable() ? 'fa-chevron-down' : 'fa-chevron-right') : 'fa-ban'"></span>&nbsp;
-                                                                    <span class="fa fa-table"></span>&nbsp;<span data-bind="text: tableName" class=""></span>
-                                                                </div>
-                                                                <div class="pull-right" data-bind="visible: $data === $parents[2].SelectedTable() && !$parents[2].isFormulaField() && !$parents[2].SelectedTable().dynamicColumns">
-                                                                    <a href="#" class="small text-muted" data-bind="click: $parents[2].MoveAllFields">Select all</a> |
-                                                                    <a href="#" class="small text-muted" data-bind="click: $parents[2].RemoveSelectedFields">Remove all</a>
+                                                        <!-- Fields Expand Here -->
+                                                        <div data-bind="visible: $data === $parents[2].SelectedTable()" style="padding-left: 30px;">
+                                                            <!-- ko foreach: $parents[2].ChooseFields -->
+                                                            <div class="row border-bottom py-2 align-items-center w-100">
+                                                                <div class="checkbox">
+                                                                    <label>
+                                                                        <input type="checkbox" data-bind="checkedInArray: {array: $parents[2].isFormulaField() ? $parents[2].formulaFields : $parents[2].SelectedFields, value: $data}">
+                                                                        <span data-bind="text: fieldName"></span>
+                                                                    </label>
                                                                 </div>
                                                             </div>
-
-                                                            <!-- Fields Expand Here -->
-                                                            <div data-bind="visible: $data === $parents[2].SelectedTable()" style="padding-left: 30px;">
-                                                                <!-- ko foreach: $parents[2].ChooseFields -->
-                                                                <div class="row border-bottom py-2 align-items-center w-100">
-                                                                    <div class="checkbox">
-                                                                        <label>
-                                                                            <input type="checkbox" data-bind="checkedInArray: {array: $parents[2].isFormulaField() ? $parents[2].formulaFields : $parents[2].SelectedFields, value: $data}">
-                                                                            <span data-bind="text: fieldName"></span>
-                                                                        </label>
-                                                                    </div>
-                                                                </div>
-                                                                <!--/ko-->
-                                                            </div>
+                                                            <!--/ko-->
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <!-- /ko -->
                                             </div>
+                                            <!-- /ko -->
                                         </div>
                                     </div>
-
                                 </div>
-
                             </div>
+                        </div>
+                        <br />
 
+                        <div class="card card-body">
+
+                            <div class="form-group row">
+                                <label class="control-label h6">
+                                    <i class="fa fa-info-circle"></i> Report Description
+                                </label>
+                                <div>
+                                    <textarea class="form-control" style="width: 100%;" rows="3" placeholder="Additional details (optional)" data-bind="value: ReportDescription"></textarea>
+                                </div>
+                            </div>
+                            <div class="checkbox" data-bind="visible: CanSaveReports()">
+                                <label>
+                                    <input type="checkbox" data-bind="checked: SaveReport">
+                                    Save Report
+                                </label>
+                            </div>
+                            <div class="form-group row" data-bind="visible: SaveReport">
+                                <label class="control-label h6">
+                                    <i class="fa fa-folder-open"></i> Choose Folder
+                                </label>
+                                <div>
+                                    <select class="form-select" style="width: 100%;" data-bind="options: Folders, optionsText: 'FolderName', optionsValue: 'Id', value: FolderID"></select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-8">
                         <div class="card card-body">
@@ -1457,6 +1601,10 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                     <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('Combo'); }, css: { active: ReportType()=='Combo' }">
                                         <span class="fa fa-2x fa-signal"></span>
                                         <p>Combo</p>
+                                    </button>
+                                    <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('Html'); }, css: { active: ReportType()=='Html' }">
+                                        <span class="fa fa-2x fa-code"></span>
+                                        <p>Custom</p>
                                     </button>
                                     <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('Map'); }, css: { active: ReportType().indexOf('Map')==0 }">
                                         <span class="fa fa-2x fa-globe"></span>
@@ -1811,8 +1959,11 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                 <div class="alert alert-info" data-bind="visible: ReportType()=='Treemap'">
                                     <span class="fa fa-lightbulb-o fa-2x"></span>&nbsp;For Treemap, the data must be in a hierarchical format with 2nd column having parent and third column having a numeric value. The data must have a single root node having null as its parent as well.
                                 </div>
-                                <div class="alert alert-info" data-bind="visible: ReportType()=='Line'">
-                                    <span class="fa fa-lightbulb-o fa-2x"></span>&nbsp;For Line Graph, the first field below will show on the x-axis. All other fields will numeric fields will show on y-axis.
+
+                                <div data-bind="visible: ReportType()=='Line'" class="card card-body" style="margin-bottom: 15px">
+                                    <div class="alert alert-info">
+                                        <span class="fa fa-lightbulb-o fa-2x"></span>&nbsp;For Line Graph, the first field below will show on the x-axis. All other fields will numeric fields will show on y-axis.
+                                    </div>
                                     <div class="form-group row">
                                         <div class="checkbox col-6">
                                             <label>
@@ -1932,6 +2083,103 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                 </ul>
                             </div>
                         </div>
+                        <div data-bind="if: linkedReportFields().length > 0">
+                            <br />
+                             <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                <h5 class="mb-0">
+                                    <i class="fa fa-bookmark"></i> Include Sub Reports
+                                </h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted mb-3">
+                                        Linked reports are available to add as sub reports.
+                                        Selecting sub reports will restrict the report to <strong>one record per page</strong>.
+                                    </p>
+
+                                    <div class="mb-3">
+                                        <select class="form-select"
+                                                data-bind="options: linkedReportFields,
+                                                           optionsText: 'name',
+                                                           value: selectedSubReport,
+                                                           optionsCaption: 'Select a linked report...'">
+                                        </select>
+                                    </div>
+                                    <ul class="list-group"
+                                        data-bind="sortable: {
+                                                       data: subReports,
+                                                       options: { handle: '.sortable', cursor: 'move', placeholder: 'drop-highlight' }
+                                                   }">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span>
+                                                <i class="fa fa-bars sortable me-2" style="cursor:move;"></i>
+                                                <span data-bind="text: name"></span>
+                                            </span>
+                                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                                    data-bind="click: $parent.removeSubReport">
+                                                Delete
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div data-bind="visible: ReportType()=='Html'">
+                            <br />
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                <h5 class="mb-0">
+                                    <i class="fa fa-pencil"></i> Design your Report
+                                </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row align-items-center mb-1">
+                                        <div class="col-md-4">
+                                        <select class="form-select" data-bind="options: SelectedFields, value: SelectFieldToInsert, optionsCaption: 'Select a field...', optionsText: 'selectedFieldName'"></select>
+                                        </div>
+                                        <div class="col-auto dropdown">
+                                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            <i class="fa fa-table"></i> Insert as Table
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bind="click: insertFieldTableTransposed">
+                                                    Transposed
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bind="click: insertFieldTableStandard">
+                                                    Standard
+                                                    </a>
+                                                </li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bind="click: insertHeaderBreak">
+                                                        Add Header Break
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bind="click: insertFooterBreak">
+                                                        Add Footer Break
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="col-md-auto ms-2">
+                                        <label class="form-check-label">
+                                            <input class="form-check-input me-2" type="checkbox" data-bind="checked: cardView">
+                                            Card Layout
+                                        </label>
+                                        </div>                                        
+                                    </div>
+                                    <div class="mb-3">
+                                        <textarea id="summernote-editor"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <br />
                         <div class="card card-body">
                             <h5><span class="fa fa-filter"></span>&nbsp;Choose Filters</h5>
@@ -2045,15 +2293,25 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <div class="checkbox col-md-5">
-                                                <label>
-                                                    <input type="checkbox" data-bind="checked: changePageSize" />
-                                                    Change Page Size
-                                                </label>
-                                            </div>
-                                            <div class="col-md-5" data-bind="visible: changePageSize">
-                                                <select style="width: 150px;" class="form-select" data-bind="options: [10,30,50,100,150,200,500,1000], value: DefaultPageSize"></select>
-                                            </div>
+                                          <div class="checkbox col-md-5">
+                                            <label>
+                                              <input type="checkbox" data-bind="checked: changePageSize, disable: subReports().length > 0" />
+                                              Change Page Size
+                                            </label>
+                                          </div>
+                                          <div class="col-md-5"
+                                               data-bind="visible: changePageSize,
+                                                          css: { 'text-muted': subReports().length > 0 }">
+                                            <select style="width: 150px;" class="form-select"
+                                                    data-bind="options: [1,10,30,50,100,150,200,500,1000],
+                                                               value: DefaultPageSize,
+                                                               disable: subReports().length > 0">
+                                            </select>
+                                            <!-- Force default to 1 if sub reports selected -->
+                                            <small class="text-danger" data-bind="visible: subReports().length > 0">
+                                              Page size is restricted to 1 when sub reports are selected.
+                                            </small>
+                                          </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -2096,40 +2354,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                         <div data-bind="visible: adminMode" class="card card-body">
                             <div data-bind="template: {name: 'manage-access-template', data: manageAccess}"></div>
                         </div>
-                        <br />
 
-                        <div class="card card-body">
-                            <div class="form-group row">
-                                <label class="control-label h6">
-                                    <i class="fa fa-file"></i> Report Name
-                                </label>
-                                <div>
-                                    <input type="text" style="width: 100%;" class="form-control" required placeholder="Report Name" data-bind="value: ReportName">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="control-label h6">
-                                    <i class="fa fa-info-circle"></i> Description
-                                </label>
-                                <div>
-                                    <textarea class="form-control" style="width: 100%;" rows="3" placeholder="Additional details (optional)" data-bind="value: ReportDescription"></textarea>
-                                </div>
-                            </div>
-                            <div class="checkbox" data-bind="visible: CanSaveReports()">
-                                <label>
-                                    <input type="checkbox" data-bind="checked: SaveReport">
-                                    Save Report
-                                </label>
-                            </div>
-                            <div class="form-group row" data-bind="visible: SaveReport">
-                                <label class="control-label h6">
-                                    <i class="fa fa-folder-open"></i> Choose Folder
-                                </label>
-                                <div>
-                                    <select class="form-select" style="width: 100%;" data-bind="options: Folders, optionsText: 'FolderName', optionsValue: 'Id', value: FolderID"></select>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -2155,8 +2380,8 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 
         <div class="chart-settings-panel border p-2 shadow-sm bg-light" data-bind="visible: showSettings">
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <h6 class="mb-0">Report Settings</h6>
                 <button class="btn btn-sm btn-close" data-bind="click: toggleChartSettings"></button>
+                <h6 class="mb-0">Report Settings</h6>                
             </div>
              <ul class="nav nav-tabs nav-sm mb-2 small" data-bind="visible: ReportType() === 'Bar' || ReportType() === 'Pie' || ReportType() === 'Line'">
                 <li class="nav-item">
@@ -2175,7 +2400,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                 </li>
             </ul>
             <div class="tab-content small">
-                <div class="tab-pane fade" 
+                <div class="tab-pane fade"
                      data-bind="attr: { id: 'chartTab-' + ReportID() }, css: { 'show active': ReportType() === 'Bar' || ReportType() === 'Pie' || ReportType() === 'Line' }">
                     <div class="mb-2">
                         <div class="btn-group" role="group" data-bind="visible: ReportType() === 'Bar' || ReportType() === 'Pie' || ReportType() === 'Line'">
@@ -2286,61 +2511,61 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                 </div>
 
                 <div class="tab-pane fade"
-                     data-bind="attr: { id: 'tableTab-' + ReportID() }, css: { 'show active': !(ReportType() === 'Bar' || ReportType() === 'Pie' || ReportType() === 'Line') }">                   
+                     data-bind="attr: { id: 'tableTab-' + ReportID() }, css: { 'show active': !(ReportType() === 'Bar' || ReportType() === 'Pie' || ReportType() === 'Line') }">
                     <div class="form-group row">
                         <div class="mb-2 col-6">
-                            <label class="form-label small">Header Back Color</label>
+                            <label class="form-label small">Header Back Color</label><br />
                             <input type="color" class="color-picker"
-                                   data-bind="value: tableheaderBackColor, event: { change: updateTable }"/>
+                                   data-bind="attr: { id: 'tbl-color-picker-' + ReportID()} , value: tableSettings().headerBackColor, event: { change: updateTable }"/>
                         </div>
                         <div class="mb-2 col-6">
-                            <label class="form-label small">Header Font Color</label>
+                            <label class="form-label small">Header Font Color</label><br />
                             <input type="color" class="color-picker"
-                                   data-bind="value: tableheaderFontColor, event: { change: updateTable }"/>
+                                   data-bind="attr: { id: 'tbl-color-picker-' + ReportID()} ,value: tableSettings().headerFontColor, event: { change: updateTable }"/>
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="mb-2 col-6">
-                            <label class="form-label small">Row Back Color</label>
+                            <label class="form-label small">Row Back Color</label><br />
                             <input type="color" class="color-picker"
-                                   data-bind="value: tableRowBackColor, event: { change: updateTable }"/>
+                                   data-bind="attr: { id: 'tbl-color-picker-' + ReportID()} ,value: tableSettings().rowBackColor, event: { change: updateTable }"/>
                         </div>
                         <div class="mb-2 col-6">
-                            <label class="form-label small">Row Font Color</label>
+                            <label class="form-label small">Row Font Color</label><br />
                             <input type="color" class="color-picker"
-                                   data-bind="value: tableRowFontColor, event: { change: updateTable }"/>
+                                   data-bind="attr: { id: 'tbl-color-picker-' + ReportID()} ,value: tableSettings().rowFontColor, event: { change: updateTable }"/>
                         </div>
                     </div>
                     <div class="form-group row" style="display: none;">
                         <div class="mb-2 col-6">
-                            <label class="form-label small">Alt Row Back Color</label>
+                            <label class="form-label small">Alt Row Back Color</label><br />
                             <input type="color" class="color-picker"
-                                   data-bind="value: tableAltRowBackColor, event: { change: updateTable }"/>
+                                   data-bind="value: tableSettings().altRowBackColor, event: { change: updateTable }"/>
                         </div>
                         <div class="mb-2 col-6">
                             <label class="form-label small">Alt Row Font Color</label>
                             <input type="color" class="color-picker"
-                                   data-bind="value: tableAltRowFontColor, event: { change: updateTable }"/>
+                                   data-bind="value: tableSettings().altRowFontColor, event: { change: updateTable }"/>
                         </div>
                     </div>
                     <div class="form-group mb-2" style="display: none;">
                         <label class="form-label small">Borders</label>
                         <div class="btn-group d-flex flex-wrap">
                             <button type="button" class="btn btn-light btn-sm flex-fill"
-                                    data-bind="click: function(){ tableBorder('none'); updateTable(); }, css: { active: tableBorder() === 'none' }">None</button>
+                                    data-bind="click: function(){ tableSettings().border('none'); updateTable(); }, css: { active: tableSettings().border === 'none' }">None</button>
                             <button type="button" class="btn btn-light btn-sm flex-fill"
-                                    data-bind="click: function(){ tableBorder('all'); updateTable(); }, css: { active: tableBorder() === 'all' }">All</button>
+                                    data-bind="click: function(){ tableSettings().border('all'); updateTable(); }, css: { active: tableSettings().border === 'all' }">All</button>
                             <button type="button" class="btn btn-light btn-sm flex-fill"
-                                    data-bind="click: function(){ tableBorder('outer'); updateTable(); }, css: { active: tableBorder() === 'outer' }">Outside</button>
+                                    data-bind="click: function(){ tableSettings().border('outer'); updateTable(); }, css: { active: tableSettings().border === 'outer' }">Outside</button>
                             <button type="button" class="btn btn-light btn-sm flex-fill"
-                                    data-bind="click: function(){ tableBorder('inner'); updateTable(); }, css: { active: tableBorder() === 'inner' }">Inside</button>
+                                    data-bind="click: function(){ tableSettings().border('inner'); updateTable(); }, css: { active: tableSettings().border === 'inner' }">Inside</button>
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="mb-2 col-6" style="display: none;">
                             <label class="form-label small">Border Color</label>
                             <input type="color" class="color-picker"
-                               data-bind="value: tableBorderColor, event: { change: updateTable }"/>
+                               data-bind="value: tableSettings().borderColor, event: { change: updateTable }"/>
                         </div>
                         <div class="mb-2 col-6 d-flex align-items-end">
                              <button class="btn btn-sm small btn-outline-secondary" data-bind="click: clearTableSettings">
@@ -2459,66 +2684,66 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
     </div>
 </div>
 <script type="text/html" id="pdf-options-schedule-template">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content" data-bind="with: PdfPage">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="pdfOptionsScheduleModalLabel">
-                        <i class="fa fa-file-pdf-o me-2"></i> Set PDF Page Size
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body row g-0">
-                    <div class="col-md-5 d-flex justify-content-center align-items-center">
-                        <div id="pagePreviewBox" class="text-center">
-                            <div data-bind="style: {
-                                         width: selectedWidth(),
-                                         height: selectedHeight(),
-                                         backgroundColor: selectedBackgroundStyle(),
-                                         transition: 'all 0.3s ease'
-                                     }"
-                                 class="shadow rounded mx-auto mb-2 border position-relative">
-                                <span class="position-absolute top-50 start-50 translate-middle text-muted small">Preview</span>
-                            </div>
-                            <div data-bind="text: selectedPageLabel" class="fw-bold"></div>
-                            <div data-bind="text: selectedPageDimension" class="text-muted small"></div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" data-bind="with: PdfPage">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pdfOptionsScheduleModalLabel">
+                    <i class="fa fa-file-pdf-o me-2"></i> Set PDF Page Size
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body row g-0">
+                <div class="col-md-5 d-flex justify-content-center align-items-center">
+                    <div id="pagePreviewBox" class="text-center">
+                        <div data-bind="style: {
+                                     width: selectedWidth(),
+                                     height: selectedHeight(),
+                                     backgroundColor: selectedBackgroundStyle(),
+                                     transition: 'all 0.3s ease'
+                                 }"
+                             class="shadow rounded mx-auto mb-2 border position-relative">
+                            <span class="position-absolute top-50 start-50 translate-middle text-muted small">Preview</span>
                         </div>
-                    </div>
-                    <div class="col-md-7">
-                        <div class="mb-3">
-                            <label for="pageSizeSelect" class="form-label fw-bold">Page Size:</label>
-                            <select class="form-select" id="pageSizeSelect"
-                                    data-bind="options: availablePageSizes,
-                                               optionsText: 'label',
-                                               optionsValue: 'value',
-                                               value: selectedPageSize">
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="pageOrientationSelect" class="form-label fw-bold">Page Orientation:</label>
-                            <select class="form-select" id="pageOrientationSelect"
-                                    data-bind="options: availablePageOrientation,
-                                               optionsText: 'label',
-                                               optionsValue: 'value',
-                                               value: selectedPageOrientation">
-                            </select>
-                        </div>
-                        <div class="alert alert-info p-2 small mt-2">
-                            This PDF will be exported using the selected page size. Ensure your content fits well.
-                            If the content width exceeds the selected size, it will default to Letter.
-                        </div>
+                        <div data-bind="text: selectedPageLabel" class="fw-bold"></div>
+                        <div data-bind="text: selectedPageDimension" class="text-muted small"></div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal" data-bind="click: save">
-                         Save
-                    </button>
+                <div class="col-md-7">
+                    <div class="mb-3">
+                        <label for="pageSizeSelect" class="form-label fw-bold">Page Size:</label>
+                        <select class="form-select" id="pageSizeSelect"
+                                data-bind="options: availablePageSizes,
+                                           optionsText: 'label',
+                                           optionsValue: 'value',
+                                           value: selectedPageSize">
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="pageOrientationSelect" class="form-label fw-bold">Page Orientation:</label>
+                        <select class="form-select" id="pageOrientationSelect"
+                                data-bind="options: availablePageOrientation,
+                                           optionsText: 'label',
+                                           optionsValue: 'value',
+                                           value: selectedPageOrientation">
+                        </select>
+                    </div>
+                    <div class="alert alert-info p-2 small mt-2">
+                        This PDF will be exported using the selected page size. Ensure your content fits well.
+                        If the content width exceeds the selected size, it will default to Letter.
+                    </div>
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal" data-bind="click: save">
+                     Save
+                </button>
+            </div>
         </div>
+    </div>
 </script>
 <script type="text/html" id="word-options-schedule-template">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" data-bind="with: WordPage">
             <div class="modal-header">
                 <h5 class="modal-title" id="pdfOptionsScheduleModalLabel">
@@ -2577,7 +2802,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
     </div>
 </script>
 <script type="text/html" id="word-options-template">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" data-bind="with: WordPage">
             <div class="modal-header">
                 <h5 class="modal-title" id="wordOptionsModalLabel"><i class="fa fa-file-pdf-o me-2"></i> Export to WORD</h5>
@@ -2590,7 +2815,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                         <div data-bind="style: {
                                      width: selectedWidth(),
                                      height: selectedHeight(),
-                                     backgroundColor: selectedBackgroundStyle()
+                                     backgroundColor: selectedBackgroundStyle(),
                                  }"
                              class="shadow rounded mx-auto mb-2 border position-relative">
                             <span class="position-absolute top-50 start-50 translate-middle text-muted small">Preview</span>
@@ -2636,7 +2861,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
     </div>
 </script>
 <script type="text/html" id="pdf-options-template">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" data-bind="with: PdfPage">
             <div class="modal-header">
                 <h5 class="modal-title" id="pdfOptionsModalLabel"><i class="fa fa-file-pdf-o me-2"></i> Export to PDF</h5>
@@ -2694,7 +2919,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
         </div>
     </div>
 </script>
-        `);
+    `);
     this.cdref.detectChanges();
   }
   
@@ -2709,36 +2934,36 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
     let _vm = vm;
 
     $(function () {
-        var options = {
-            cellHeight: 80,
+        $('.grid-stack').show();
+        var grid = GridStack.init({
+            cellHeight: 60,
             verticalMargin: 10,
             resizable: {
                 handles: 'se, sw, ne, nw, n, e, s, w' 
             }
-        };
-        $('.grid-stack').gridstack(options);
-        $('.grid-stack').on('change', function(event: any, items: any[]) {
+        });
+        grid.on('change', function(event: any, items: any[]) {
           if (items) {
             _.forEach(items, function(x: any) {
               _vm.updatePosition(x);
             });
           }
         });
-        $('.grid-stack').on('resizestop', function(event: { target: any; }, item: { size: { height: number; }; }) {
+        grid.on('resizestop', function(event: { target: any; }, item: { size: { height: number; }; }) {
             var e = $(event.target).find('.report-chart');
             var d = $(event.target).find('table');
-            if (e.length > 0 && d.length == 0) {
-                e.height(item.size.height - e[0].offsetTop - 40);
-                _vm.drawChart();
+            if (e && !d) {
+               _vm.drawChart();
             }
-        });                               
+        });  
+        setTimeout(function () {
+        _vm.drawChart();
+        grid.enableMove(false);
+        grid.enableResize(false);                           
+    }, 1000);                             
     });
     
-    setTimeout(function () {
-        _vm.drawChart();
-        var grid = $('.grid-stack').data("gridstack");
-        grid.disable();                            
-    }, 1000);
+    
   }
   
   
