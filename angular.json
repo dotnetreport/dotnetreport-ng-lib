@@ -124,10 +124,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "dotnetreport-app:build:production"
+              "buildTarget": "dotnetreport-app:build:production"
             },
             "development": {
-              "browserTarget": "dotnetreport-app:build:development"
+              "buildTarget": "dotnetreport-app:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -135,7 +135,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "dotnetreport-app:build"
+            "buildTarget": "dotnetreport-app:build"
           }
         },
         "test": {
