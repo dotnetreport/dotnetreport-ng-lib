@@ -12,8 +12,8 @@
     "name": "dotnetreport"
   },
   "peerDependencies": {
-    "@angular/common": ">=16.2.12",
-    "@angular/core": ">=16.2.12",
+    "@angular/common": ">=18.2.14",
+    "@angular/core": ">=18.2.14",
     "@types/jquery": "^3.4.1",
     "@types/knockout": "^3.4.72",
     "bootbox": "^6.0.0",
