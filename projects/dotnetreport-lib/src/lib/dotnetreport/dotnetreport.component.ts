@@ -3,6 +3,7 @@ import { ChangeDetectorRef, Component, Inject, Injector, OnDestroy, OnInit } fro
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { BASE_URL_TOKEN } from './../dotnetreport-lib.di';
 import { ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 declare var ko: any;
 declare var reportViewModel: any;
@@ -11,6 +12,8 @@ declare var $: any;
 @Component({
   selector: 'app-dotnetreport',
   templateUrl: './dotnetreport.component.html',
+  standalone: true,
+  imports: [CommonModule],
   styleUrls: ['./dotnetreport.component.css']
 })
  
@@ -18,7 +21,7 @@ declare var $: any;
 export class DotnetreportComponent implements OnInit, OnDestroy {
     private baseServiceUrl: string;
     public reportTemplates: SafeHtml;
-    private queryParams: { [key: string]: string };
+    private queryParams: { [key: string]: string }={};
   
     constructor(injector: Injector,
       private sanitizer: DomSanitizer,
