@@ -58,7 +58,6 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                 reportsData.forEach((r:any) => {
                     reports.push({ reportSql: r.ReportSql, reportId: r.ReportId, reportFilter: r.ReportFilter, connectKey: r.ConnectKey, x: r.X, y: r.Y, width: r.Width, height: r.Height });
                 });
-
                 this.http.get(getUsersAndRolesUrl).subscribe((response: any) => {
 
                     let result = response;
@@ -92,12 +91,13 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                     });
                     
                     vm.init(0, result.noAccount).done(()=>{
-
+                    vm.loadDashboard(dashboardId).done(()=>{
                         this.renderKOTemplates();
                         ko.applyBindings(vm, document.getElementById('dot-net-report'));
     
                         this.bindGridInit(vm);
                         this.bindWindowResize(vm);
+                    })
                     });
                 });
             });

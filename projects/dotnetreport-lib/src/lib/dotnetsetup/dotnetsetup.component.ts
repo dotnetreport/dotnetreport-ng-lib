@@ -66,7 +66,8 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
             apiUrl:  this.baseServiceUrl + '/DotNetReportApi/CallPostReportApi',
             getPreviewFromSqlUrl: this.baseServiceUrl + '/DotNetReportApi/GetPreviewFromSql',
             onlyApi: onlyApi,
-            loadSchemaUrl: loadSetupSchemaUrl
+            loadSchemaUrl: loadSetupSchemaUrl,
+            currentUserId: model.CurrentUserId
         };
 
         this.renderKOTemplates();

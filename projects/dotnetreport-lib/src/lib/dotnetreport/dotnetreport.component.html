@@ -73,7 +73,7 @@
                         </ul>
                         <div class="form-inline my-2 my-lg-0 ms-auto w-50">
                             <div class="input-group w-100">
-                                <p id="search-input" class="form-control search-input" data-placeholder="Search Report by Name, Description or Data Field..."></p>
+                                <p id="search-input" class="form-control search-input" data-placeholder="Search Report by Name, Description or Data Field..." contenteditable="true" data-tribute="true"></p>
                                 <span data-bind="click: searchForReports" class="input-group-text" style="height: 38px; cursor: pointer;" title="Search"><i class="fa fa-search"></i></span>
                                 <span data-bind="click: function() {resetQuery(true, true);}" class="input-group-text" style="height: 38px; cursor: pointer;" title="Clear Search"><i class="fa fa-close"></i></span>
                             </div>
@@ -237,7 +237,7 @@
                                                         <button class="btn btn-sm btn-outline-secondary" data-bind="click: openReport, visible: canEdit" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
                                                             <span class="fa fa-edit" aria-hidden="true"></span> Edit
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-secondary" data-bind="click: copyReport, visible: canEdit" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
+                                                        <button class="btn btn-sm btn-outline-secondary" data-bind="click: copyReport, visible: canEdit || $parent.appSettings.canCopyReport" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
                                                             <span class="fa fa-copy" aria-hidden="true"></span> Copy
                                                         </button>
                                                     </span>
@@ -271,7 +271,7 @@
                                                         <button class="btn btn-sm btn-outline-secondary" title="Edit Report" data-bind="click: openReport, visible: canEdit" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
                                                             <span class="fa fa-edit" aria-hidden="true"></span>
                                                         </button>
-                                                        <button class="btn btn-sm btn-light" data-bind="click: copyReport, visible: canEdit" title="Copy Report" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
+                                                        <button class="btn btn-sm btn-light" data-bind="click: copyReport, visible: canEdit || $parent.appSettings.canCopyReport" title="Copy Report" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
                                                             <span class="fa fa-copy" aria-hidden="true"></span>
                                                         </button>
                                                     </span>
@@ -392,7 +392,7 @@
                                                                 </a>
                                                             </li>
                                                             <li>
-                                                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder" data-bind="click: copyReport, visible: canEdit">
+                                                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder" data-bind="click: copyReport, visible: canEdit || $parent.appSettings.canCopyReport">
                                                                     <span class="fa fa-copy"></span> Copy
                                                                 </a>
                                                             </li>
