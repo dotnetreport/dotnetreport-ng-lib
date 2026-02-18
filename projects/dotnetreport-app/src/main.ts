@@ -1,13 +1,17 @@
-import { enableProdMode } from '@angular/core';
-import '@angular/compiler';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { AppComponent } from './app/app.component';
 
-import { AppModule } from './app/app.module';
-import { environment } from './environments/environment';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { routes } from './app/app.routes';
+import {provideDotNetReport} from 'dotnetreport-ng';
+import { provideRouter } from '@angular/router';
 
-if (environment.production) {
-  enableProdMode();
-}
-
-platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.error(err));
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideRouter(routes),
+    provideAnimations(),
+    provideHttpClient(withInterceptorsFromDi()),
+    ...provideDotNetReport('https://localhost:52107')
+  ]
+});

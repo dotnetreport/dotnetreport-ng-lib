@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, Inject, Injector, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { BASE_URL_TOKEN } from './../dotnetreport-lib.di';
-import { ActivatedRoute } from '@angular/router';
-
+import { BASE_URL_TOKEN } from '../dotnetreport-lib.di';
+import { ActivatedRoute, RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
 declare var ko: any;
 declare var dashboardViewModel: any;
 declare var $: any;
@@ -12,6 +12,8 @@ declare var _: any;
 
 @Component({
   selector: 'app-dotnetdashboard',
+  standalone: true,
+  imports: [RouterOutlet,CommonModule],
   templateUrl: './dotnetdashboard.component.html',
   styleUrls: ['./dotnetdashboard.component.css']
 })
@@ -20,7 +22,7 @@ declare var _: any;
 export class DotnetdashboardComponent implements OnInit, OnDestroy {
     private baseServiceUrl: string;
     public reportTemplates: SafeHtml;
-    private queryParams: { [key: string]: string };
+    private queryParams: { [key: string]: string }={};
   
     constructor(injector: Injector,
       private sanitizer: DomSanitizer,

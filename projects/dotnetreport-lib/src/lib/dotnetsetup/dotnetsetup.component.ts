@@ -3,6 +3,7 @@ import { ChangeDetectorRef, Component, Inject, Injector, OnDestroy, OnInit } fro
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { BASE_URL_TOKEN } from './../dotnetreport-lib.di';
 import { ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 declare var ko: any;
 declare var manageViewModel: any;
@@ -10,13 +11,15 @@ declare var manageViewModel: any;
 @Component({
   selector: 'app-dotnetsetup',
   templateUrl: './dotnetsetup.component.html',
+  standalone: true,
+  imports: [ CommonModule],
   styleUrls: ['./dotnetsetup.component.css']
 })
 
 export class DotnetsetupComponent implements OnInit, OnDestroy {
   private baseServiceUrl: string;
   public reportTemplates: SafeHtml;
-  private queryParams: { [key: string]: string };
+  private queryParams: { [key: string]: string }={};
 
   constructor(injector: Injector,
     private sanitizer: DomSanitizer,
