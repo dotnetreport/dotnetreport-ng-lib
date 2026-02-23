@@ -19,7 +19,7 @@
 
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav mr-auto">
-                            <li class="nav-item dropdown" data-bind="visible: (CanSaveReports() && appSettings.usePromptBuilder()) || adminMode()">
+                            <li class="nav-item dropdown" data-bind="visible: SelectedFolder() ? SelectedFolder().canEdit : (CanSaveReports() || adminMode())">
                                 <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <span class="fa fa-plus"></span> New Report
                                 </a>
@@ -27,11 +27,6 @@
                                     <a class="dropdown-item" href="#" data-bind="click: createNewReport" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder"><i class="fa fa-sliders"></i> Use Standard Designer</a>
                                     <a class="dropdown-item" href="#" data-bind="click: createNewReportAi"><i class="fa fa-bolt"></i> Use Smarter Designer</a>
                                 </div>
-                            </li>
-                            <li class="nav-item active" data-bind="visible: (SelectedFolder() ? SelectedFolder().canEdit : (CanSaveReports() || adminMode())) && !appSettings.usePromptBuilder()">
-                                <a href="#" class="nav-link" data-bind="click: createNewReport" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
-                                    <span class="fa fa-plus"></span> New Report
-                                </a>
                             </li>
                             <li class="nav-item" data-bind="visible: CanManageFolders() || adminMode()">
                                 <a href="#" class="nav-link" data-bind="click: ManageFolder.newFolder">
@@ -156,6 +151,10 @@
                                           css: isSelected() ? 'fa fa-check-square text-primary me-2' : 'fa fa-square-o me-2'"></span>
                                     <span class="fa fa-3x fa-folder text-secondary"></span>
                                     <span class="desc" data-bind="text: FolderName"></span>
+                                    <div data-bind="visible: $root.adminMode" style="font-size: 0.75em; margin-top: 4px;" onclick="event.stopPropagation()">
+                                        <span class="badge text-bg-info text-white" data-bind="text: UserId ? UserId : 'Any User'"></span>
+                                        <span class="badge text-bg-info text-white" data-bind="text: UserRoles ? UserRoles : 'Any Role'"></span>
+                                    </div>                                    
                                 </li>
                             </ul>
                         </div>
@@ -172,8 +171,40 @@
                                 <div data-bind="if: SelectedFolder()!=null && reportsInFolder().length==0">
                                     This folder is empty.
                                 </div>
-                                <div data-bind="if: searchReports() && reportsInSearch().length==0">
-                                    No Reports found matching your Search
+                                <div data-bind="if: searchReports() && reportsInSearch().length==0 && foldersInSearch().length==0">
+                                    No results found matching your search.
+                                </div>
+                                <!-- Folder search results (icon view) -->
+                                <div data-bind="if: searchReports() && foldersInSearch().length > 0">
+                                    <div class="mt-1 mb-1"><strong><span class="fa fa-folder"></span> Matching Folders</strong></div>
+                                    <ul class="folder-list" data-bind="foreach: foldersInSearch">
+                                        <li data-bind="click: function(){ $parent.SelectedFolder($data); $parent.searchReports(''); }">
+                                            <span class="fa fa-3x fa-folder text-secondary"></span>
+                                            <span class="desc" data-bind="highlightedText: { text: FolderName, highlight: $parent.searchReports, css: 'highlight' }"></span>
+                                            <div data-bind="visible: $root.adminMode" style="font-size: 0.75em; margin-top: 4px;" onclick="event.stopPropagation()">
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    <span class="badge bg-info text-white" title="Manage Users" data-bind="text: UserId ? '👤 ' + UserId : '👤 Any User'"></span>
+                                                    <!-- ko if: ViewOnlyUserId -->
+                                                    <span class="badge bg-info text-white border" title="View only Users" data-bind="text: '👁 ' + ViewOnlyUserId"></span>
+                                                    <!-- /ko -->
+                                                    <!-- ko if: DeleteOnlyUserId -->
+                                                    <span class="badge bg-info text-white border" title="Delete only Users" data-bind="text: '🗑 ' + DeleteOnlyUserId"></span>
+                                                    <!-- /ko -->
+                                                    <span class="badge bg-info text-white" title="Manage Roles" data-bind="text: '🔑 ' + (UserRoles ? UserRoles : 'Any Role')"></span>
+                                                    <!-- ko if: ViewOnlyUserRoles -->
+                                                    <span class="badge bg-info text-white border" title="View only Roles" data-bind="text: '👁 ' + ViewOnlyUserRoles"></span>
+                                                    <!-- /ko -->
+                                                    <!-- ko if: DeleteOnlyUserRoles -->
+                                                    <span class="badge bg-info text-white border" title="Delete only Roles" data-bind="text: '🗑 ' + DeleteOnlyUserRoles"></span>
+                                                    <!-- /ko -->
+                                                    <!-- ko if: ClientId -->
+                                                    <span class="badge bg-info text-white" title="Client" data-bind="text: '🏢 ' + ClientId"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <hr />
                                 </div>
                                 <div class="list-group" data-bind="foreach: searchReports() ? reportsInSearch() : reportsInFolder()">
                                     <div class="list-group-item">
@@ -197,36 +228,26 @@
                                                     </span>
                                                 </p>
                                                 <div data-bind="if: $parent.adminMode">
-                                                    <div class="small">
-                                                        <b>Report Access</b><br />
-                                                        Manage by User <span class="badge text-bg-info text-white" data-bind="text: userId ? userId : 'Any User'"></span>
-                                                        <br />
-                                                        View only by User <span class="badge text-bg-info text-white" data-bind="text: (viewOnlyUserId ? viewOnlyUserId : (userId ? userId : 'Any User'))"></span>
-                                                        <br />
-                                                        <div data-bind="if: deleteOnlyUserId">
-                                                            Delete only by User <span class="badge text-bg-info text-white" data-bind="text: deleteOnlyUserId"></span>
-                                                            <br />
-                                                        </div>
-                                                        <div data-bind="if: userRole">
-                                                            Manage by Role <span class="badge text-bg-info text-white" data-bind="text: userRole ? userRole : 'No Role'"></span>
-                                                            <br />
-                                                        </div>
-                                                        <div data-bind="if: viewOnlyUserRole">
-                                                            View only by Role <span class="badge text-bg-info text-white" data-bind="text: viewOnlyUserRole ? viewOnlyUserRole : 'Any Role'"></span>
-                                                            <br />
-                                                        </div>
-                                                        <div data-bind="if: deleteOnlyUserRole">
-                                                            Delete only by Role <span class="badge text-bg-info text-white" data-bind="text: deleteOnlyUserRole ? deleteOnlyUserRole : 'Same as Manage'"></span>
-                                                            <br />
-                                                        </div>
-                                                        <div data-bind="if: clientId">
-                                                            For Client <span class="label label-info" data-bind="text: clientId ? clientId : 'Any'"></span>
-                                                            <br />
-                                                        </div>
-                                                        <div>
-                                                            Direct Link to Run Report: <a data-bind="attr: {href: '/DotNetReport/?linkedreport=true&noparent=true&reportId=' + reportId }" target="_blank"><span class="fa fa-link"></span></a>
-                                                            &nbsp;<a href="#" data-bind="click: navigator.clipboard.writeText(window.location.href + '?linkedreport=true&noparent=true&reportId=' + reportId )"><span class="fa fa-copy" title="Click to Copy Link"></span></a>
-                                                        </div>
+                                                    <div class="d-flex flex-wrap gap-1 align-items-center mt-1">
+                                                        <span class="badge bg-info text-white" title="Manage Users" data-bind="text: userId ? '👤 ' + userId : '👤 Any User'"></span>
+                                                        <!-- ko if: viewOnlyUserId -->
+                                                        <span class="badge bg-info text-white border" title="View only Users" data-bind="text: '👁 ' + viewOnlyUserId"></span>
+                                                        <!-- /ko -->
+                                                        <!-- ko if: deleteOnlyUserId -->
+                                                        <span class="badge bg-info text-white border" title="Delete only Users" data-bind="text: '🗑 ' + deleteOnlyUserId"></span>
+                                                        <!-- /ko -->
+                                                        <span class="badge bg-info text-white" title="Manage Roles" data-bind="text: '🔑 ' + (userRole ? userRole : 'Any Role')"></span>                                                        
+                                                        <!-- ko if: viewOnlyUserRole -->
+                                                        <span class="badge bg-info text-white border" title="View only Roles" data-bind="text: '👁 ' + viewOnlyUserRole"></span>
+                                                        <!-- /ko -->
+                                                        <!-- ko if: deleteOnlyUserRole -->
+                                                        <span class="badge bg-info text-white border" title="Delete only Roles" data-bind="text: '🗑 ' + deleteOnlyUserRole"></span>
+                                                        <!-- /ko -->
+                                                        <!-- ko if: clientId -->
+                                                        <span class="badge bg-info text-white" title="Client" data-bind="text: '🏢 ' + clientId"></span>
+                                                        <!-- /ko -->
+                                                        <a data-bind="attr: {href: '/DotNetReport/?linkedreport=true&noparent=true&reportId=' + reportId }" target="_blank" title="Direct Link"><span class="fa fa-link"></span></a>
+                                                        <a href="#" data-bind="click: function() { navigator && navigator.clipboard && navigator.clipboard.writeText('/DotNetReport?linkedreport=true&noparent=true&reportId=' + reportId) }" title="Copy Link"><span class="fa fa-copy"></span></a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -237,7 +258,7 @@
                                                         <button class="btn btn-sm btn-outline-secondary" data-bind="click: openReport, visible: canEdit" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
                                                             <span class="fa fa-edit" aria-hidden="true"></span> Edit
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-secondary" data-bind="click: copyReport, visible: canEdit || $parent.appSettings.canCopyReport" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
+                                                        <button class="btn btn-sm btn-outline-secondary" data-bind="click: copyReport, visible:canEdit || $parent.appSettings.canCopyReport" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
                                                             <span class="fa fa-copy" aria-hidden="true"></span> Copy
                                                         </button>
                                                     </span>
@@ -249,8 +270,8 @@
                                                             <span class="sr-only"></span>
                                                         </button>
                                                         <div class="dropdown-menu dropdown-menu-right">
-                                                            <a class="dropdown-item" href="#" data-bind="click: function() {exportReport('pdf');}">
-                                                                <span class="fa fa-file-excel-o"></span> Download PDF
+                                                            <a class="dropdown-item" href="#" data-bind="click: function() { exportReport($root.appSettings.useAltPdf ? 'pdfalt' : 'pdf');}">
+                                                                <span class="fa fa-file-pdf-o"></span> Download PDF
                                                             </a>
                                                             <a class="dropdown-item" href="#" data-bind="click: function() {exportReport('excel');}">
                                                                 <span class="fa fa-file-excel-o"></span> Download Excel
@@ -271,7 +292,7 @@
                                                         <button class="btn btn-sm btn-outline-secondary" title="Edit Report" data-bind="click: openReport, visible: canEdit" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
                                                             <span class="fa fa-edit" aria-hidden="true"></span>
                                                         </button>
-                                                        <button class="btn btn-sm btn-light" data-bind="click: copyReport, visible: canEdit || $parent.appSettings.canCopyReport" title="Copy Report" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
+                                                        <button class="btn btn-sm btn-light" data-bind="click: copyReport, visible:canEdit || $parent.appSettings.canCopyReport" title="Copy Report" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
                                                             <span class="fa fa-copy" aria-hidden="true"></span>
                                                         </button>
                                                     </span>
@@ -319,20 +340,57 @@
                             <div data-bind="visible: !SelectedFolder() && !searchReports()">
                                 <div class="container-fluid">
                                     <div class="row fw-bold border-bottom py-2 w-100">
-                                        <div class="col-md-6">Name</div>
-                                        <div class="col-md-6 text-end" data-bind="visible: adminMode">Access Control</div>
+                                        <div class="col-md-5">Name</div>
+                                        <div class="col-md-1"></div>
+                                        <div class="col-md-6" data-bind="visible: adminMode">Access Control</div>
                                     </div>
-                                    <div class="folder-list" data-bind="foreach: Folders">
-                                        <div class="row clickable py-2 border-bottom align-items-center w-100" data-bind="click: function(){ $parent.SelectedFolder($data); }">
-                                            <div class="col-md-6 d-flex align-items-center">
+                                    <div class="" data-bind="foreach: Folders">
+                                        <div class="row py-2 border-bottom align-items-center w-100" >
+                                            <div class="col-md-5 d-flex align-items-center clickable" data-bind="click: function(){ $parent.SelectedFolder($data); }">
                                                 <span data-bind="visible: $root.selectMode, click: function(d,e){ isSelected(!isSelected()); e.stopPropagation(); },
                                                     css: isSelected() ? 'fa fa-check-square text-primary me-2' : 'fa fa-square-o me-2'"></span>
                                                 <span class="fa fa-folder text-secondary me-2"></span>
                                                 <span data-bind="text: FolderName"></span>
                                             </div>
-                                            <div class="col-md-6 text-end" data-bind="visible: $parent.adminMode">
-                                                <!--<div class="badge bg-info text-white" data-bind="text: userId ? userId : 'Any User'"></div>
-                                                    <div class="badge bg-info text-white" data-bind="text: userRole ? userRole : 'No Role'"></div>-->
+                                            <div class="col-md-1" onclick="event.stopPropagation()">
+                                                <div class="dropdown" data-bind="visible: ($root.CanManageFolders() || $root.adminMode()) && (canEdit || canDelete || $root.adminMode())">
+                                                    <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <span class="fa fa-ellipsis-h"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li>
+                                                            <a class="dropdown-item" href="#" data-bind="click: function(){ $parent.SelectedFolder($data); $parent.ManageFolder.editFolder(); }, visible: canEdit || $root.adminMode()">
+                                                                <span class="fa fa-edit"></span> Edit Folder
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item text-danger" href="#" data-bind="click: function(){ $parent.SelectedFolder($data); $parent.ManageFolder.deleteFolder(); }, visible: canDelete || $root.adminMode()">
+                                                                <span class="fa fa-trash"></span> Delete Folder
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6" data-bind="visible: $parent.adminMode">
+                                                <div class="d-flex flex-wrap gap-1 align-items-center">
+                                                    <span class="badge bg-info text-white" title="Manage Users" data-bind="text: UserId ? '👤 ' + UserId : '👤 Any User'"></span>
+                                                    <!-- ko if: ViewOnlyUserId -->
+                                                    <span class="badge bg-info text-white border" title="View only Users" data-bind="text: '👁 ' + ViewOnlyUserId"></span>
+                                                    <!-- /ko -->
+                                                    <!-- ko if: DeleteOnlyUserId -->
+                                                    <span class="badge bg-info text-white border" title="Delete only Users" data-bind="text: '🗑 ' + DeleteOnlyUserId"></span>
+                                                    <!-- /ko -->
+                                                    <span class="badge bg-info text-white" title="Manage Roles" data-bind="text: '🔑 ' + (UserRoles ? UserRoles : 'Any Role')"></span>
+                                                    <!-- ko if: ViewOnlyUserRoles -->
+                                                    <span class="badge bg-info text-white border" title="View only Roles" data-bind="text: '👁 ' + ViewOnlyUserRoles"></span>
+                                                    <!-- /ko -->
+                                                    <!-- ko if: DeleteOnlyUserRoles -->
+                                                    <span class="badge bg-info text-white border" title="Delete only Roles" data-bind="text: '🗑 ' + DeleteOnlyUserRoles"></span>
+                                                    <!-- /ko -->
+                                                    <!-- ko if: ClientId -->
+                                                    <span class="badge bg-info text-white" data-bind="text: '🏢 ' + ClientId"></span>
+                                                    <!-- /ko -->
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -345,8 +403,45 @@
                                         <p class="text-muted">This folder is empty.</p>
                                     </div>
 
-                                    <div data-bind="if: searchReports() && reportsInSearch().length==0">
-                                        <p class="text-center text-muted">No reports found matching your search.</p>
+                                    <div data-bind="if: searchReports() && reportsInSearch().length==0 && foldersInSearch().length==0">
+                                        <p class="text-center text-muted">No results found matching your search.</p>
+                                    </div>
+                                    <!-- Folder search results (list view) -->
+                                    <div data-bind="if: searchReports() && foldersInSearch().length > 0">
+                                        <div class="row fw-bold py-1 border-bottom mt-2 w-100">
+                                            <div class="col-md-6"><span class="fa fa-folder"></span> Matching Folders</div>
+                                            <div class="col-md-6" data-bind="visible: $root.adminMode">Access</div>
+                                        </div>
+                                        <div data-bind="foreach: foldersInSearch">
+                                            <div class="row border-bottom py-2 align-items-center w-100">
+                                                <div class="col-md-6 d-flex align-items-center">
+                                                    <span class="fa fa-folder text-secondary me-2"></span>
+                                                    <a href="#" data-bind="click: function(){ $parent.SelectedFolder($data); $parent.searchReports(''); }, highlightedText: { text: FolderName, highlight: $parent.searchReports, css: 'highlight' }" style="cursor: pointer"></a>
+                                                </div>
+                                                <div class="col-md-6" data-bind="visible: $root.adminMode">
+                                                    <div class="small text-muted d-flex flex-wrap gap-1 align-items-center">
+                                                        <span class="badge bg-info text-white" title="Manage Users" data-bind="text: UserId ? '👤 ' + UserId : '👤 Any User'"></span>
+                                                        <!-- ko if: ViewOnlyUserId -->
+                                                        <span class="badge bg-info text-white border" title="View only Users" data-bind="text: '👁 ' + ViewOnlyUserId"></span>
+                                                        <!-- /ko -->
+                                                        <!-- ko if: DeleteOnlyUserId -->
+                                                        <span class="badge bg-info text-white border" title="Delete only Users" data-bind="text: '🗑 ' + DeleteOnlyUserId"></span>
+                                                        <!-- /ko -->
+                                                        <span class="badge bg-info text-white" title="Manage Roles" data-bind="text: '🔑 ' + (UserRoles ? UserRoles : 'Any Role')"></span>
+                                                        <!-- ko if: ViewOnlyUserRoles -->
+                                                        <span class="badge bg-info text-white border" title="View only Roles" data-bind="text: '👁 ' + ViewOnlyUserRoles"></span>
+                                                        <!-- /ko -->
+                                                        <!-- ko if: DeleteOnlyUserRoles -->
+                                                        <span class="badge bg-info text-white border" title="Delete only Roles" data-bind="text: '🗑 ' + DeleteOnlyUserRoles"></span>
+                                                        <!-- /ko -->
+                                                        <!-- ko if: ClientId -->
+                                                        <span class="badge bg-info text-white" title="Client" data-bind="text: '🏢 ' + ClientId"></span>
+                                                        <!-- /ko -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-2"></div>
                                     </div>
                                     <div data-bind="if: reportsInFolder().length > 0 || reportsInSearch().length > 0">
                                         <div class="row fw-bold border-bottom py-2 w-100">
@@ -392,7 +487,7 @@
                                                                 </a>
                                                             </li>
                                                             <li>
-                                                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder" data-bind="click: copyReport, visible: canEdit || $parent.appSettings.canCopyReport">
+                                                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder" data-bind="click: copyReport, visible:canEdit || $parent.appSettings.canCopyReport">
                                                                     <span class="fa fa-copy"></span> Copy
                                                                 </a>
                                                             </li>
@@ -411,8 +506,8 @@
                                                                 <a class="dropdown-item dropdown-toggle" href="#">Export</a>
                                                                 <ul class="dropdown-menu">
                                                                     <li>
-                                                                        <a class="dropdown-item" href="#" data-bind="click: function() {exportReport('pdf');}">
-                                                                            <span class="fa fa-file-excel-o"></span> Download PDF
+                                                                        <a class="dropdown-item" href="#" data-bind="click: function() {exportReport($root.appSettings.useAltPdf ? 'pdfalt' : 'pdf');}">
+                                                                            <span class="fa fa-file-pdf-o"></span> Download PDF
                                                                         </a>
                                                                     </li>
                                                                     <li>
@@ -425,22 +520,33 @@
                                                                             <span class="fa fa-file-excel-o"></span> Download Excel (Expanded)
                                                                         </a>
                                                                     </li>
-                                                                    <li>
-                                                                        <a class="dropdown-item" href="#" data-bind="visible:$parent.adminMode, click: function() {exportReport('json');}">
-                                                                            <span class="fa fa-file"></span> Export JSON
-                                                                        </a>
-                                                                    </li>
                                                                 </ul>
                                                             </li>
                                                         </ul>
                                                     </div>
 
                                                 </div>
-                                                <div class="col-md-2" data-bind="text: folderName, visible: $parent.searchReports()"></div>
-                                                <div class="col-md-2"></div>
-                                                <div class="col-md-2" data-bind="visible: $parent.adminMode">
-                                                    <div class="badge bg-info text-white" data-bind="text: userId ? userId : 'Any User'"></div>
-                                                    <div class="badge bg-info text-white" data-bind="text: userRole ? userRole : 'No Role'"></div>
+                                                <div class="col-md-2" data-bind="text: folderName, visible: $parent.searchReports()"></div>                                                
+                                                <div class="col-md-4" data-bind="visible: $parent.adminMode">
+                                                    <div class="d-flex flex-wrap gap-1 align-items-center mt-1">
+                                                        <span class="badge bg-info text-white" title="Manage Users" data-bind="text: userId ? '👤 ' + userId : '👤 Any User'"></span>
+                                                        <!-- ko if: viewOnlyUserId -->
+                                                        <span class="badge bg-info text-white border" title="View only Users" data-bind="text: '👁 ' + viewOnlyUserId"></span>
+                                                        <!-- /ko -->
+                                                        <!-- ko if: deleteOnlyUserId -->
+                                                        <span class="badge bg-info text-white border" title="Delete only Users" data-bind="text: '🗑 ' + deleteOnlyUserId"></span>
+                                                        <!-- /ko -->
+                                                        <span class="badge bg-info text-white" title="Manage Roles" data-bind="text: '🔑 ' + (userRole ? userRole : 'Any Role')"></span>
+                                                        <!-- ko if: viewOnlyUserRole -->
+                                                        <span class="badge bg-info text-white border" title="View only Roles" data-bind="text: '👁 ' + viewOnlyUserRole"></span>
+                                                        <!-- /ko -->
+                                                        <!-- ko if: deleteOnlyUserRole -->
+                                                        <span class="badge bg-info text-white border" title="Delete only Roles" data-bind="text: '🗑 ' + deleteOnlyUserRole"></span>
+                                                        <!-- /ko -->
+                                                        <!-- ko if: clientId -->
+                                                        <span class="badge bg-info text-white" title="Client" data-bind="text: '🏢 ' + clientId"></span>
+                                                        <!-- /ko -->
+                                                    </div>
                                                 </div>
                                                 <div class="col-md-1" data-bind="visible: $parent.adminMode">
                                                     <a data-bind="attr: {href: '/DotNetReport?linkedreport=true&noparent=true&reportId=' + reportId }" target="_blank"><span class="fa fa-link"></span></a>
@@ -487,7 +593,7 @@
                                 </button>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item" href="#"
-                                       data-bind="click: function(){ SaveReport(true); }"
+                                       data-bind="click: function(){ SaveReport(true); activeDesign(false); }"
                                        data-bs-toggle="modal"
                                        data-bs-target="#modal-reportbuilder">
                                         <i class="fa fa-sliders"></i> Edit with Standard Designer
@@ -523,7 +629,7 @@
                                             <i class="fa fa-file-pdf-o"></i> Pdf
                                         </a>
                                     </li>
-                                    <li data-bind="visible: adminMode() && !appSettings.useAltPdf">
+                                    <li data-bind="visible: adminMode() && !appSettings.useAltPdf()">
                                         <a href="#" class="dropdown-item" data-bind="click: appSettings.showPageSize
                                               ? function() { PdfPage.isDebug = true; $('#pdfOptionsModal').modal('show'); }
                                               : function() { downloadPdf(true); }">
@@ -577,68 +683,7 @@
             </div>
             <div class="card-body">
                 <div data-bind="if: activeDesign()">
-                    <div data-bind="if: ReportID() <= 0">
-                        <ul class="nav nav-tabs" id="designTabs" role="tablist">                            
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="designer-tab" data-bs-toggle="tab" data-bs-target="#designer" type="button" role="tab">
-                                    Report Designer
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="nl-tab" data-bs-toggle="tab" data-bs-target="#nl" type="button" role="tab">
-                                    Use Prompt<span title="This feature is still in Beta release. You can turn it off from settings" style="font-size: 10pt; padding: 5px; max-width: 350px; white-space: normal; margin-bottom: 0;">
-                                        <i class="fa fa-info-circle"></i>
-                                    </span>
-                                </button>
-                            </li>
-                        </ul>
-
-                        <div class="tab-content mt-3">
-                            <div class="tab-pane fade show active" id="designer" role="tabpanel" aria-labelledby="designer-tab">
-                                <div data-bind="template: 'report-designer-compact', data: $root"></div>
-                            </div>
-                            <div class="tab-pane fade" id="nl" role="tabpanel" aria-labelledby="nl-tab">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <p>
-                                            What would you like to know? Type a <b>natural language prompt</b> below to ask questions about your data.<br>
-                                            Use <b>Auto Complete</b> suggestions to guide your query — the AI will convert your prompt into a Dotnet Report that you can then preview, design, save and reuse.
-                                        </p>
-
-                                        <p id="query-input" class="query-input">
-                                            Show me&nbsp;
-                                        </p>
-
-                                        <p>
-                                            <button data-bind="click: function() {runQuery(false);}" class="btn btn-primary btn-sm">
-                                                <span class="fa fa-magic"></span> Process with AI
-                                            </button>
-
-                                            <button data-bind="click: function() {resetQuery(true, false);}" class="btn btn-secondary btn-sm">
-                                                <span class="fa fa-undo"></span> Start Over
-                                            </button>
-
-                                            <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#sqlModal" data-bind="visible: adminMode">
-                                                <span class="fa fa-code"></span> View Code
-                                            </button>
-
-                                            <button class="btn btn-secondary btn-sm" data-bind="visible: CanSaveReports(), click: SaveWithoutRun">
-                                                <span class="fa fa-save"></span> Save Report
-                                            </button>
-
-                                            <button data-bind="click: openDesigner" class="btn btn-secondary btn-sm">
-                                                <span class="fa fa-pencil"></span> Design/Save Report
-                                            </button>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div data-bind="if: ReportID() > 0">
-                        <div data-bind="template: 'report-designer-compact', data: $root"></div>
-                    </div>
+                    <div data-bind="template: 'report-designer-compact', data: $root"></div>
                 </div>
 
                 <div data-bind="with: ReportResult" class="report-view">
@@ -739,9 +784,13 @@
                                 </div>
                                 <div class="report-canvas" data-bind="hidden: DontExecuteOnRun() && !reportRan()">
                                     <div class="report-container bg-light">
-                                        <div class="report-inner bg-white">
+                                           <div class="report-inner" data-bind="style: { backgroundColor: ReportResult()?.ReportData()?.BackColor || null },
+                                               css: { 'bg-white': !ReportResult()?.ReportData()?.BackColor }">
                                             <div data-bind="if: $root.CanEdit() && ReportType()!='Html' && ReportType()!='Single'">
                                                 <div data-bind="template: 'chart-settings', data: $data"></div>
+                                            </div>
+                                            <div data-bind="if: $root.CanEdit() && ReportType()=='Single'">
+                                                <div data-bind="template: 'kpi-settings', data: $data"></div>
                                             </div>
                                             <div data-bind="visible: headerDesigner.UseReportHeader">
                                                 <div id="report-header" width="900" height="120" data-bind="html: headerDesigner.headerHtml"></div>

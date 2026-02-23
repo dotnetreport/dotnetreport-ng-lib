@@ -1,6 +1,6 @@
 {
   "name": "dotnetreport-ng",
-  "version": "6.2.2-beta",
+  "version": "6.2.4-beta.1",
   "description": "Angular Component for dotnetreport",
   "keywords": [
     "dotnet report",
@@ -18,7 +18,7 @@
     "@types/knockout": "^3.4.72",
     "bootbox": "^6.0.0",
     "bootstrap": "^5.3.3",
-    "dotnetreport": "^6.2.2"
+    "dotnetreport": "^6.2.4-beta.1"
   },
   "dependencies": {
     "tslib": "^2.3.0"
