@@ -54,11 +54,12 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
             var dashboardId = parseInt(this.queryParams['id'] || '0');
             if (!dashboardId && dashboards.length > 0) { dashboardId = dashboards[0].id; }
 
-            this.http.get(loadSavedDashboard + "?id=" + dashboardId).subscribe((reportsData: any) => {
-                reportsData.forEach((r:any) => {
-                    reports.push({ reportSql: r.ReportSql, reportId: r.ReportId, reportFilter: r.ReportFilter, connectKey: r.ConnectKey, x: r.X, y: r.Y, width: r.Width, height: r.Height });
-                });
-                this.http.get(getUsersAndRolesUrl).subscribe((response: any) => {
+            // this.http.get(loadSavedDashboard + "?id=" + dashboardId).subscribe((reportsData: any) => {
+            //     reportsData.forEach((r:any) => {
+            //         reports.push({ reportSql: r.ReportSql, reportId: r.ReportId, reportFilter: r.ReportFilter, connectKey: r.ConnectKey, x: r.X, y: r.Y, width: r.Width, height: r.Height });
+            //     });
+            // });
+            this.http.get(getUsersAndRolesUrl).subscribe((response: any) => {
 
                     let result = response;
                     let vm = new dashboardViewModel({
@@ -100,7 +101,6 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                     })
                     });
                 });
-            });
         });
     }
   
@@ -3462,7 +3462,70 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
         </div>
     </div>
 </script>
-`);
+<script type="text/html" id="line-separator-template">
+    <div class="grid-stack-item-content position-relative p-2" data-bind="css: { card: $root.arrangeDashboard }">
+        <hr data-bind="style: { borderTop: thickness() + 'px solid ' + color() }" class="m-0">
+        <div data-bind="visible: $root.arrangeDashboard" class="dropdown position-absolute" style="top:-5px; right:0; z-index:2000;">
+            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
+                <i class="fa fa-ellipsis-v"></i>
+            </button>
+               <ul class="dropdown-menu dropdown-menu-end p-2 bg-light small">
+                    <li class="d-flex align-items-center gap-2 mb-2">
+                        <label class="form-label small mb-0">Line Color</label>
+                        <input type="color" class="color-picker" data-bind="value: color,valueUpdate: 'input',event: { change: () => $root.onWidgetChange($data)}">
+                    </li>
+
+                    <li class="d-flex align-items-center gap-2 mb-2">
+                        <label class="mb-0">Thickness</label>
+                        <input type="number"
+                               min="1"
+                               max="10"
+                               data-bind="value: thickness,valueUpdate: 'input',event: { change: () => $root.onWidgetChange($data)}"
+                               class="form-control form-control-sm"
+                               style="width:50px">
+                    </li>
+
+                    <li>
+                        <button class="dropdown-item text-danger" data-bind="click: deleteSeparator">
+                            <i class="fa fa-trash me-2"></i>
+                            Delete
+                        </button>
+                    </li>
+                </ul>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="text-widget-template">
+    <div class="grid-stack-item-content position-relative p-2" data-bind="css: { card: $root.arrangeDashboard }">
+        <div data-bind="html: decodeURIComponent(text())"></div>
+        <div class="position-absolute" style="top:3px; right:4px; z-index:2000;" data-bind="visible: $root.arrangeDashboard">
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    <i class="fa fa-ellipsis-v"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <button class="dropdown-item"
+                                data-bind="click: $root.openTextEditor">
+                            <i class="fa fa-edit me-2"></i>
+                            Edit
+                        </button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item text-danger"
+                                data-bind="click: deleteText">
+                            <i class="fa fa-trash me-2"></i>
+                            Delete
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</script>`);
     this.cdref.detectChanges();
   }
   

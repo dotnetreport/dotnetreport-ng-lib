@@ -228,9 +228,8 @@
 </div>
 
 
-<div class="grid-stack" style="display: none;">
-    <!-- ko foreach: dashboardItems -->
-    <!-- ko if: type === 'report' -->
+<div class="grid-stack" style="display: none;"  data-bind="foreach: dashboardItems">
+    <div data-bind="if: type === 'report'">
     <div class="grid-stack-item" data-bind="attr: {'gs-x': x, 'gs-y': y, 'gs-w': width, 'gs-h': height, 'gs-id': ReportID,'data-type':'report'}">
         <div class="card" data-bind="attr: {class: 'card ' + panelStyle + ' grid-stack-item-content'}, css: { expanded: isExpanded }, style: { border: noDashboardBorders() ? 'none' : '', 'box-shadow': noDashboardBorders() ? 'none' : '','background-color': $parent.getCardBackground($data) }" style="overflow-y: hidden;">
             <div class="padded-div" style="padding-bottom: 0; margin-bottom: 0;">
@@ -362,18 +361,18 @@
             </div>
         </div>
     </div>
-    <!-- /ko -->
-    <!-- ko if: type === 'separator' -->
+    </div>
+
+    <div data-bind="if: type === 'separator'">
     <div class="grid-stack-item" data-bind="attr: {'gs-x': x, 'gs-y': y, 'gs-w': width, 'gs-h': height, 'gs-id': id,'data-type':'separator'}">
         <div data-bind="template: { name: 'line-separator-template', data: $data }"></div>
     </div>
-    <!-- /ko -->
-    <!-- ko if: type === 'text' -->
+    </div>
+    <div data-bind="if: type === 'text'">
     <div class="grid-stack-item" data-bind="attr: {'gs-x': x, 'gs-y': y, 'gs-w': width, 'gs-h': height,'gs-id': id,'data-type':'text'}">
         <div data-bind="template:{name:'text-widget-template', data:$data}"></div>
     </div>
-    <!-- /ko -->
-    <!-- /ko -->
+    </div>
 </div>
 <script type="text/html" id="line-separator-template">
     <div class="grid-stack-item-content position-relative p-2" data-bind="css: { card: $root.arrangeDashboard }">
