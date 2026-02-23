@@ -46,7 +46,7 @@
                     <i class="fa fa-clock-o"></i> Schedules
                 </a>
             </li>
-            <li role="presentation" class="nav-item" style="display: none;">
+            <li role="presentation" class="nav-item" data-bind="visible: settings.useFunctions">
                 <a class="nav-link" href="#functions" aria-controls="functions" role="tab" data-bs-toggle="tab">
                     <i class="fa fa-cogs"></i> Custom Functions
                 </a>
@@ -58,7 +58,7 @@
             </li>
             <li role="presentation" class="nav-item">
                 <a class="nav-link" href="#connection" aria-controls="home" role="tab" data-bs-toggle="tab">
-                    <i class="fa fa-plug"></i> Data Connection
+                    <i class="fa fa-plug"></i> Data Settings
                 </a>
             </li>
         </ul>
@@ -141,6 +141,14 @@
                                     <label class="form-check-label">Pivot with Drilldown</label>
                                     <small class="text-muted d-block">Use alternate Pivot method that doesn’t use SQL’s PIVOT.<br>Allows drilldown, but may be slower.</small>
                                 </div>
+                                <div class="form-check" data-bind="visible: isEnterprise">
+                                    <input type="checkbox" class="form-check-input" data-bind="checked: useFunctions">
+                                    <label class="form-check-label">Use Functions</label>
+                                    <small class="text-muted d-block">
+                                        Enable calculated functions for List reports only.<br>
+                                        Available for Enterprise license users.
+                                    </small>
+                                </div>
                                 <h6 class="mt-3 mb-2">Report Options</h6>
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" id="allowUsersToCreateReports" data-bind="checked: allowUsersToCreateReports">
@@ -156,9 +164,16 @@
                                 </div>
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" data-bind="checked: canCopyReport">
-                                    <label class="form-check-label">Allow User to copy reports</label>
+                                    <label class="form-check-label">Always allow users to copy reports</label>
                                     <small class="text-muted d-block">
                                         Allow users with View Only access to copy Reports in the system.
+                                    </small>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" data-bind="checked: showScheduling">
+                                    <label class="form-check-label">Hide Report/Dashboard Scheduling</label>
+                                    <small class="text-muted d-block">
+                                        Removes scheduling in reports and dashboard, select only if you don't want to use scheduling feature.
                                     </small>
                                 </div>
                             </div>
@@ -277,8 +292,9 @@
                                 <div class="checkbox pull-left">
                                     <label>
                                         <input type="checkbox" data-bind="checked: Selected" title="Check to use in Dotnet Report, uncheck to Remove">
-                                        <span data-bind="text: TableName,attr: { title: TableName }, click: function() { $root.activeTable($data); }" class="table-name-label" style="cursor: pointer"></span>
-                                        <span data-bind="visible: IsView" class="label-sm">(view)</span>
+                                        <span data-bind="text: TableName, attr: { title: TableName }, click: function() { $root.activeTable($data); }" class="table-name-label" style="cursor: pointer"></span>
+                                        <span data-bind="visible: SchemaName, text: SchemaName" title="schema" class="text-muted small"></span>
+                                        <span data-bind="visible: IsView" class="label label-sm">(view)</span>
                                     </label>
                                     <button class="btn btn-sm" title="Save this Table" data-bind="click: function() { saveTable($root.keys.AccountApiKey, $root.keys.DatabaseApiKey); }">
                                         <i class="fa fa-floppy-o"></i>
@@ -369,6 +385,10 @@
                                 </div>
 
                                 <div class="d-flex align-items-center justify-content-end gap-2">
+                                    <button class="btn btn-sm btn-primary"
+                                            data-bind="click: addNewColumn, visible: false">
+                                        <i class="fa fa-plus"></i> Add Column
+                                    </button>
                                     <label class="label-sm m-0"><span data-bind="text: Columns().length"></span> Columns</label>
                                     <button class="btn btn-sm btn-outline-secondary" data-bind="click: autoFormat, visible: Selected">Auto Format</button>
                                     <button class="btn btn-sm btn-outline-secondary" data-bind="click: unselectAllColumns, visible: Selected">Unselect All</button>
@@ -388,6 +408,7 @@
                                             <span class="badge text-bg-info text-white" data-bind="text: FieldType"></span>
                                             <label data-bind="visible: PrimaryKey" class="badge text-bg-primary">Primary</label>
                                             <label data-bind="visible: ForeignKey" class="badge text-bg-info text-white">Foreign</label>
+                                            <label class="badge text-bg-warning" data-bind="visible: isNew">New</label>
                                         </label>
                                         <button class="btn btn-sm pull-right" data-bs-toggle="modal" data-bs-target="#column-modal" title="All column options" data-bind="click: $root.selectColumn.bind($data, false)">...</button>
                                         <div class="btn btn-sm pull-right sortable">
@@ -795,7 +816,8 @@
             <p>
                 Create and manage Custom Function that you can use in building Reports and Dashboards
             </p>
-            <button class="btn btn-sm btn-primary" data-bind="click: createNewFunction">Add new Function</button>
+            <button class="btn btn-sm btn-primary" data-bind="visible: $root.settings.canAddFunction,click: createNewFunction">Add new Function</button>
+            <button class="btn btn-sm btn-primary" data-bind="click: buildCustomFunctions">Rebuild Functions Library</button>
             <br />
             <hr />
 
@@ -846,34 +868,34 @@
                                         <table class="table table-bordered">
                                             <thead>
                                                 <tr>
+                                                    <th></th>
                                                     <th>Name</th>
-                                                    <th>Display Name</th>
                                                     <th>Description</th>
-                                                    <th>Data Type</th>
-                                                    <th>Required</th>
+                                                    <!--<th>Data Type</th>-->
+                                                    <th>Optional</th>
                                                     <th></th>
                                                 </tr>
                                             </thead>
-                                            <tbody data-bind="foreach: parameters">
-                                                <tr>
-                                                    <td>
-                                                        <input class="form-control" data-bind="value: parameterName, valueUpdate: 'input'" />
-                                                        <span class="text-danger" data-bind="visible: name.hasError, text: name.validationMessage"></span>
-                                                    </td>
-                                                    <td><input class="form-control" data-bind="value: displayName, valueUpdate: 'input'" /></td>
-                                                    <td><input class="form-control" data-bind="value: description, valueUpdate: 'input'" placeholder="Friendly description for user..." /></td>
-                                                    <td>
-                                                        <select class="form-select" data-bind="value: datatype">
-                                                            <option>object</option>
-                                                            <option>string</option>
-                                                            <option>int</option>
-                                                            <option>float</option>
-                                                            <option>bool</option>
-                                                        </select>
-                                                    </td>
-                                                    <td><input type="checkbox" data-bind="checked: required" /></td>
-                                                    <td><button class="btn btn-sm btn-danger" data-bind="click: $parent.removeParameter">Remove</button></td>
-                                                </tr>
+                                            <tbody data-bind="foreach: parameters, tableSortable: { data: parameters, placeholder: 'sortable-placeholder' }" >
+                                            <tr>
+                                                <td> <span class="fa fa-ellipsis-v" aria-hidden="true" title="Drag to reorder"></span></td>
+                                                <td>
+                                                    <input class="form-control" data-bind="value: parameterName, valueUpdate: 'input'" />
+                                                    <span class="text-danger" data-bind="visible: name.hasError, text: name.validationMessage"></span>
+                                                </td>
+                                                <td><input class="form-control" data-bind="value: description, valueUpdate: 'input'" placeholder="Friendly description for user..." /></td>
+                                                <!--<td>
+                                                    <select class="form-select" data-bind="value: datatype">
+                                                        <option>object</option>
+                                                        <option>string</option>
+                                                        <option>int</option>
+                                                        <option>float</option>
+                                                        <option>bool</option>
+                                                    </select>
+                                                </td>-->
+                                                <td> <input type="checkbox" data-bind="checked: required, checkedValue: false, uncheckedValue: true" /></td>
+                                                <td><button class="btn btn-sm btn-danger" data-bind="click: $parent.removeParameter">Remove</button></td>
+                                            </tr>
                                             </tbody>
                                         </table>
                                         <button class="btn btn-sm btn-primary" data-bind="click: addParameter">Add Argument</button>
@@ -1278,7 +1300,7 @@
                         <button class="btn btn-secondary" title="Manage Role Access" data-bs-toggle="modal" data-bs-target="#role-access-modal" data-bind="click: $root.selectAllowedRoles">
                             <i class="fa fa-user"></i>Manage Role Access
                         </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Done</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bind="click: function(){$root.saveColumn()}">Done</button>
                     </div>
                 </div>
             </div>
@@ -1653,6 +1675,19 @@
                         <span data-bs-toggle="tooltip" data-bs-placement="right" class="fa fa-question-circle helptip" title="Use Schema in SQL when building query"></span>
                     </div>
                 </div>
+                <div class="form-group row">
+                    <label class="col-md-3 col-sm-3 col-form-label">Database Type</label>
+                    <div class="col-md-6 col-sm-6">
+                        <select class="form-select" data-bind="value: DatabaseType" required>
+                            <option>MS SQL</option>
+                            <option>MySql</option>
+                            <option>PostgreSQL</option>
+                            <option>Oracle</option>
+                            <option value="OleDB">OleDB/Others</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="form-group row" data-bind="hidden: $root.editingDataConnection">
                     <div class="check-box col-md-12">
                         <label>
