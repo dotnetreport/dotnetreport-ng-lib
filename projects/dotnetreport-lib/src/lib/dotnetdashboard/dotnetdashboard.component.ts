@@ -22,6 +22,7 @@ declare var _: any;
 export class DotnetdashboardComponent implements OnInit, OnDestroy {
     private baseServiceUrl: string;
     public reportTemplates: SafeHtml;
+    public dashboardHtml: SafeHtml;
     private queryParams: { [key: string]: string }={};
   
     constructor(injector: Injector,
@@ -33,6 +34,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
   
         this.baseServiceUrl = this.baseUrl + '/api'; // "http://localhost:39378"; \
         this.reportTemplates = "";
+        this.dashboardHtml = "";
       }
   
     ngOnInit() {
@@ -44,7 +46,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
         let getUsersAndRolesUrl = this.baseServiceUrl + "/DotNetReportApi/GetUsersAndRoles";
         getUsersAndRolesUrl = getUsersAndRolesUrl.replace(/[?&]$/, "");
 
-        
+        this.renderKODashboardItems()
         this.http.get(getDashboardsUrl).subscribe((dashboardData: any) => {
             dashboardData.forEach((d:any)=> {
                 dashboards.push({ id: d.Id, name: d.Name, description: d.Description, selectedReports: d.SelectedReports,schedule:d.Schedule, userId: d.UserId, userRoles: d.UserRoles, viewOnlyUserId: d.ViewOnlyUserId, viewOnlyUserRoles: d.ViewOnlyUserRoles,clientId:d.ClientId,canManage:d.CanManage });
@@ -90,7 +92,6 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                         getUsersAndRolesUrl: getUsersAndRolesUrl,
                         samePageOnRun: true,
                     });
-                    
                     vm.init(0, result.noAccount).done(()=>{
                     vm.loadDashboard(dashboardId).done(()=>{
                         this.renderKOTemplates();
@@ -3528,7 +3529,157 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 </script>`);
     this.cdref.detectChanges();
   }
-  
+  private renderKODashboardItems(){
+    this.dashboardHtml =this.sanitizer.bypassSecurityTrustHtml(`<div class="grid-stack" style="display: none;">
+    <!-- ko foreach: dashboardItems -->
+    <!-- ko if: type === 'report' -->
+    <div class="grid-stack-item" data-bind="attr: {'gs-x': x, 'gs-y': y, 'gs-w': width, 'gs-h': height, 'gs-id': ReportID,'data-type':'report'}">
+        <div class="card" data-bind="attr: {class: 'card ' + panelStyle + ' grid-stack-item-content'}, css: { expanded: isExpanded }, style: { border: noDashboardBorders() ? 'none' : '', 'box-shadow': noDashboardBorders() ? 'none' : '','background-color': $parent.getCardBackground($data) }" style="overflow-y: hidden;">
+            <div class="padded-div" style="padding-bottom: 0; margin-bottom: 0;">
+                <div class="pull-left">
+                    <button type="button" class="btn" data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
+                        <span class="fa fa-ellipsis-v"></span>
+                    </button>
+                    <ul class="dropdown-menu small" style="z-index: 1001;">
+                        <li data-bind="visible: FlyFilters().length > 0">
+                            <a href="#" class="dropdown-item" data-bind="click: toggleFlyFilters">
+                                <span class="fa fa-filter"></span> Filter
+                            </a>
+                        </li>
+                        <li class="dropdown dropdown-hover">
+                            <a href="#" class="dropdown-toggle dropdown-item" data-bs-toggle="dropdown" role="button" aria-expanded="false" data-bind="click: editReportAi">
+                                <span class="fa fa-pencil"></span> Edit
+                            </a>
+                            <ul class="dropdown-menu small">
+                                <li>
+                                    <a class="dropdown-item" href="#" data-bind="click: openReport">
+                                        <span class="fa fa-pencil"></span> Edit Standard
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" data-bind="click: editReportAi">
+                                        <span class="fa fa-bolt"></span> Edit Smarter
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown dropdown-hover" data-bind="visible: ReportType()!='Single'">
+                            <a href="#" class="dropdown-toggle dropdown-item">
+                                <span class="fa fa-download"></span> Export
+                            </a>
+                            <ul class="dropdown-menu small">
+                                <li>
+                                    <a href="#" class="dropdown-item" data-bind="click: downloadExcel">
+                                        <span class="fa fa-file-excel-o"></span> Excel
+                                    </a>
+                                </li>
+                                <li data-bind="visible: canDrilldown">
+                                    <a href="#" class="dropdown-item" data-bind="click: downloadExcelWithDrilldown">
+                                        <span class="fa fa-file-excel-o"></span> Excel (Expanded)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="dropdown-item" data-bind="click: $parent.appSettings.showPageSize ? function() { loadPdfModel() } : function() { $parent.appSettings.useAltPdf ? downloadPdfAlt('','') : downloadPdf('','') }">
+                                        <span class="fa fa-file-pdf-o"></span> PDF
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="dropdown-item" data-bind="click: $parent.appSettings.showPageSize ? function() { loadWordModel()} : function() { downloadWord('',''); }">
+                                        <span class="fa fa-file-word-o"></span> Word
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li data-bind="visible: ReportType()!='Single'">
+                            <a class="dropdown-item" data-bind="attr: {href: '/DotNetReport?linkedreport=true&noparent=true&reportId=' + ReportID() }" target="_blank">
+                                <span class="fa fa-folder-open"></span> Open Report
+                            </a>
+                        </li>
+                        <li data-bind="visible: CanEdit() && CanSaveReports()">
+                            <a href="#" class="dropdown-item" data-bind="click: SaveWithoutRun">
+                                <span class="fa fa-save"></span> Save
+                            </a>
+                        </li>
+                        <li data-bind="visible: $parent.currentDashboard().canManage || $parent.adminMode()">
+                            <a href="#" class="dropdown-item" data-bind="click: function() { $parent.removeReportFromDashboard(ReportID()); }">
+                                <span class="fa fa-close"></span> Remove
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="dropdown-item" data-bind="click: function() { RefreshReport(ReportID()); }">
+                                <span class="fa fa-refresh"></span> Refresh
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#sqlModal" data-bind="visible: $parent.adminMode, click: getCode">
+                                <span class="fa fa-code"></span> Report Code
+                            </a>
+                        </li>
+                    </ul>
+
+                </div>
+
+                <h2 class="pull-left" data-bind="text: ReportName"></h2>
+                <div class="pull-right">
+                    <span data-bind="visible: isDirty" class="text-warning small" title="You have unsaved changes">
+                        <i class="fa fa-exclamation-triangle"></i>
+                    </span>
+                    <a class="btn btn-link" data-bind="visible: CanEdit() && CanSaveReports() && isDirty(), click: SaveWithoutRun">
+                        <span class="fa fa-save"></span>
+                    </a>
+                    <a class="btn btn-link" data-bind="visible:ReportType() != 'Single',click: toggleExpand"><span class="fa" data-bind="css: {'fa-expand': !isExpanded(), 'fa-minus': isExpanded() }, visible: ReportType() != 'Single' && !noDashboardBorders()"></span></a>
+                </div>
+                <div data-bind="visible: $parent.arrangeDashboard">
+                    <div class="pull-right" data-bind="if: ReportType()!='Single' && ReportType()!='Html' && CanEdit()">
+                        <div data-bind="template: 'chart-settings', data: $data"></div>
+                    </div>
+                    <div data-bind="if:ReportType() == 'Single' && CanEdit()">
+                        <div data-bind="template: {name: 'kpi-settings', data: $data }"></div>
+                    </div>
+                </div>
+            </div>
+            <div data-bind="if: activeDesign()">
+                <div data-bind="template: 'report-designer-compact'"></div>
+            </div>
+            <div class="card-body list-overflow-auto" style="padding-top: 0; margin-top: 0;">
+                <p data-bind="html: ReportDescription, visible: ReportDescription"></p>
+                <div data-bind="template: {name: 'fly-filter-template'}, visible: showFlyFilters"></div>
+                <div data-bind="with: ReportResult" class="small">
+                    <div data-bind="visible: !ReportData()">
+                        <div class="report-spinner"></div>
+                    </div>
+                    <div data-bind="template: 'report-template', data: $data"></div>
+                </div>
+            </div>
+            <div class="form-inline" data-bind="ifnot: noDashboardBorders">
+                <div class="small" data-bind="with: pager">
+                    <div class="form-group pull-left total-records" data-bind="if: totalRecords()>1 && $parent.ReportType() != 'Single'">
+                        <span data-bind="text: 'Total Records: ' + totalRecords()"></span><br />
+                    </div>
+                    <div class="form-group pull-right" data-bind="if: pages()>1 && $parent.ReportType() != 'Single'">
+                        <div data-bind="template: 'pager-template', data: $data"></div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /ko -->
+    <!-- ko if: type === 'separator' -->
+        <div class="grid-stack-item" data-bind="attr: {'gs-x': x, 'gs-y': y, 'gs-w': width, 'gs-h': height, 'gs-id': id,'data-type':'separator'}">
+            <div data-bind="template: { name: 'line-separator-template', data: $data }"></div>
+        </div>
+    <!-- /ko -->
+    <!-- ko if: type === 'text' -->
+        <div class="grid-stack-item" data-bind="attr: {'gs-x': x, 'gs-y': y, 'gs-w': width, 'gs-h': height,'gs-id': id,'data-type':'text'}">
+            <div data-bind="template:{name:'text-widget-template', data:$data}"></div>
+        </div>
+    <!-- /ko -->
+    <!-- /ko -->
+</div>
+`);
+    this.cdref.detectChanges();
+  }
   private bindWindowResize(vm: any): void {
     let _vm = vm;
     $(window).resize(function () {
