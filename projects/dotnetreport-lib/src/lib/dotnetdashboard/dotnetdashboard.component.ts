@@ -1658,7 +1658,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                 </span>
             </div>
 
-            <div class="data-select-tree">
+            <div class="data-select-tree" style="max-height:calc(100vh - 200px);overflow-y:auto">
                 <!-- ko foreach: CategorizedTables -->
                 <div class="mb-3">
                     <div data-bind="click: function() { isExpanded(!isExpanded()); }, visible: categoryName" style="cursor: pointer;">
@@ -1860,21 +1860,21 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                         <span class="badge bg-danger" >Dynamic cannot be first column.</span>
                     </span>
                 </div>
-                <div class="col-7">
-                    <div class="pull-right" style="margin-top: -5px;" data-bind="if: $parent.AggregateReport() && !$parent.useStoredProc()">
+                <div class="col-7 d-flex flex-row-reverse">
+                    <div style="margin-top: -5px;" data-bind="if: $parent.AggregateReport() && !$parent.useStoredProc()">
                         <select class="form-select form-control-sm" data-bind="options: $parent.canDrilldown() && $index()>0 ? fieldAggregateWithDrilldown : fieldAggregate, value: selectedAggregate"></select>
                     </div>
 
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="ifnot: $parent.useStoredProc">
+                    <div style="padding-right: 10px;" data-bind="ifnot: $parent.useStoredProc">
                         <span class="fa fa-trash-o" title="Cannot Delete Required Filter" data-bind="visible: forceFilterForTable"></span>
                         <span class="fa fa-trash" style="cursor: pointer;" aria-hidden="true" title="Delete this Field" data-bind="click: $parent.RemoveField, hidden: forceFilterForTable"></span>
                     </div>
-                    <!--<div class="pull-right" style="padding-right: 10px;" data-bind="ifnot: $parent.useStoredProc">
+                    <!--<div style="padding-right: 10px;" data-bind="ifnot: $parent.useStoredProc">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: function(){ filterOnFly(!filterOnFly()); }, css: {active: filterOnFly()==true}">
                             <span class="fa fa-filter" aria-hidden="true" title="Filter by this field on the Report"></span>
                         </span>
                     </div>-->
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="visible: $parent.ReportType()!='Pivot'">
+                    <div style="padding-right: 10px;" data-bind="visible: $parent.ReportType()!='Pivot'">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: toggleDisable">
                             <span data-bind="
                                 css: {
@@ -1889,42 +1889,42 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                             " aria-hidden="true"></span>
                         </span>
                     </div>
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="visible: $parent.ReportType()!='Pivot' && $parent.ReportType()!='List' && !$parent.useStoredProc()">
+                    <div style="padding-right: 10px;" data-bind="visible: $parent.ReportType()!='Pivot' && $parent.ReportType()!='List' && !$parent.useStoredProc()">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: function(){ hideInDetail(!hideInDetail()); }, css: {active: hideInDetail()==true}">
                             <span class="fa fa-eye-slash" aria-hidden="true" title="Hide in Details"></span>
                         </span>
                     </div>
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="visible: $parent.isFieldValidForYAxis($index(), fieldType || fieldFormat(), selectedAggregate())  && $parent.isChart() && $index()>0">
+                    <div style="padding-right: 10px;" data-bind="visible: $parent.isFieldValidForYAxis($index(), fieldType || fieldFormat(), selectedAggregate())  && $parent.isChart() && $index()>0">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: function(){ groupInGraph(!groupInGraph()); }, css: {active: groupInGraph()==false}">
                             <span class="fa fa-signal" aria-hidden="true" title="Include in series"></span>
                         </span>
                     </div>
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="visible: $parent.IncludeSubTotal()  &&  (['Int', 'Double', 'Money', 'Decimal', 'Currency'].indexOf(fieldType) >= 0 || ['Int', 'Double', 'Money', 'Decimal', 'Currency'].indexOf(fieldFormat()) >= 0)">
+                    <div style="padding-right: 10px;" data-bind="visible: $parent.IncludeSubTotal()  &&  (['Int', 'Double', 'Money', 'Decimal', 'Currency'].indexOf(fieldType) >= 0 || ['Int', 'Double', 'Money', 'Decimal', 'Currency'].indexOf(fieldFormat()) >= 0)">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: function(){ dontSubTotal(!dontSubTotal()); }, css: {active: dontSubTotal()==true}">
                             <span class="fa fa-plus-circle" aria-hidden="true" title="Don't add to Total row"></span>
                         </span>
                     </div>
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="visible: $parent.ReportType()!='Pivot'">
+                    <div style="padding-right: 10px;" data-bind="visible: $parent.ReportType()!='Pivot'">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: setupLinkField, css: {active: linkField()==true}">
                             <span class="fa fa-link" aria-hidden="true" title="Link to another Report or Url"></span>
                         </span>
                     </div>
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="visible: $parent.ReportType()=='Combo' && $parent.isFieldValidForYAxis($index(), fieldType || fieldFormat(), selectedAggregate())  && $parent.isChart() && $index()>0">
+                    <div style="padding-right: 10px;" data-bind="visible: $parent.ReportType()=='Combo' && $parent.isFieldValidForYAxis($index(), fieldType || fieldFormat(), selectedAggregate())  && $parent.isChart() && $index()>0">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: function(){ seriesType(seriesType() == 'line' ? 'area' : (seriesType()=='bars' ? 'line' : 'bars')); }">
                             <span class="fa" aria-hidden="true" data-bind="css: {'fa-line-chart': seriesType() == 'line', 'fa-bar-chart': seriesType() == 'bars', 'fa-area-chart': seriesType()=='area' }, attr: {title: seriesType}"></span>
                         </span>
                     </div>
-                    <div class="pull-right" style="padding-right: 10px;">
+                    <div style="padding-right: 10px;">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: setupFieldOptions">
                             <span class="fa fa-gear" aria-hidden="true" title="More Options"></span>
                         </span>
                     </div>
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="if: isFormulaField">
+                    <div style="padding-right: 10px;" data-bind="if: isFormulaField">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: editFormulaField">
                             <span class="fa fa-pencil" aria-hidden="true" title="Edit Formula Field"></span>
                         </span>
                     </div>
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="if: isFormulaField">
+                    <div style="padding-right: 10px;" data-bind="if: isFormulaField">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: duplicateFormulaField">
                             <span class="fa fa-copy" aria-hidden="true" title="Duplicate Formula Field"></span>
                         </span>
@@ -3535,7 +3535,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
     <!-- ko if: type === 'report' -->
     <div class="grid-stack-item" data-bind="attr: {'gs-x': x, 'gs-y': y, 'gs-w': width, 'gs-h': height, 'gs-id': ReportID,'data-type':'report'}">
         <div class="card" data-bind="attr: {class: 'card ' + panelStyle + ' grid-stack-item-content'}, css: { expanded: isExpanded }, style: { border: noDashboardBorders() ? 'none' : '', 'box-shadow': noDashboardBorders() ? 'none' : '','background-color': $parent.getCardBackground($data) }" style="overflow-y: hidden;">
-            <div class="padded-div" style="padding-bottom: 0; margin-bottom: 0;">
+            <div class="padded-div flex-row" style="padding-bottom: 0; margin-bottom: 0;">
                 <div class="pull-left">
                     <button type="button" class="btn" data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
                         <span class="fa fa-ellipsis-v"></span>
@@ -3684,6 +3684,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
     let _vm = vm;
     $(window).resize(function () {
         _vm.drawChart()
+        _vm.gridResponsive();
     });
   }
 
@@ -3697,12 +3698,17 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
             verticalMargin: 10,
             resizable: {
                 handles: 'se, sw, ne, nw, n, e, s, w' 
-            }
+            },
+            oneColumnSize: 768
         });
         grid.on('change', function(event: any, items: any[]) {
+          if (!_vm.arrangeDashboard()) return;
           if (items) {
             _.forEach(items, function(x: any) {
-              _vm.updatePosition(x);
+              const el = x.el;
+                const type = el.getAttribute("data-type");
+                x.type = type;
+                _vm.updatePosition(x);
             });
           }
         });
@@ -3716,7 +3722,8 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
         setTimeout(function () {
         _vm.drawChart();
         grid.enableMove(false);
-        grid.enableResize(false);                           
+        grid.enableResize(false);  
+        _vm.gridResponsive();                         
     }, 1000);                             
     });
     

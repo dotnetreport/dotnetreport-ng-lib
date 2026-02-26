@@ -1641,7 +1641,7 @@ export class DotnetreportComponent implements OnInit, OnDestroy {
                 </span>
             </div>
 
-            <div class="data-select-tree">
+            <div class="data-select-tree" style="max-height:calc(100vh - 200px);overflow-y:auto">
                 <!-- ko foreach: CategorizedTables -->
                 <div class="mb-3">
                     <div data-bind="click: function() { isExpanded(!isExpanded()); }, visible: categoryName" style="cursor: pointer;">
