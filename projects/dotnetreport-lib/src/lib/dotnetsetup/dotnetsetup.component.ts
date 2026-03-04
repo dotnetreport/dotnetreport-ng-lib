@@ -165,8 +165,8 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                 <option><= Today -</option>
             </optgroup>
         </select>
-        <div data-bind="if: $parent.Value().indexOf('Today +') >= 0 || $parent.Value().indexOf('Today -') >= 0" class="form-group pull-left" style="padding-top: 5px;">
-            <input type="number" class="form-control input-sm pull-left" style="width: 80px;" data-bind="value: $parent.Value2" required /><span style="padding: 5px 5px;" class="pull-left"> days</span>
+        <div data-bind="if: $parent.Value().indexOf('Today +') >= 0 || $parent.Value().indexOf('Today -') >= 0" class="form-group float-start" style="padding-top: 5px;">
+            <input type="number" class="form-control input-sm float-start" style="width: 80px;" data-bind="value: $parent.Value2" required /><span style="padding: 5px 5px;" class="float-start"> days</span>
         </div>
         <!-- /ko -->
         <!-- /ko -->
@@ -260,7 +260,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
     <!-- ko foreach: Columns -->
     <th data-bind="attr: { id: !IsPivotField ? fieldId : 'pivot--' + fieldName }, style: {'text-align': fieldAlign() ? fieldAlign() : (IsNumeric ? 'right' : 'left'), 'background-color': headerBackColor }, hidden: outerGroup" style="border-right: 1px solid;">
 
-        <div class="pull-left" data-bind="if: !$parent.IsDrillDown()" style="padding-right: 5px;">
+        <div class="float-start" data-bind="if: !$parent.IsDrillDown()" style="padding-right: 5px;">
             <div class="dropup">
                 <a href="#" data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
                     <span class="fa fa-ellipsis-v sortable" title="Drag to reorder"></span>
@@ -318,7 +318,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 
 </script>
 <script type="text/html" id="kpi-settings">
-    <div class="chart-container pull-right">
+    <div class="chart-container float-end">
         <button class="btn btn-light btn-sm d-flex align-items-center mt-2 chart-settings-btn"
                 data-bind="click: toggleKpiSettings()" title="KPI Settings">
             <i class="fa fa-cog"></i>
@@ -541,18 +541,18 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                         </table>
                         <div class="col-xs-12 col-centered" data-bind="with: pager">
                             <div class="form-inline small text-muted">
-                                <div class="pull-left total-records" data-bind="visible: pages()">
+                                <div class="float-start total-records" data-bind="visible: pages()">
                                     <span data-bind="text: 'Total Records: ' + totalRecords()"></span>
                                 </div>
-                                <div class="pull-left total-records">
+                                <div class="float-start total-records">
                                     &nbsp;
-                                    <a href="#" title="Download Excel" data-bind="click: $parent.exportExcel"><span class="fa fa-file-excel-o"></span></a>
+                                    <a href="#" title="Download Excel" data-bind="click: $parent.exportExcel"><span class="fas fa-file-excel"></span></a>
                                     &nbsp;
                                     <a href="#" title="View Code" data-bs-toggle="modal" data-bs-target="#sqlDrillDownModal" data-bind="visible: $root.adminMode">
                                         <span class="fa fa-code"></span>
                                     </a>
                                 </div>
-                                <div class="form-group pull-right" data-bind="visible: pages()">
+                                <div class="form-group float-end" data-bind="visible: pages()">
                                     <div data-bind="template: 'pager-template', data: $data"></div>
                                 </div>
                             </div>
@@ -567,7 +567,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                         <div data-bind="foreach: subReportsRan">
                             <div class="">
                                 <div class="" style="padding-bottom: 20px;" >
-                                    <h2 class="pull-left" data-bind="text: ReportName"></h2>
+                                    <h2 class="float-start" data-bind="text: ReportName"></h2>
 
                                     <div class="clearfix"></div>
                                     <div class="list-overflow-auto" style="padding-top: 0; margin-top: 0;">
@@ -582,10 +582,10 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                                     </div>
                                     <div class="form-inline">
                                         <div class="small" data-bind="with: pager">
-                                            <div class="form-group pull-left total-records" data-bind="if: totalRecords()>1 && $parent.ReportType() != 'Single'">
+                                            <div class="form-group float-start total-records" data-bind="if: totalRecords()>1 && $parent.ReportType() != 'Single'">
                                                 <span data-bind="text: 'Total Records: ' + totalRecords()"></span><br />
                                             </div>
-                                            <div class="form-group pull-right" data-bind="if: pages()>1 && $parent.ReportType() != 'Single'">
+                                            <div class="form-group float-end" data-bind="if: pages()>1 && $parent.ReportType() != 'Single'">
                                                 <div data-bind="template: 'pager-template', data: $data"></div>
                                             </div>
                                         </div>
@@ -600,7 +600,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                 <!-- /ko -->
                 <!-- /ko-->
             </tbody>
-            <!-- ko if: $parentContext.$parent.SubTotals().length == 1 && $parentContext.$parentContext.$parent.OuterGroupColumns().length == 0 -->
+            <!-- ko if: $parentContext.$parent.SubTotals().length == 1 && $parentContext.$parentContext.$parent.OuterGroupColumns().length == 0 && $parentContext.$parentContext.$parent.totalRowFormat() == 'row' -->
             <tfoot data-bind="foreach: $parentContext.$parent.SubTotals">
                 <tr class="sub-total">
                     <!-- ko if: $parentContext.$parentContext.$parentContext.$parent.canDrilldown() && !$parent.IsDrillDown() && !$parent.CanExpandOption() -->
@@ -609,7 +609,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                     <!-- ko foreach: Items -->
                     <!-- ko if: Value != 'NA' && Value != 'NaN' && !outerGroup() -->
                     <td data-bind="style: {'background-color': _backColor ?? backColor(), 'color': _fontColor ?? fontColor(), 'font-weight': fontBold() || _fontBold ? 'bold' : 'normal', 'text-align': fieldAlign() ? fieldAlign() : 'right'}">
-                        <div data-bind="style: {'width': fieldWidth }">
+                        <div data-bind="style: {'width': fieldWidth }, attr: {'title': (Column.fieldLabel() || Column.ColumnName) + ' - ' +_aggregate }, visible:  _showInTotalRow != false">
                         <span data-bind="html: formattedVal"></span>
                         </div>
                     </td>
@@ -618,7 +618,75 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                 </tr>
             </tfoot>
             <!-- /ko -->
+            <!-- ko if: $parentContext.$parentContext.$parent.subTotalPerGroup() && $parentContext.$parent.perGroupSubTotals().length > 0 && $parentContext.$parentContext.$parent.totalRowFormat() == 'row' -->
+            <!-- ko if: $parentContext.$parent.perGroupSubTotals()[$parentContext.$data.groupIndex] && $parentContext.$parent.perGroupSubTotals()[$parentContext.$data.groupIndex].length > 0 -->
+            <tfoot>
+                <tr class="sub-total" style="border-top: 2px solid #dee2e6;">
+                    <!-- ko if: $parentContext.$parentContext.$parent.canDrilldown() && IsDrillDown() && CanExpandOption() -->
+                    <td></td>
+                    <!-- /ko -->
+                    <!-- ko foreach: $parentContext.$parent.perGroupSubTotals()[$parentContext.$data.groupIndex] -->
+                    <td data-bind="style: {'text-align': Column.IsNumeric ? 'right' : 'left', 'font-weight': 'bold'}">
+                        <div data-bind="style: {'width': Column.fieldWidth}">
+                            <span data-bind="text: formattedVal"></span>
+                        </div>
+                    </td>
+                    <!-- /ko -->
+                </tr>
+            </tfoot>
+            <!-- /ko -->
+            <!-- /ko -->
         </table>
+        <!-- ko if: $parentContext.$parent.SubTotals().length > 0 && $parentContext.$parentContext.$parent.totalRowFormat() == 'table' && $parentContext.$parentContext.$parent.OuterGroupColumns().length == 0 -->
+        <div class="mt-3" style="max-width: 450px;">
+            <table class="table table-bordered table-sm">
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- ko foreach: $parentContext.$parent.SubTotals()[0].Items -->
+                    <!-- ko if: _showInTotalRow != false && Value != 'NA' && Value != 'NaN' -->
+                    <tr>
+                        <td data-bind="text: (Column.fieldLabel() || Column.ColumnName) + ' (' + _aggregate + ')'"></td>
+                        <td class="text-end">
+                            <span data-bind="html: formattedVal"></span>
+                        </td>
+                    </tr>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </tbody>
+            </table>
+        </div>
+        <!-- /ko -->
+        <!-- ko if: $parentContext.$parent.SubTotals().length > 0 && $parentContext.$parentContext.$parent.totalRowFormat() == 'table' && $parentContext.$parentContext.$parent.OuterGroupColumns().length > 0 && $parentContext.$parentContext.$parent.subTotalPerGroup() -->
+        <!-- ko if: $parentContext.$parent.perGroupSubTotals()[$parentContext.$data.groupIndex] && $parentContext.$parent.perGroupSubTotals()[$parentContext.$data.groupIndex].length > 0 -->
+        <div class="mt-3" style="max-width: 450px;">
+            <table class="table table-bordered table-sm">
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- ko foreach: $parentContext.$parent.perGroupSubTotals()[$parentContext.$data.groupIndex] -->
+                    <!-- ko if: _showInTotalRow != false -->
+                    <tr>
+                        <td data-bind="text: Column.fieldLabel() || Column.ColumnName"></td>
+                        <td class="text-end">
+                            <span data-bind="text: formattedVal"></span>
+                        </td>
+                    </tr>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </tbody>
+            </table>
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
     </div>
 </script>
 
@@ -643,10 +711,10 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                         </div>
                         <div class="form-inline">
                             <div class="small" data-bind="with: pager">
-                                <div class="form-group pull-left total-records" data-bind="if: totalRecords()>1 && $parent.ReportType() != 'Single'">
+                                <div class="form-group float-start total-records" data-bind="if: totalRecords()>1 && $parent.ReportType() != 'Single'">
                                     <span data-bind="text: 'Total Records: ' + totalRecords()"></span><br />
                                 </div>
-                                <div class="form-group pull-right" data-bind="if: pages()>1 && $parent.ReportType() != 'Single'">
+                                <div class="form-group float-end" data-bind="if: pages()>1 && $parent.ReportType() != 'Single'">
                                     <div data-bind="template: 'pager-template', data: $data"></div>
                                 </div>
                             </div>
@@ -671,7 +739,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
     <!-- /ko -->
 
     <!-- ko if: $parent.ReportType() != 'Pivot' && $parent.ReportType() != 'Html' && (!$parent.isChart() || $parent.ShowDataWithGraph()) -->
-    <div class="pull-right" data-bind="if: $parent.OuterGroupColumns().length > 0">
+    <div class="float-end" data-bind="if: $parent.OuterGroupColumns().length > 0">
         <a href="#" data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
             Manage Groups <span class="fa fa-ellipsis-v"></span>
         </a>
@@ -699,6 +767,69 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
         <!-- /ko -->
         <!-- /ko -->
     </div>
+    <!-- ko if: SubTotals().length > 0 && $parent.hasOuterGroupFields() && $parent.IncludeSubTotal() && $parent.totalRowFormat() == 'row' -->
+    <table class="table table-bordered table-sm mt-0" style="border-top: 2px double #dee2e6; margin-bottom: 5px;">
+         <thead>
+            <tr>
+                <th data-bind="attr: { colspan: SubTotals()[0].Items.length }">Grand Total</th>                        
+            </tr>
+        </thead>
+        <tbody></tbody>
+            <tr>
+                <!-- ko if: $parent.canDrilldown() -->
+                <td style="width: 30px;"></td>
+                <!-- /ko -->
+                <!-- ko foreach: SubTotals()[0].Items -->
+                <!-- ko if: _showInTotalRow != false -->
+                 <td data-bind="text: (Column.fieldLabel() || Column.ColumnName) + ' (' + _aggregate + ')'"></td>
+                <!-- /ko -->
+                <!-- /ko -->
+            </tr>
+        
+            <tr class="sub-total">
+                <!-- ko if: $parent.canDrilldown() -->
+                <td style="width: 30px;"></td>
+                <!-- /ko -->
+                <!-- ko foreach: SubTotals()[0].Items -->
+                <!-- ko if: _showInTotalRow != false -->
+                <td data-bind="style: {'text-align': Column.IsNumeric ? 'right' : 'left', 'font-weight': 'bold'}">
+                    <div data-bind="style: {'width': Column.fieldWidth}">                        
+                        <span data-bind="html: formattedVal"></span>                        
+                    </div>
+                </td>
+                <!-- /ko -->
+                <!-- /ko -->
+            </tr>
+        </tbody>
+    </table>
+    <!-- /ko -->
+    <!-- Grand Total: Table mode — Field/Total summary table -->
+    <!-- ko if: SubTotals().length > 0 && $parent.hasOuterGroupFields() && $parent.IncludeSubTotal() && $parent.totalRowFormat() != 'row' -->
+    <div class="mt-3">
+        <!-- ko if: $parent.subTotalPerGroup() --><strong>Grand Total</strong><!-- /ko -->
+        <!-- ko ifnot: $parent.subTotalPerGroup() --><strong>Total</strong><!-- /ko -->
+        <table class="table table-bordered table-sm mt-2" style="max-width: 450px;">
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th class="text-end">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- ko foreach: SubTotals()[0].Items -->
+                <!-- ko if: _showInTotalRow != false && Value != 'NA' && Value != 'NaN' -->
+                <tr>
+                    <td data-bind="text: (Column.fieldLabel() || Column.ColumnName) + ' (' + _aggregate + ')'"></td>
+                    <td class="text-end">
+                        <span data-bind="html: formattedVal"></span>
+                    </td>
+                </tr>
+                <!-- /ko -->
+                <!-- /ko -->
+            </tbody>
+        </table>
+    </div>
+    <!-- /ko -->
     <!-- /ko -->
 </script>
 <script type="text/html" id="admin-mode-template">
@@ -734,7 +865,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
             </div>
         </div>
         <div class="alert alert-info">
-            <span class="fa fa-lightbulb-o fa-2x"></span>&nbsp;User level rights override Role level rights. No selection for a rule implies report is available to all.
+            <span class="fas fa-lightbulb fa-2x"></span>&nbsp;User level rights override Role level rights. No selection for a rule implies report is available to all.
         </div>
 
         <div class="row small">
@@ -750,7 +881,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                       </div>
                       <div class="row container-fluid" data-bind="visible: show">
                         <!-- ko foreach: users -->
-                        <div class="pull-left">
+                        <div class="float-start">
                           <div class="checkbox">
                             <label class="label label-info">
                               <input type="checkbox" data-bind="checked: selected"> &nbsp; <span data-bind="text: text"></span>&nbsp; </label>
@@ -763,7 +894,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                     <!-- /ko -->
                     <!-- ko if: groupedUsers().length == 0 && users().length > 0 -->
                     <!-- ko foreach: users -->
-                    <div class="pull-left">
+                    <div class="float-start">
                         <div class="checkbox">
                             <label class="label label-info">
                                 <input type="checkbox" data-bind="checked: selected">&nbsp;<span data-bind="text: text"></span>&nbsp;
@@ -788,7 +919,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                       </div>
                       <div class="row container-fluid" data-bind="visible: show">
                         <!-- ko foreach: viewOnlyUsers -->
-                        <div class="pull-left">
+                        <div class="float-start">
                           <div class="checkbox">
                             <label class="label label-info">
                               <input type="checkbox" data-bind="checked: selected"> &nbsp; <span data-bind="text: text"></span>&nbsp; </label>
@@ -801,7 +932,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                     <!-- /ko -->
                     <!-- ko if: groupedViewOnlyUsers().length == 0 && viewOnlyUsers().length > 0 -->
                     <!-- ko foreach: viewOnlyUsers -->
-                    <div class="pull-left">
+                    <div class="float-start">
                         <div class="checkbox">
                             <label class="label label-info">
                                 <input type="checkbox" data-bind="checked: selected">&nbsp;<span data-bind="text: text"></span>&nbsp;
@@ -827,7 +958,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                       </div>
                       <div class="row container-fluid" data-bind="visible: show">
                         <!-- ko foreach: deleteOnlyUsers -->
-                        <div class="pull-left">
+                        <div class="float-start">
                           <div class="checkbox">
                             <label class="label label-info">
                               <input type="checkbox" data-bind="checked: selected"> &nbsp; <span data-bind="text: text"></span>&nbsp; </label>
@@ -840,7 +971,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                     <!-- /ko -->
                     <!-- ko if: groupedDeleteOnlyUsers().length == 0 && deleteOnlyUsers().length > 0 -->
                     <!-- ko foreach: deleteOnlyUsers -->
-                        <div class="pull-left">
+                        <div class="float-start">
                             <div class="checkbox">
                                 <label class="label label-info">
                                     <input type="checkbox" data-bind="checked: selected">&nbsp;<span data-bind="text: text"></span>&nbsp;
@@ -860,7 +991,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                 <i class="toggle-icon fa" data-bind="click: toggleManageRoles,css: { 'fa-chevron-down': showManageRoles(), 'fa-chevron-right': !showManageRoles() }"></i><b>Manage by User Role</b> (allow edit)
                 <div class="row container-fluid" data-bind="visible: showManageRoles">
                     <!-- ko foreach: userRoles -->
-                    <div class="pull-left">
+                    <div class="float-start">
                         <div class="checkbox">
                             <label class="label label-info">
                                 <input type="checkbox" data-bind="checked: selected">&nbsp;<span data-bind="text: text"></span>&nbsp;
@@ -876,7 +1007,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                 <i class="toggle-icon fa" data-bind="click: toggleViewRoles,css: { 'fa-chevron-down': showViewRoles(), 'fa-chevron-right': !showViewRoles() }"></i><b>View only by User Role</b> (no edit/delete)
                 <div class="row container-fluid" data-bind="visible: showViewRoles">
                     <!-- ko foreach: viewOnlyUserRoles -->
-                    <div class="pull-left">
+                    <div class="float-start">
                         <div class="checkbox">
                             <label class="label label-info">
                                 <input type="checkbox" data-bind="checked: selected">&nbsp;<span data-bind="text: text"></span>&nbsp;
@@ -892,7 +1023,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                     <i class="toggle-icon fa" data-bind="click: toggleDeleteRoles,css: { 'fa-chevron-down': showDeleteRoles(), 'fa-chevron-right': !showDeleteRoles() }"></i><b>Delete by User Role</b> (allow delete)
                     <div class="row container-fluid" data-bind="visible: showDeleteRoles">
                         <!-- ko foreach: deleteOnlyUserRoles -->
-                        <div class="pull-left">
+                        <div class="float-start">
                             <div class="checkbox">
                                 <label class="label label-info">
                                     <input type="checkbox" data-bind="checked: selected">&nbsp;<span data-bind="text: text"></span>&nbsp;
@@ -914,7 +1045,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
         <div class="rules-group-container">
             <div class="rules-group-header" data-bind="attr: {parentdivid: generateUniqueId()}">
                 <div data-bind="visible: !isRoot">
-                    <div class="pull-left">
+                    <div class="float-start">
                         <div class="btn-group btn-group-toggle btn-group-sm" data-bs-toggle="buttons" role="group">
                             <label class="btn btn-light active" style="margin-right: 0px;">
                                 <input type="radio" data-bind="attr: { name: 'andOrGroup-' + $element.closest('.rules-group-header').getAttribute('parentdivid') }, checked: AndOr" value="And" /> And
@@ -924,12 +1055,12 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                             </label>
                         </div>
                     </div>
-                    <div class="pull-right">
+                    <div class="float-end">
                         <button class="btn btn-sm btn-secondary" data-bind="click: $parent.RemoveFilterGroup, visible: !isRoot">Remove Group</button>&nbsp;
                     </div>
                 </div>
                 <div data-bind="visible: isRoot">
-                    <div class="pull-left padded-div">
+                    <div class="float-start padded-div">
                         <label> &nbsp;Filter Conditions</label>
                     </div>
                 </div>
@@ -1315,12 +1446,28 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <div class="checkbox pull-left" >
+                            <div class="checkbox float-start" >
                                 <label>
                                     <input type="checkbox" data-bind="checked: outerGroup" />
                                     <b>Outer Group</b> - Use this field as a group heading
                                 </label>
                             </div>
+                        </div>
+                    </div>
+                    <div class="form-group row" data-bind="visible: $parents[1].IncludeSubTotal()">
+                        <div class="col-sm-12">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" data-bind="checked: dontSubTotal" />
+                                    <b>Don't Show In Total Row</b>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row" data-bind="visible: $parents[1].IncludeSubTotal() && !dontSubTotal()">
+                        <label class="col-sm-5 col-md-5 control-label">Total Row Aggregate</label>
+                        <div class="col-sm-7 col-md-7">
+                            <select class="form-select" data-bind="options: totalRowAggregateOptions, value: totalRowAggregate"></select>
                         </div>
                     </div>
                 </div>
@@ -1553,7 +1700,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 <script type="text/html" id="designer-choose-visual">
     <div class="btn-group" role="group" aria-label="Visualization Options">
         <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('List'); }, css: { active: ReportType()=='List' }">
-            <span class="fa fa-2x fa-list-alt"></span>
+            <span class="fa fa-2x fa-list"></span>
             <p>List</p>
         </button>
         <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('Summary'); }, css: { active: ReportType()=='Summary',disabled: hasFunctionField() }">
@@ -1561,7 +1708,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
             <p>Summary</p>
         </button>
         <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('Bar'); }, css: { active: ReportType()=='Bar',disabled: hasFunctionField() }">
-            <span class="fa fa-2x fa-bar-chart"></span>
+            <span class="fa fa-2x fa-chart-bar"></span>
             <p>Bar</p>
         </button>
         <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('Pie'); }, css: { active: ReportType()=='Pie',disabled: hasFunctionField() }">
@@ -1605,7 +1752,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 
 <script type="text/html" id="designer-choose-data">
     <div>
-        <div class="pull-left btn-group btn-group-toggle" role="group" data-bind="if: ReportID() <= 0">
+        <div class="float-start btn-group btn-group-toggle" role="group" data-bind="if: ReportID() <= 0">
             <label class="btn btn-sm btn-light active" style="margin-right: 0px;" title="You can change the Data source only when creating a new report, changing this will clear all selections">
                 <input type="radio" name="dataoption" id="table" checked data-bind="checked: useStoredProc, checkedValue: false"> Dynamic
             </label>
@@ -1613,7 +1760,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                 <input type="radio" name="dataoption" id="proc" value="1" data-bind="checked: useStoredProc, checkedValue: true"> Predefined
             </label>
         </div>
-        <div class="pull-right">
+        <div class="float-end">
             <a href="#" class="btn btn-secondary btn-sm" title="Add Custom Field using Formula" data-bind="hidden: isFunctionField() || useStoredProc(), click: cancelFormulaField, text: isFormulaField()? 'Cancel': 'Custom Field', css: {'btn-primary': !isFormulaField(), 'btn-danger': isFormulaField}"></a>
             <a href="#" class="btn btn-secondary btn-sm" title="Add Custom Field using Function" data-bind="hidden:isFormulaField() || useStoredProc() || !ko.unwrap(appSettings.useFunctions) || ReportType() !== 'List' , click: function(){designFunctionField()}, text: isFunctionField()? 'Cancel': 'Function Field', css: {'btn-primary': !isFunctionField(), 'btn-danger': isFunctionField}"></a>
         </div>
@@ -1650,11 +1797,11 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                     <div class="report-list" data-bind="visible: isExpanded(), foreach: tables" style="padding-left: 15px;">
                         <div class="row border-bottom py-2 w-100">
                             <div class="col-md-12">
-                                <div class="pull-left" data-bind="click: function() { selectTable($data); }, css: {'text-muted': !isEnabled()}, style: {cursor: isEnabled() ? 'pointer' : ''}, attr: {title: !isEnabled() ? 'Cannot use table as joins do not exist': ''}">
+                                <div class="float-start" data-bind="click: function() { selectTable($data); }, css: {'text-muted': !isEnabled()}, style: {cursor: isEnabled() ? 'pointer' : ''}, attr: {title: !isEnabled() ? 'Cannot use table as joins do not exist': ''}">
                                     <span class="text-secondary fa" data-bind="css: isEnabled() ? ($data === $parents[1].SelectedTable() ? 'fa-chevron-down' : 'fa-chevron-right') : 'fa-ban'"></span>&nbsp;
                                     <span class="fa fa-table"></span>&nbsp;<span data-bind="text: tableName" class=""></span>
                                 </div>
-                                <div class="pull-right" data-bind="visible: $data === $parents[1].SelectedTable() && !$parents[1].isFormulaField() && !$parents[1].SelectedTable().dynamicColumns">
+                                <div class="float-end" data-bind="visible: $data === $parents[1].SelectedTable() && !$parents[1].isFormulaField() && !$parents[1].SelectedTable().dynamicColumns">
                                     <a href="#" class="small text-muted" data-bind="click: $parents[1].MoveAllFields">Select all</a> |
                                     <a href="#" class="small text-muted" data-bind="click: $parents[1].RemoveSelectedFields">Remove all</a>
                                 </div>
@@ -1689,7 +1836,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
     <div data-bind="if: SelectedFields().length > 0">
         <div data-bind="visible: ReportType()=='Bar'" class="card card-body">
             <div class="alert alert-info small py-1 mb-2">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;For Bar Graph, the first field below will show on the x-axis. All other numeric fields will show on y-axis.
+            <span class="fas fa-lightbulb"></span>&nbsp;For Bar Graph, the first field below will show on the x-axis. All other numeric fields will show on y-axis.
             </div>
             <div class="form-group row small">
             <div class="checkbox col-6">
@@ -1709,7 +1856,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 
         <div data-bind="visible: ReportType()=='Pie'" class="card card-body">
             <div class="alert alert-info small py-1 mb-2">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;For Pie Graph, the first field below will be grouped, and the first numeric field will show as the ratio.
+            <span class="fas fa-lightbulb"></span>&nbsp;For Pie Graph, the first field below will be grouped, and the first numeric field will show as the ratio.
             </div>
             <div class="form-group row small">
             <div class="checkbox col-6">
@@ -1723,12 +1870,12 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 
         <div data-bind="visible: ReportType()=='Treemap'" class="card card-body">
             <div class="alert alert-info small py-1 mb-0">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;For Treemap, the data must be in a hierarchical format with 2nd column having parent and third column having a numeric value. The data must have a single root node having null as its parent as well.
+            <span class="fas fa-lightbulb"></span>&nbsp;For Treemap, the data must be in a hierarchical format with 2nd column having parent and third column having a numeric value. The data must have a single root node having null as its parent as well.
             </div>
         </div>
         <div data-bind="visible: ReportType()=='HeatMap'" class="card card-body">
             <div class="alert alert-info mb-3">
-                <span class="fa fa-lightbulb-o fa-2x"></span>&nbsp;For HeatMap, the first two columns must be numeric values representing
+                <span class="fas fa-lightbulb fa-2x"></span>&nbsp;For HeatMap, the first two columns must be numeric values representing
                 <strong>Latitude</strong> and <strong>Longitude</strong>. At least one additional numeric column is required to provide the
                 <strong>intensity</strong> of each point.
             </div>
@@ -1762,7 +1909,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 
         <div data-bind="visible: ReportType()=='Line'" class="card card-body">
             <div class="alert alert-info small py-1 mb-2">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;For Line Graph, the first field below will show on the x-axis. All other fields will numeric fields will show on y-axis.
+            <span class="fas fa-lightbulb"></span>&nbsp;For Line Graph, the first field below will show on the x-axis. All other fields will numeric fields will show on y-axis.
             </div>
             <div class="form-group row small">
             <div class="checkbox col-6">
@@ -1776,7 +1923,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 
         <div data-bind="visible: ReportType()=='Combo'" class="card card-body">
             <div class="alert alert-info small py-1 mb-2">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;For Combo Graph, the first field below will show on the x-axis. All other numeric fields will show on y-axis, and you can choose display each series as line, bar or area.
+            <span class="fas fa-lightbulb"></span>&nbsp;For Combo Graph, the first field below will show on the x-axis. All other numeric fields will show on y-axis, and you can choose display each series as line, bar or area.
             </div>
             <div class="form-group row small">
             <div class="col-6">
@@ -1788,13 +1935,13 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 
         <div data-bind="visible: ReportType()=='Pivot'" class="card card-body">
             <div class="alert alert-info small py-1 mb-0">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;For Transpose, the first field below will be used to Pivot/Transpose the rows as columns, and it must be grouped.
+            <span class="fas fa-lightbulb"></span>&nbsp;For Transpose, the first field below will be used to Pivot/Transpose the rows as columns, and it must be grouped.
             </div>
         </div>
 
         <div data-bind="visible: ReportType()=='Single'" class="card card-body">
             <div class="alert alert-info small py-1 mb-0">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;KPI is a single value report that is ideal for placing on a Dashboard. All fields except one must be hidden for Widgets.
+            <span class="fas fa-lightbulb"></span>&nbsp;KPI is a single value report that is ideal for placing on a Dashboard. All fields except one must be hidden for Widgets.
             </div>
         </div>
 
@@ -1811,7 +1958,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 
         <div data-bind="visible: ReportType()=='Map'" class="card card-body">
             <div class="alert alert-info small py-1 mb-2">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;For Map Graph, the first field below has to be a Region, like a Country.
+            <span class="fas fa-lightbulb"></span>&nbsp;For Map Graph, the first field below has to be a Region, like a Country.
             </div>
             <div class="form-group row small">
             <label class="col-sm-3 control-label">Map Display</label>
@@ -1825,7 +1972,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
         <li class="list-group-item">
             <div class="row">
                 <div class="col-5">
-                    <span class="sortable pull-left" style="padding-right: 15px;" data-bind="ifnot: $parent.useStoredProc">
+                    <span class="sortable float-start" style="padding-right: 15px;" data-bind="ifnot: $parent.useStoredProc">
                         <span class="fa fa-ellipsis-v" aria-hidden="true" title="Drag to reorder"></span>
                     </span>
                     <span class="fa fa-columns"></span>
@@ -1841,21 +1988,21 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                         <span class="badge bg-danger" >Dynamic cannot be first column.</span>
                     </span>
                 </div>
-                <div class="col-7">
-                    <div class="pull-right" style="margin-top: -5px;" data-bind="if: $parent.AggregateReport() && !$parent.useStoredProc()">
+                <div class="col-7 d-flex flex-row-reverse">
+                    <div  style="margin-top: -5px;" data-bind="if: $parent.AggregateReport() && !$parent.useStoredProc()">
                         <select class="form-select form-control-sm" data-bind="options: $parent.canDrilldown() && $index()>0 ? fieldAggregateWithDrilldown : fieldAggregate, value: selectedAggregate"></select>
                     </div>
 
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="ifnot: $parent.useStoredProc">
+                    <div  style="padding-right: 10px;" data-bind="ifnot: $parent.useStoredProc">
                         <span class="fa fa-trash-o" title="Cannot Delete Required Filter" data-bind="visible: forceFilterForTable"></span>
                         <span class="fa fa-trash" style="cursor: pointer;" aria-hidden="true" title="Delete this Field" data-bind="click: $parent.RemoveField, hidden: forceFilterForTable"></span>
                     </div>
-                    <!--<div class="pull-right" style="padding-right: 10px;" data-bind="ifnot: $parent.useStoredProc">
+                    <!--<div  style="padding-right: 10px;" data-bind="ifnot: $parent.useStoredProc">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: function(){ filterOnFly(!filterOnFly()); }, css: {active: filterOnFly()==true}">
                             <span class="fa fa-filter" aria-hidden="true" title="Filter by this field on the Report"></span>
                         </span>
                     </div>-->
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="visible: $parent.ReportType()!='Pivot'">
+                    <div  style="padding-right: 10px;" data-bind="visible: $parent.ReportType()!='Pivot'">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: toggleDisable">
                             <span data-bind="
                                 css: {
@@ -1870,42 +2017,37 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                             " aria-hidden="true"></span>
                         </span>
                     </div>
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="visible: $parent.ReportType()!='Pivot' && $parent.ReportType()!='List' && !$parent.useStoredProc()">
+                    <div  style="padding-right: 10px;" data-bind="visible: $parent.ReportType()!='Pivot' && $parent.ReportType()!='List' && !$parent.useStoredProc()">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: function(){ hideInDetail(!hideInDetail()); }, css: {active: hideInDetail()==true}">
                             <span class="fa fa-eye-slash" aria-hidden="true" title="Hide in Details"></span>
                         </span>
                     </div>
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="visible: $parent.isFieldValidForYAxis($index(), fieldType || fieldFormat(), selectedAggregate())  && $parent.isChart() && $index()>0">
+                    <div  style="padding-right: 10px;" data-bind="visible: $parent.isFieldValidForYAxis($index(), fieldType || fieldFormat(), selectedAggregate())  && $parent.isChart() && $index()>0">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: function(){ groupInGraph(!groupInGraph()); }, css: {active: groupInGraph()==false}">
                             <span class="fa fa-signal" aria-hidden="true" title="Include in series"></span>
                         </span>
                     </div>
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="visible: $parent.IncludeSubTotal()  &&  (['Int', 'Double', 'Money', 'Decimal', 'Currency'].indexOf(fieldType) >= 0 || ['Int', 'Double', 'Money', 'Decimal', 'Currency'].indexOf(fieldFormat()) >= 0)">
-                        <span class="button-box no-padding" tabindex="0" data-bind="click: function(){ dontSubTotal(!dontSubTotal()); }, css: {active: dontSubTotal()==true}">
-                            <span class="fa fa-plus-circle" aria-hidden="true" title="Don't add to Total row"></span>
-                        </span>
-                    </div>
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="visible: $parent.ReportType()!='Pivot'">
+                    <div  style="padding-right: 10px;" data-bind="visible: $parent.ReportType()!='Pivot'">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: setupLinkField, css: {active: linkField()==true}">
                             <span class="fa fa-link" aria-hidden="true" title="Link to another Report or Url"></span>
                         </span>
                     </div>
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="visible: $parent.ReportType()=='Combo' && $parent.isFieldValidForYAxis($index(), fieldType || fieldFormat(), selectedAggregate())  && $parent.isChart() && $index()>0">
+                    <div  style="padding-right: 10px;" data-bind="visible: $parent.ReportType()=='Combo' && $parent.isFieldValidForYAxis($index(), fieldType || fieldFormat(), selectedAggregate())  && $parent.isChart() && $index()>0">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: function(){ seriesType(seriesType() == 'line' ? 'area' : (seriesType()=='bars' ? 'line' : 'bars')); }">
                             <span class="fa" aria-hidden="true" data-bind="css: {'fa-line-chart': seriesType() == 'line', 'fa-bar-chart': seriesType() == 'bars', 'fa-area-chart': seriesType()=='area' }, attr: {title: seriesType}"></span>
                         </span>
                     </div>
-                    <div class="pull-right" style="padding-right: 10px;">
+                    <div  style="padding-right: 10px;">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: setupFieldOptions">
                             <span class="fa fa-gear" aria-hidden="true" title="More Options"></span>
                         </span>
                     </div>
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="if: isFormulaField">
+                    <div  style="padding-right: 10px;" data-bind="if: isFormulaField">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: editFormulaField">
                             <span class="fa fa-pencil" aria-hidden="true" title="Edit Formula Field"></span>
                         </span>
                     </div>
-                    <div class="pull-right" style="padding-right: 10px;" data-bind="if: isFormulaField">
+                    <div  style="padding-right: 10px;" data-bind="if: isFormulaField">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: duplicateFormulaField">
                             <span class="fa fa-copy" aria-hidden="true" title="Duplicate Formula Field"></span>
                         </span>
@@ -1960,6 +2102,9 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#" data-bind="click: insertFieldTableTransposed">Transposed</a></li>
                 <li><a class="dropdown-item" href="#" data-bind="click: insertFieldTableStandard">Standard</a></li>
+                <!-- ko if: hasOuterGroupFields -->
+                <li><a class="dropdown-item" href="#" data-bind="click: insertGroupedTable">Grouped</a></li>
+                <!-- /ko -->
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="#" data-bind="click: insertHeaderBreak">Add Header Break</a></li>
                 <li><a class="dropdown-item" href="#" data-bind="click: insertFooterBreak">Add Footer Break</a></li>
@@ -2027,17 +2172,37 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 <script type="text/html" id="designer-options">
     <div class="row">
         <div class="col-md-5">
-            <div class="checkbox" data-bind="visible: ReportType()!='Pivot'">
-                <label>
-                    <input type="checkbox" data-bind="checked: IncludeSubTotal" />
-                    Include Total Row
-                </label>
-            </div>
-            <div class="checkbox" data-bind="visible: ReportType()!='Pivot' && hasPivotColumn()">
-                <label>
-                    <input type="checkbox" data-bind="checked: IncludeColumnTotal" />
-                    Include Total Column
-                </label>
+            <div data-bind="visible: ReportType()!='Pivot' && ReportType()!='Custom'">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" data-bind="checked: IncludeSubTotal" />
+                        Include Total Row
+                    </label>
+                </div>
+                <div data-bind="visible: IncludeSubTotal()" style="padding-left: 20px; margin-top: 4px; margin-bottom: 4px;">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" data-bind="checked: totalRowFormat" value="row" />
+                        <label class="form-check-label">As Total Row</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" data-bind="checked: totalRowFormat" value="table" />
+                        <label class="form-check-label">As Total Table</label>
+                    </div>
+                </div>
+                <div data-bind="visible: IncludeSubTotal() && hasOuterGroupFields()" style="padding-left: 20px; margin-top: 2px; margin-bottom: 4px;">
+                    <div class="checkbox" style="margin-top: 0;">
+                        <label>
+                            <input type="checkbox" data-bind="checked: subTotalPerGroup" />
+                            Sub Total Per Group
+                        </label>
+                    </div>
+                </div>
+                <div class="checkbox" data-bind="visible: hasPivotColumn()">
+                    <label>
+                        <input type="checkbox" data-bind="checked: IncludeColumnTotal" />
+                        Include Total Column
+                    </label>
+                </div>            
             </div>
             <div class="checkbox" data-bind="hidden: AggregateReport">
                 <label>
@@ -2198,7 +2363,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
         <textarea id="function-code"></textarea>
     </div>
     <div class="form-group row" >
-        <div class="col-md-12 pull-right">
+        <div class="col-md-12 float-end">
             <hr />
             <a href="#" class="btn btn-primary btn-sm" title="Save Custom Function Field" data-bind="click: saveFunctionField, visible: isFunctionField">Save</a>
             <a href="#" class="btn btn-sm" title="Custom Field using Function" data-bind="click: function(){isFunctionField(!isFunctionField())}, text: isFunctionField() ? 'Cancel': 'Function', css: {'btn-primary': !isFunctionField(), 'btn-danger': isFunctionField}"></a>
@@ -2581,7 +2746,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 
         <!-- Schedule -->
         <div class="card flex-fill expandable-panel" id="schedulePanel"
-             data-bind="css:{'collapsed-vertical': panels.isCollapsed('schedulePanel')}">
+             data-bind="css:{'collapsed-vertical': panels.isCollapsed('schedulePanel')}, visible: SaveReport() && !appSettings.showScheduling()">
           <div class="card-header p-1" data-bind="click:function(){panels.togglePanel('schedulePanel')}">
             <i class="fa fa-hourglass"></i> Schedule
           </div>
@@ -2757,8 +2922,8 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                         <br />
                         <div class="card card-body">
                             <div class="row">
-                                <h5 class="col-8 pull-left"><span class="fa fa-table"></span>&nbsp;Selected data for the Report</h5>
-                                <div class="col-4 pull-right right-align">
+                                <h5 class="col-8 float-start"><span class="fa fa-table"></span>&nbsp;Selected data for the Report</h5>
+                                <div class="col-4 float-end right-align">
                                     <a href="#" class="small text-muted" data-bind="visible: SelectedFields().length, click: function() {SelectedFields([]);}">Clear all</a>
                                 </div>
                             </div>
@@ -2818,7 +2983,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                             <div data-bind="template: 'designer-sort'"></div>
                         </div>
                         <br />
-                        <div data-bind="visible: SaveReport && !appSettings.showScheduling" class="card card-body">
+                        <div data-bind="visible: SaveReport() && !appSettings.showScheduling()" class="card card-body">
                             <h5><span class="fa fa-hourglass"></span>&nbsp;Choose Schedule</h5>
 
                             <div style="padding: 10px 10px" data-bind="if: SaveReport">
@@ -2853,7 +3018,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 </script>
 
 <script type="text/html" id="chart-settings">
-    <div class="chart-container pull-right">
+    <div class="chart-container float-end">
         <button class="btn btn-light btn-sm d-flex align-items-center mt-2 chart-settings-btn"
                 data-bind="click: toggleChartSettings" title="Report settings">
             <i class="fa fa-cog"></i>
@@ -3087,7 +3252,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
         <div class="modal-content" data-bind="with: ChartDrillDownData">
             <div class="modal-header">
                 <h4 class="modal-title">Drilldown Data</h4>
-                <button type="button" class="btn-close pull-right" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close float-end" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <!-- ko if: DrillDownData -->
             <div class="modal-body">
@@ -3131,16 +3296,16 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
             <div class="modal-footer">
                 <div class="col-xs-12 col-centered" data-bind="with: pager">
                     <div class="form-inline small text-muted">
-                        <div class="pull-left total-records" data-bind="visible: pages()">
+                        <div class="float-start total-records" data-bind="visible: pages()">
                             <span data-bind="text: 'Total Records: ' + totalRecords()"></span>
                         </div>
-                        <div class="pull-left">
-                            <button class="btn btn-xs" title="Download Excel" data-bind="click: $parent.exportExcel"><span class="fa fa-file-excel-o"></span></button>
+                        <div class="float-start">
+                            <button class="btn btn-xs" title="Download Excel" data-bind="click: $parent.exportExcel"><span class="fas fa-file-excel"></span></button>
                             <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#sqlDrillDownModal" data-bind="visible: $root.adminMode">
                                 <span class="fa fa-code"></span> View Code
                             </button>
                         </div>
-                        <div class="form-group pull-right" data-bind="visible: pages()">
+                        <div class="form-group float-end" data-bind="visible: pages()">
                             <div data-bind="template: 'pager-template', data: $data"></div>
                         </div>
                     </div>
@@ -3160,7 +3325,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                         data-bind="click: function(data, event) { copySqlToClipboard(event.target); }">
                     <i class="fa fa-clipboard"></i>&nbsp;Copy
                 </button>
-                <button type="button" class="btn-close pull-right" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close float-end" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" data-bind="with: ReportResult">
                 <div id="reportSqlCode" style="overflow-x: auto; max-height: 500px; overflow-y: scroll; border: 1px solid; padding: 10px;" class="bg-dark text-light">
@@ -3180,7 +3345,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                         data-bind="click: function(data, event) { copySqlToClipboard(event.target); }">
                     <i class="fa fa-clipboard"></i>&nbsp;Copy
                 </button>
-                <button type="button" class="btn-close pull-right" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close float-end" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" data-bind="with:DrillDownData">
                 <div id="reportSqlCode" style="overflow-x: auto; max-height: 500px; overflow-y: scroll; border: 1px solid; padding: 10px;" class="bg-dark text-light">
@@ -3213,7 +3378,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
         <div class="modal-content" data-bind="with: PdfPage">
             <div class="modal-header">
                 <h5 class="modal-title" id="pdfOptionsScheduleModalLabel">
-                    <i class="fa fa-file-pdf-o me-2"></i> Set PDF Page Size
+                    <i class="fas fa-file-pdf me-2"></i> Set PDF Page Size
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -3272,7 +3437,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
         <div class="modal-content" data-bind="with: WordPage">
             <div class="modal-header">
                 <h5 class="modal-title" id="pdfOptionsScheduleModalLabel">
-                    <i class="fa fa-file-pdf-o me-2"></i> Set WORD Page Size
+                    <i class="fas fa-file-pdf me-2"></i> Set WORD Page Size
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -3330,7 +3495,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
         <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" data-bind="with: WordPage">
             <div class="modal-header">
-                <h5 class="modal-title" id="wordOptionsModalLabel"><i class="fa fa-file-pdf-o me-2"></i> Export to WORD</h5>
+                <h5 class="modal-title" id="wordOptionsModalLabel"><i class="fas fa-file-pdf me-2"></i> Export to WORD</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body row g-0">
@@ -3340,7 +3505,8 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                         <div data-bind="style: {
                                      width: selectedWidth(),
                                      height: selectedHeight(),
-                                     backgroundColor: selectedBackgroundStyle()
+                                     backgroundColor: selectedBackgroundStyle(),
+                                     transition: 'all 0.3s ease'
                                  }"
                              class="shadow rounded mx-auto mb-2 border position-relative">
                             <span class="position-absolute top-50 start-50 translate-middle text-muted small">Preview</span>
@@ -3389,7 +3555,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" data-bind="with: PdfPage">
             <div class="modal-header">
-                <h5 class="modal-title" id="pdfOptionsModalLabel"><i class="fa fa-file-pdf-o me-2"></i> Export to PDF</h5>
+                <h5 class="modal-title" id="pdfOptionsModalLabel"><i class="fas fa-file-pdf me-2"></i> Export to PDF</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body row g-0">
@@ -3399,7 +3565,8 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                         <div data-bind="style: {
                                      width: selectedWidth(),
                                      height: selectedHeight(),
-                                     backgroundColor: selectedBackgroundStyle()
+                                     backgroundColor: selectedBackgroundStyle(),
+                                     transition: 'all 0.3s ease'
                                  }"
                              class="shadow rounded mx-auto mb-2 border position-relative">
                             <span class="position-absolute top-50 start-50 translate-middle text-muted small">Preview</span>
