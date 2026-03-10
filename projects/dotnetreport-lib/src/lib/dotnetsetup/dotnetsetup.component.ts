@@ -1736,11 +1736,11 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
             <p>HeatMap</p>
         </button>
         <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('Single'); }, css: { active: ReportType()=='Single',disabled: hasFunctionField() }">
-            <span class="fa fa-2x fa-window-maximize"></span>
+            <span class="fas fa-2x fa-window-maximize"></span>
             <p>KPI</p>
         </button>
         <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('Treemap'); }, css: { active: ReportType()=='Treemap',disabled: hasFunctionField() }">
-            <span class="fa fa-2x fa-window-restore"></span>
+            <span class="fas fa-2x fa-window-restore"></span>
             <p>Treemap</p>
         </button>
         <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('Pivot'); }, css: { active: ReportType()=='Pivot',disabled: hasFunctionField() }">
@@ -2024,7 +2024,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                     </div>
                     <div  style="padding-right: 10px;" data-bind="visible: $parent.isFieldValidForYAxis($index(), fieldType || fieldFormat(), selectedAggregate())  && $parent.isChart() && $index()>0">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: function(){ groupInGraph(!groupInGraph()); }, css: {active: groupInGraph()==false}">
-                            <span class="fa fa-signal" aria-hidden="true" title="Include in series"></span>
+                            <span class="fas fa-signal" aria-hidden="true" title="Include in series"></span>
                         </span>
                     </div>
                     <div  style="padding-right: 10px;" data-bind="visible: $parent.ReportType()!='Pivot'">

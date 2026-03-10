@@ -1608,11 +1608,11 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
             <p>HeatMap</p>
         </button>
         <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('Single'); }, css: { active: ReportType()=='Single',disabled: hasFunctionField() }">
-            <span class="fa fa-2x fa-window-maximize"></span>
+            <span class="fas fa-2x fa-window-maximize"></span>
             <p>KPI</p>
         </button>
         <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('Treemap'); }, css: { active: ReportType()=='Treemap',disabled: hasFunctionField() }">
-            <span class="fa fa-2x fa-window-restore"></span>
+            <span class="fas fa-2x fa-window-restore"></span>
             <p>Treemap</p>
         </button>
         <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('Pivot'); }, css: { active: ReportType()=='Pivot',disabled: hasFunctionField() }">
@@ -1896,7 +1896,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                     </div>
                     <div style="padding-right: 10px;" data-bind="visible: $parent.isFieldValidForYAxis($index(), fieldType || fieldFormat(), selectedAggregate())  && $parent.isChart() && $index()>0">
                         <span class="button-box no-padding" tabindex="0" data-bind="click: function(){ groupInGraph(!groupInGraph()); }, css: {active: groupInGraph()==false}">
-                            <span class="fa fa-signal" aria-hidden="true" title="Include in series"></span>
+                            <span class="fas fa-signal" aria-hidden="true" title="Include in series"></span>
                         </span>
                     </div>
                     <div style="padding-right: 10px;" data-bind="visible: $parent.IncludeSubTotal()  &&  (['Int', 'Double', 'Money', 'Decimal', 'Currency'].indexOf(fieldType) >= 0 || ['Int', 'Double', 'Money', 'Decimal', 'Currency'].indexOf(fieldFormat()) >= 0)">
@@ -3232,7 +3232,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
         <div class="modal-content" data-bind="with: PdfPage">
             <div class="modal-header">
                 <h5 class="modal-title" id="pdfOptionsScheduleModalLabel">
-                    <i class="fa fa-file-pdf-o me-2"></i> Set PDF Page Size
+                    <i class="fa fa-file-pdf me-2"></i> Set PDF Page Size
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -3291,7 +3291,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
         <div class="modal-content" data-bind="with: WordPage">
             <div class="modal-header">
                 <h5 class="modal-title" id="pdfOptionsScheduleModalLabel">
-                    <i class="fa fa-file-pdf-o me-2"></i> Set WORD Page Size
+                    <i class="fa fa-file-pdf me-2"></i> Set WORD Page Size
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -3349,7 +3349,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
         <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" data-bind="with: WordPage">
             <div class="modal-header">
-                <h5 class="modal-title" id="wordOptionsModalLabel"><i class="fa fa-file-pdf-o me-2"></i> Export to WORD</h5>
+                <h5 class="modal-title" id="wordOptionsModalLabel"><i class="fa fa-file-pdf me-2"></i> Export to WORD</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body row g-0">
@@ -3408,7 +3408,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" data-bind="with: PdfPage">
             <div class="modal-header">
-                <h5 class="modal-title" id="pdfOptionsModalLabel"><i class="fa fa-file-pdf-o me-2"></i> Export to PDF</h5>
+                <h5 class="modal-title" id="pdfOptionsModalLabel"><i class="fa fa-file-pdf me-2"></i> Export to PDF</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body row g-0">
@@ -3580,7 +3580,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                 </li>
                                 <li>
                                     <a href="#" class="dropdown-item" data-bind="click: $parent.appSettings.showPageSize ? function() { loadPdfModel() } : function() { $parent.appSettings.useAltPdf ? downloadPdfAlt('','') : downloadPdf('','') }">
-                                        <span class="fa fa-file-pdf-o"></span> PDF
+                                        <span class="fa fa-file-pdf"></span> PDF
                                     </a>
                                 </li>
                                 <li>
