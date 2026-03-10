@@ -184,8 +184,8 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                 <option><= Today -</option>
             </optgroup>
         </select>
-        <div data-bind="if: $parent.Value().indexOf('Today +') >= 0 || $parent.Value().indexOf('Today -') >= 0" class="form-group pull-left" style="padding-top: 5px;">
-            <input type="number" class="form-control input-sm pull-left" style="width: 80px;" data-bind="value: $parent.Value2" required /><span style="padding: 5px 5px;" class="pull-left"> days</span>
+        <div data-bind="if: $parent.Value().indexOf('Today +') >= 0 || $parent.Value().indexOf('Today -') >= 0" class="form-group  float-start" style="padding-top: 5px;">
+            <input type="number" class="form-control input-sm  float-start" style="width: 80px;" data-bind="value: $parent.Value2" required /><span style="padding: 5px 5px;" class=" float-start"> days</span>
         </div>
         <!-- /ko -->
         <!-- /ko -->
@@ -279,7 +279,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
     <!-- ko foreach: Columns -->
     <th data-bind="attr: { id: !IsPivotField ? fieldId : 'pivot--' + fieldName }, style: {'text-align': fieldAlign() ? fieldAlign() : (IsNumeric ? 'right' : 'left'), 'background-color': headerBackColor }, hidden: outerGroup" style="border-right: 1px solid;">
 
-        <div class="pull-left" data-bind="if: !$parent.IsDrillDown()" style="padding-right: 5px;">
+        <div class=" float-start" data-bind="if: !$parent.IsDrillDown()" style="padding-right: 5px;">
             <div class="dropup">
                 <a href="#" data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
                     <span class="fa fa-ellipsis-v sortable" title="Drag to reorder"></span>
@@ -337,7 +337,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 
 </script>
 <script type="text/html" id="kpi-settings">
-    <div class="chart-container pull-right">
+    <div class="chart-container  float-end">
         <button class="btn btn-light btn-sm d-flex align-items-center mt-2 chart-settings-btn"
                 data-bind="click: toggleKpiSettings()" title="KPI Settings">
             <i class="fa fa-cog"></i>
@@ -560,10 +560,10 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                         </table>
                         <div class="col-xs-12 col-centered" data-bind="with: pager">
                             <div class="form-inline small text-muted">
-                                <div class="pull-left total-records" data-bind="visible: pages()">
+                                <div class=" float-start total-records" data-bind="visible: pages()">
                                     <span data-bind="text: 'Total Records: ' + totalRecords()"></span>
                                 </div>
-                                <div class="pull-left total-records">
+                                <div class=" float-start total-records">
                                     &nbsp;
                                     <a href="#" title="Download Excel" data-bind="click: $parent.exportExcel"><span class="fa fa-file-excel "></span></a>
                                     &nbsp;
@@ -571,7 +571,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                         <span class="fa fa-code"></span>
                                     </a>
                                 </div>
-                                <div class="form-group pull-right" data-bind="visible: pages()">
+                                <div class="form-group  float-end" data-bind="visible: pages()">
                                     <div data-bind="template: 'pager-template', data: $data"></div>
                                 </div>
                             </div>
@@ -586,7 +586,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                         <div data-bind="foreach: subReportsRan">
                             <div class="">
                                 <div class="" style="padding-bottom: 20px;" >
-                                    <h2 class="pull-left" data-bind="text: ReportName"></h2>
+                                    <h2 class=" float-start" data-bind="text: ReportName"></h2>
 
                                     <div class="clearfix"></div>
                                     <div class="list-overflow-auto" style="padding-top: 0; margin-top: 0;">
@@ -601,10 +601,10 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                     </div>
                                     <div class="form-inline">
                                         <div class="small" data-bind="with: pager">
-                                            <div class="form-group pull-left total-records" data-bind="if: totalRecords()>1 && $parent.ReportType() != 'Single'">
+                                            <div class="form-group  float-start total-records" data-bind="if: totalRecords()>1 && $parent.ReportType() != 'Single'">
                                                 <span data-bind="text: 'Total Records: ' + totalRecords()"></span><br />
                                             </div>
-                                            <div class="form-group pull-right" data-bind="if: pages()>1 && $parent.ReportType() != 'Single'">
+                                            <div class="form-group  float-end" data-bind="if: pages()>1 && $parent.ReportType() != 'Single'">
                                                 <div data-bind="template: 'pager-template', data: $data"></div>
                                             </div>
                                         </div>
@@ -662,10 +662,10 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                         </div>
                         <div class="form-inline">
                             <div class="small" data-bind="with: pager">
-                                <div class="form-group pull-left total-records" data-bind="if: totalRecords()>1 && $parent.ReportType() != 'Single'">
+                                <div class="form-group  float-start total-records" data-bind="if: totalRecords()>1 && $parent.ReportType() != 'Single'">
                                     <span data-bind="text: 'Total Records: ' + totalRecords()"></span><br />
                                 </div>
-                                <div class="form-group pull-right" data-bind="if: pages()>1 && $parent.ReportType() != 'Single'">
+                                <div class="form-group  float-end" data-bind="if: pages()>1 && $parent.ReportType() != 'Single'">
                                     <div data-bind="template: 'pager-template', data: $data"></div>
                                 </div>
                             </div>
@@ -690,7 +690,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
     <!-- /ko -->
 
     <!-- ko if: $parent.ReportType() != 'Pivot' && $parent.ReportType() != 'Html' && (!$parent.isChart() || $parent.ShowDataWithGraph()) -->
-    <div class="pull-right" data-bind="if: $parent.OuterGroupColumns().length > 0">
+    <div class=" float-end" data-bind="if: $parent.OuterGroupColumns().length > 0">
         <a href="#" data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
             Manage Groups <span class="fa fa-ellipsis-v"></span>
         </a>
@@ -769,7 +769,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                       </div>
                       <div class="row container-fluid" data-bind="visible: show">
                         <!-- ko foreach: users -->
-                        <div class="pull-left">
+                        <div class=" float-start">
                           <div class="checkbox">
                             <label class="label label-info">
                               <input type="checkbox" data-bind="checked: selected"> &nbsp; <span data-bind="text: text"></span>&nbsp; </label>
@@ -782,7 +782,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                     <!-- /ko -->
                     <!-- ko if: groupedUsers().length == 0 && users().length > 0 -->
                     <!-- ko foreach: users -->
-                    <div class="pull-left">
+                    <div class=" float-start">
                         <div class="checkbox">
                             <label class="label label-info">
                                 <input type="checkbox" data-bind="checked: selected">&nbsp;<span data-bind="text: text"></span>&nbsp;
@@ -807,7 +807,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                       </div>
                       <div class="row container-fluid" data-bind="visible: show">
                         <!-- ko foreach: viewOnlyUsers -->
-                        <div class="pull-left">
+                        <div class=" float-start">
                           <div class="checkbox">
                             <label class="label label-info">
                               <input type="checkbox" data-bind="checked: selected"> &nbsp; <span data-bind="text: text"></span>&nbsp; </label>
@@ -820,7 +820,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                     <!-- /ko -->
                     <!-- ko if: groupedViewOnlyUsers().length == 0 && viewOnlyUsers().length > 0 -->
                     <!-- ko foreach: viewOnlyUsers -->
-                    <div class="pull-left">
+                    <div class=" float-start">
                         <div class="checkbox">
                             <label class="label label-info">
                                 <input type="checkbox" data-bind="checked: selected">&nbsp;<span data-bind="text: text"></span>&nbsp;
@@ -846,7 +846,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                       </div>
                       <div class="row container-fluid" data-bind="visible: show">
                         <!-- ko foreach: deleteOnlyUsers -->
-                        <div class="pull-left">
+                        <div class=" float-start">
                           <div class="checkbox">
                             <label class="label label-info">
                               <input type="checkbox" data-bind="checked: selected"> &nbsp; <span data-bind="text: text"></span>&nbsp; </label>
@@ -859,7 +859,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                     <!-- /ko -->
                     <!-- ko if: groupedDeleteOnlyUsers().length == 0 && deleteOnlyUsers().length > 0 -->
                     <!-- ko foreach: deleteOnlyUsers -->
-                        <div class="pull-left">
+                        <div class=" float-start">
                             <div class="checkbox">
                                 <label class="label label-info">
                                     <input type="checkbox" data-bind="checked: selected">&nbsp;<span data-bind="text: text"></span>&nbsp;
@@ -879,7 +879,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                 <i class="toggle-icon fa" data-bind="click: toggleManageRoles,css: { 'fa-chevron-down': showManageRoles(), 'fa-chevron-right': !showManageRoles() }"></i><b>Manage by User Role</b> (allow edit)
                 <div class="row container-fluid" data-bind="visible: showManageRoles">
                     <!-- ko foreach: userRoles -->
-                    <div class="pull-left">
+                    <div class=" float-start">
                         <div class="checkbox">
                             <label class="label label-info">
                                 <input type="checkbox" data-bind="checked: selected">&nbsp;<span data-bind="text: text"></span>&nbsp;
@@ -895,7 +895,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                 <i class="toggle-icon fa" data-bind="click: toggleViewRoles,css: { 'fa-chevron-down': showViewRoles(), 'fa-chevron-right': !showViewRoles() }"></i><b>View only by User Role</b> (no edit/delete)
                 <div class="row container-fluid" data-bind="visible: showViewRoles">
                     <!-- ko foreach: viewOnlyUserRoles -->
-                    <div class="pull-left">
+                    <div class=" float-start">
                         <div class="checkbox">
                             <label class="label label-info">
                                 <input type="checkbox" data-bind="checked: selected">&nbsp;<span data-bind="text: text"></span>&nbsp;
@@ -911,7 +911,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                     <i class="toggle-icon fa" data-bind="click: toggleDeleteRoles,css: { 'fa-chevron-down': showDeleteRoles(), 'fa-chevron-right': !showDeleteRoles() }"></i><b>Delete by User Role</b> (allow delete)
                     <div class="row container-fluid" data-bind="visible: showDeleteRoles">
                         <!-- ko foreach: deleteOnlyUserRoles -->
-                        <div class="pull-left">
+                        <div class=" float-start">
                             <div class="checkbox">
                                 <label class="label label-info">
                                     <input type="checkbox" data-bind="checked: selected">&nbsp;<span data-bind="text: text"></span>&nbsp;
@@ -933,7 +933,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
         <div class="rules-group-container">
             <div class="rules-group-header" data-bind="attr: {parentdivid: generateUniqueId()}">
                 <div data-bind="visible: !isRoot">
-                    <div class="pull-left">
+                    <div class=" float-start">
                         <div class="btn-group btn-group-toggle btn-group-sm" data-bs-toggle="buttons" role="group">
                             <label class="btn btn-light active" style="margin-right: 0px;">
                                 <input type="radio" data-bind="attr: { name: 'andOrGroup-' + $element.closest('.rules-group-header').getAttribute('parentdivid') }, checked: AndOr" value="And" /> And
@@ -943,12 +943,12 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                             </label>
                         </div>
                     </div>
-                    <div class="pull-right">
+                    <div class=" float-end">
                         <button class="btn btn-sm btn-secondary" data-bind="click: $parent.RemoveFilterGroup, visible: !isRoot">Remove Group</button>&nbsp;
                     </div>
                 </div>
                 <div data-bind="visible: isRoot">
-                    <div class="pull-left padded-div">
+                    <div class=" float-start padded-div">
                         <label> &nbsp;Filter Conditions</label>
                     </div>
                 </div>
@@ -1334,7 +1334,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <div class="checkbox pull-left" >
+                            <div class="checkbox  float-start" >
                                 <label>
                                     <input type="checkbox" data-bind="checked: outerGroup" />
                                     <b>Outer Group</b> - Use this field as a group heading
@@ -1624,7 +1624,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 
 <script type="text/html" id="designer-choose-data">
     <div>
-        <div class="pull-left btn-group btn-group-toggle" role="group" data-bind="if: ReportID() <= 0">
+        <div class=" float-start btn-group btn-group-toggle" role="group" data-bind="if: ReportID() <= 0">
             <label class="btn btn-sm btn-light active" style="margin-right: 0px;" title="You can change the Data source only when creating a new report, changing this will clear all selections">
                 <input type="radio" name="dataoption" id="table" checked data-bind="checked: useStoredProc, checkedValue: false"> Dynamic
             </label>
@@ -1632,7 +1632,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                 <input type="radio" name="dataoption" id="proc" value="1" data-bind="checked: useStoredProc, checkedValue: true"> Predefined
             </label>
         </div>
-        <div class="pull-right">
+        <div class=" float-end">
             <a href="#" class="btn btn-secondary btn-sm" title="Add Custom Field using Formula" data-bind="hidden: isFunctionField() || useStoredProc(), click: cancelFormulaField, text: isFormulaField()? 'Cancel': 'Custom Field', css: {'btn-primary': !isFormulaField(), 'btn-danger': isFormulaField}"></a>
             <a href="#" class="btn btn-secondary btn-sm" title="Add Custom Field using Function" data-bind="hidden:isFormulaField() || useStoredProc() || !ko.unwrap(appSettings.useFunctions) || ReportType() !== 'List' , click: function(){designFunctionField()}, text: isFunctionField()? 'Cancel': 'Function Field', css: {'btn-primary': !isFunctionField(), 'btn-danger': isFunctionField}"></a>
         </div>
@@ -1669,11 +1669,11 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                     <div class="report-list" data-bind="visible: isExpanded(), foreach: tables" style="padding-left: 15px;">
                         <div class="row border-bottom py-2 w-100">
                             <div class="col-md-12">
-                                <div class="pull-left" data-bind="click: function() { selectTable($data); }, css: {'text-muted': !isEnabled()}, style: {cursor: isEnabled() ? 'pointer' : ''}, attr: {title: !isEnabled() ? 'Cannot use table as joins do not exist': ''}">
+                                <div class=" float-start" data-bind="click: function() { selectTable($data); }, css: {'text-muted': !isEnabled()}, style: {cursor: isEnabled() ? 'pointer' : ''}, attr: {title: !isEnabled() ? 'Cannot use table as joins do not exist': ''}">
                                     <span class="text-secondary fa" data-bind="css: isEnabled() ? ($data === $parents[1].SelectedTable() ? 'fa-chevron-down' : 'fa-chevron-right') : 'fa-ban'"></span>&nbsp;
                                     <span class="fa fa-table"></span>&nbsp;<span data-bind="text: tableName" class=""></span>
                                 </div>
-                                <div class="pull-right" data-bind="visible: $data === $parents[1].SelectedTable() && !$parents[1].isFormulaField() && !$parents[1].SelectedTable().dynamicColumns">
+                                <div class=" float-end" data-bind="visible: $data === $parents[1].SelectedTable() && !$parents[1].isFormulaField() && !$parents[1].SelectedTable().dynamicColumns">
                                     <a href="#" class="small text-muted" data-bind="click: $parents[1].MoveAllFields">Select all</a> |
                                     <a href="#" class="small text-muted" data-bind="click: $parents[1].RemoveSelectedFields">Remove all</a>
                                 </div>
@@ -1844,7 +1844,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
         <li class="list-group-item">
             <div class="row">
                 <div class="col-5">
-                    <span class="sortable pull-left" style="padding-right: 15px;" data-bind="ifnot: $parent.useStoredProc">
+                    <span class="sortable  float-start" style="padding-right: 15px;" data-bind="ifnot: $parent.useStoredProc">
                         <span class="fa fa-ellipsis-v" aria-hidden="true" title="Drag to reorder"></span>
                     </span>
                     <span class="fa fa-columns"></span>
@@ -2217,7 +2217,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
         <textarea id="function-code"></textarea>
     </div>
     <div class="form-group row" >
-        <div class="col-md-12 pull-right">
+        <div class="col-md-12  float-end">
             <hr />
             <a href="#" class="btn btn-primary btn-sm" title="Save Custom Function Field" data-bind="click: saveFunctionField, visible: isFunctionField">Save</a>
             <a href="#" class="btn btn-sm" title="Custom Field using Function" data-bind="click: function(){isFunctionField(!isFunctionField())}, text: isFunctionField() ? 'Cancel': 'Function', css: {'btn-primary': !isFunctionField(), 'btn-danger': isFunctionField}"></a>
@@ -2776,8 +2776,8 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                         <br />
                         <div class="card card-body">
                             <div class="row">
-                                <h5 class="col-8 pull-left"><span class="fa fa-table"></span>&nbsp;Selected data for the Report</h5>
-                                <div class="col-4 pull-right right-align">
+                                <h5 class="col-8  float-start"><span class="fa fa-table"></span>&nbsp;Selected data for the Report</h5>
+                                <div class="col-4  float-end right-align">
                                     <a href="#" class="small text-muted" data-bind="visible: SelectedFields().length, click: function() {SelectedFields([]);}">Clear all</a>
                                 </div>
                             </div>
@@ -2872,7 +2872,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 </script>
 
 <script type="text/html" id="chart-settings">
-    <div class="chart-container pull-right">
+    <div class="chart-container  float-end">
         <button class="btn btn-light btn-sm d-flex align-items-center mt-2 chart-settings-btn"
                 data-bind="click: toggleChartSettings" title="Report settings">
             <i class="fa fa-cog"></i>
@@ -3106,7 +3106,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
         <div class="modal-content" data-bind="with: ChartDrillDownData">
             <div class="modal-header">
                 <h4 class="modal-title">Drilldown Data</h4>
-                <button type="button" class="btn-close pull-right" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close  float-end" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <!-- ko if: DrillDownData -->
             <div class="modal-body">
@@ -3150,16 +3150,16 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
             <div class="modal-footer">
                 <div class="col-xs-12 col-centered" data-bind="with: pager">
                     <div class="form-inline small text-muted">
-                        <div class="pull-left total-records" data-bind="visible: pages()">
+                        <div class=" float-start total-records" data-bind="visible: pages()">
                             <span data-bind="text: 'Total Records: ' + totalRecords()"></span>
                         </div>
-                        <div class="pull-left">
+                        <div class=" float-start">
                             <button class="btn btn-xs" title="Download Excel" data-bind="click: $parent.exportExcel"><span class="fa fa-file-excel "></span></button>
                             <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#sqlDrillDownModal" data-bind="visible: $root.adminMode">
                                 <span class="fa fa-code"></span> View Code
                             </button>
                         </div>
-                        <div class="form-group pull-right" data-bind="visible: pages()">
+                        <div class="form-group  float-end" data-bind="visible: pages()">
                             <div data-bind="template: 'pager-template', data: $data"></div>
                         </div>
                     </div>
@@ -3179,7 +3179,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                         data-bind="click: function(data, event) { copySqlToClipboard(event.target); }">
                     <i class="fa fa-clipboard"></i>&nbsp;Copy
                 </button>
-                <button type="button" class="btn-close pull-right" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close  float-end" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" data-bind="with: ReportResult">
                 <div id="reportSqlCode" style="overflow-x: auto; max-height: 500px; overflow-y: scroll; border: 1px solid; padding: 10px;" class="bg-dark text-light">
@@ -3199,7 +3199,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                         data-bind="click: function(data, event) { copySqlToClipboard(event.target); }">
                     <i class="fa fa-clipboard"></i>&nbsp;Copy
                 </button>
-                <button type="button" class="btn-close pull-right" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close  float-end" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" data-bind="with:DrillDownData">
                 <div id="reportSqlCode" style="overflow-x: auto; max-height: 500px; overflow-y: scroll; border: 1px solid; padding: 10px;" class="bg-dark text-light">
