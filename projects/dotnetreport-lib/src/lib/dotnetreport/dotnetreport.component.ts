@@ -1191,7 +1191,7 @@ export class DotnetreportComponent implements OnInit, OnDestroy {
                         <td class="row">
                             <div class="col-md-6">&nbsp;</div>
                             <div class="col-md-2">
-                                <span style="text-align: right"><button class="btn btn-sm" data-bind="click: $parents[2].RemoveSeries"><span class="fa fa-trash-o"></span></button></span>
+                                <span style="text-align: right"><button class="btn btn-sm" data-bind="click: $parents[2].RemoveSeries"><span class="fa fa-trash "></span></button></span>
                                 <span class="muted">Compare to</span>
                             </div>
                             <div class="col-md-4">
@@ -1996,7 +1996,7 @@ export class DotnetreportComponent implements OnInit, OnDestroy {
                     </div>
 
                     <div  style="padding-right: 10px;" data-bind="ifnot: $parent.useStoredProc">
-                        <span class="fa fa-trash-o" title="Cannot Delete Required Filter" data-bind="visible: forceFilterForTable"></span>
+                        <span class="fa fa-trash " title="Cannot Delete Required Filter" data-bind="visible: forceFilterForTable"></span>
                         <span class="fa fa-trash" style="cursor: pointer;" aria-hidden="true" title="Delete this Field" data-bind="click: $parent.RemoveField, hidden: forceFilterForTable"></span>
                     </div>
                     <!--<div  style="padding-right: 10px;" data-bind="ifnot: $parent.useStoredProc">
@@ -2779,7 +2779,7 @@ export class DotnetreportComponent implements OnInit, OnDestroy {
 
         <div class="d-flex justify-content-between align-items-center border-bottom bg-light p-2 px-3 flex-shrink-0">
             <h6 class="mb-0">
-                <i class="fa fa-comments-o me-1"></i> AI Report Assistant
+                <i class="fa fa-comments  me-1"></i> AI Report Assistant
                 <span class="alert alert-info" title="This feature is still in Beta release. You can turn it off from settings" style="font-size: 10pt; padding: 5px; max-width: 350px; white-space: normal; margin-bottom: 0;">
                     <i class="fa fa-info-circle"></i> Beta
                 </span>

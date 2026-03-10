@@ -53,7 +53,7 @@
                                 </a>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item" href="#" data-bind="click: function(){ selectMode(!selectMode()); }">
-                                        <span data-bind="css: selectMode() ? 'fa fa-check-square text-primary' : 'fa fa-square-o'"></span>
+                                        <span data-bind="css: selectMode() ? 'fa fa-check-square text-primary' : 'fa fa-square '"></span>
                                         <span data-bind="text: selectMode() ? 'Cancel Select Mode' : 'Select Mode'"></span>
                                     </a>
                                     <div class="dropdown-divider"></div>
@@ -148,7 +148,7 @@
                             <ul class="folder-list" data-bind="foreach: Folders">
                                 <li data-bind="click: function(){ $parent.SelectedFolder($data); }">
                                     <span data-bind="visible: $root.selectMode, click: function(d,e){ isSelected(!isSelected()); e.stopPropagation(); },
-                                          css: isSelected() ? 'fa fa-check-square text-primary me-2' : 'fa fa-square-o me-2'"></span>
+                                          css: isSelected() ? 'fa fa-check-square text-primary me-2' : 'fa fa-square  me-2'"></span>
                                     <span class="fa fa-3x fa-folder text-secondary"></span>
                                     <span class="desc" data-bind="text: FolderName"></span>
                                     <div data-bind="visible: $root.adminMode" style="font-size: 0.75em; margin-top: 4px;" onclick="event.stopPropagation()">
@@ -328,7 +328,7 @@
                                         <div class="row py-2 border-bottom align-items-center w-100" >
                                             <div class="col-md-5 d-flex align-items-center clickable" data-bind="click: function(){ $parent.SelectedFolder($data); }">
                                                 <span data-bind="visible: $root.selectMode, click: function(d,e){ isSelected(!isSelected()); e.stopPropagation(); },
-                                                    css: isSelected() ? 'fa fa-check-square text-primary me-2' : 'fa fa-square-o me-2'"></span>
+                                                    css: isSelected() ? 'fa fa-check-square text-primary me-2' : 'fa fa-square  me-2'"></span>
                                                 <span class="fa fa-folder text-secondary me-2"></span>
                                                 <span data-bind="text: FolderName"></span>
                                             </div>

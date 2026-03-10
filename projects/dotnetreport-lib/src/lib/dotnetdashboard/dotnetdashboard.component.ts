@@ -565,7 +565,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                 </div>
                                 <div class="pull-left total-records">
                                     &nbsp;
-                                    <a href="#" title="Download Excel" data-bind="click: $parent.exportExcel"><span class="fa fa-file-excel-o"></span></a>
+                                    <a href="#" title="Download Excel" data-bind="click: $parent.exportExcel"><span class="fa fa-file-excel "></span></a>
                                     &nbsp;
                                     <a href="#" title="View Code" data-bs-toggle="modal" data-bs-target="#sqlDrillDownModal" data-bind="visible: $root.adminMode">
                                         <span class="fa fa-code"></span>
@@ -753,7 +753,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
             </div>
         </div>
         <div class="alert alert-info">
-            <span class="fa fa-lightbulb-o fa-2x"></span>&nbsp;User level rights override Role level rights. No selection for a rule implies report is available to all.
+            <span class="fa fa-lightbulb  fa-2x"></span>&nbsp;User level rights override Role level rights. No selection for a rule implies report is available to all.
         </div>
 
         <div class="row small">
@@ -1077,7 +1077,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                         <td class="row">
                             <div class="col-md-6">&nbsp;</div>
                             <div class="col-md-2">
-                                <span style="text-align: right"><button class="btn btn-sm" data-bind="click: $parents[2].RemoveSeries"><span class="fa fa-trash-o"></span></button></span>
+                                <span style="text-align: right"><button class="btn btn-sm" data-bind="click: $parents[2].RemoveSeries"><span class="fa fa-trash "></span></button></span>
                                 <span class="muted">Compare to</span>
                             </div>
                             <div class="col-md-4">
@@ -1708,7 +1708,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
     <div data-bind="if: SelectedFields().length > 0">
         <div data-bind="visible: ReportType()=='Bar'" class="card card-body">
             <div class="alert alert-info small py-1 mb-2">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;For Bar Graph, the first field below will show on the x-axis. All other numeric fields will show on y-axis.
+            <span class="fa fa-lightbulb "></span>&nbsp;For Bar Graph, the first field below will show on the x-axis. All other numeric fields will show on y-axis.
             </div>
             <div class="form-group row small">
             <div class="checkbox col-6">
@@ -1728,7 +1728,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 
         <div data-bind="visible: ReportType()=='Pie'" class="card card-body">
             <div class="alert alert-info small py-1 mb-2">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;For Pie Graph, the first field below will be grouped, and the first numeric field will show as the ratio.
+            <span class="fa fa-lightbulb "></span>&nbsp;For Pie Graph, the first field below will be grouped, and the first numeric field will show as the ratio.
             </div>
             <div class="form-group row small">
             <div class="checkbox col-6">
@@ -1742,12 +1742,12 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 
         <div data-bind="visible: ReportType()=='Treemap'" class="card card-body">
             <div class="alert alert-info small py-1 mb-0">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;For Treemap, the data must be in a hierarchical format with 2nd column having parent and third column having a numeric value. The data must have a single root node having null as its parent as well.
+            <span class="fa fa-lightbulb "></span>&nbsp;For Treemap, the data must be in a hierarchical format with 2nd column having parent and third column having a numeric value. The data must have a single root node having null as its parent as well.
             </div>
         </div>
         <div data-bind="visible: ReportType()=='HeatMap'" class="card card-body">
             <div class="alert alert-info mb-3">
-                <span class="fa fa-lightbulb-o fa-2x"></span>&nbsp;For HeatMap, the first two columns must be numeric values representing
+                <span class="fa fa-lightbulb  fa-2x"></span>&nbsp;For HeatMap, the first two columns must be numeric values representing
                 <strong>Latitude</strong> and <strong>Longitude</strong>. At least one additional numeric column is required to provide the
                 <strong>intensity</strong> of each point.
             </div>
@@ -1781,7 +1781,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 
         <div data-bind="visible: ReportType()=='Line'" class="card card-body">
             <div class="alert alert-info small py-1 mb-2">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;For Line Graph, the first field below will show on the x-axis. All other fields will numeric fields will show on y-axis.
+            <span class="fa fa-lightbulb "></span>&nbsp;For Line Graph, the first field below will show on the x-axis. All other fields will numeric fields will show on y-axis.
             </div>
             <div class="form-group row small">
             <div class="checkbox col-6">
@@ -1795,7 +1795,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 
         <div data-bind="visible: ReportType()=='Combo'" class="card card-body">
             <div class="alert alert-info small py-1 mb-2">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;For Combo Graph, the first field below will show on the x-axis. All other numeric fields will show on y-axis, and you can choose display each series as line, bar or area.
+            <span class="fa fa-lightbulb "></span>&nbsp;For Combo Graph, the first field below will show on the x-axis. All other numeric fields will show on y-axis, and you can choose display each series as line, bar or area.
             </div>
             <div class="form-group row small">
             <div class="col-6">
@@ -1807,13 +1807,13 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 
         <div data-bind="visible: ReportType()=='Pivot'" class="card card-body">
             <div class="alert alert-info small py-1 mb-0">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;For Transpose, the first field below will be used to Pivot/Transpose the rows as columns, and it must be grouped.
+            <span class="fa fa-lightbulb "></span>&nbsp;For Transpose, the first field below will be used to Pivot/Transpose the rows as columns, and it must be grouped.
             </div>
         </div>
 
         <div data-bind="visible: ReportType()=='Single'" class="card card-body">
             <div class="alert alert-info small py-1 mb-0">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;KPI is a single value report that is ideal for placing on a Dashboard. All fields except one must be hidden for Widgets.
+            <span class="fa fa-lightbulb "></span>&nbsp;KPI is a single value report that is ideal for placing on a Dashboard. All fields except one must be hidden for Widgets.
             </div>
         </div>
 
@@ -1830,7 +1830,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 
         <div data-bind="visible: ReportType()=='Map'" class="card card-body">
             <div class="alert alert-info small py-1 mb-2">
-            <span class="fa fa-lightbulb-o"></span>&nbsp;For Map Graph, the first field below has to be a Region, like a Country.
+            <span class="fa fa-lightbulb "></span>&nbsp;For Map Graph, the first field below has to be a Region, like a Country.
             </div>
             <div class="form-group row small">
             <label class="col-sm-3 control-label">Map Display</label>
@@ -1866,7 +1866,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                     </div>
 
                     <div style="padding-right: 10px;" data-bind="ifnot: $parent.useStoredProc">
-                        <span class="fa fa-trash-o" title="Cannot Delete Required Filter" data-bind="visible: forceFilterForTable"></span>
+                        <span class="fa fa-trash " title="Cannot Delete Required Filter" data-bind="visible: forceFilterForTable"></span>
                         <span class="fa fa-trash" style="cursor: pointer;" aria-hidden="true" title="Delete this Field" data-bind="click: $parent.RemoveField, hidden: forceFilterForTable"></span>
                     </div>
                     <!--<div style="padding-right: 10px;" data-bind="ifnot: $parent.useStoredProc">
@@ -2631,7 +2631,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
 
         <div class="d-flex justify-content-between align-items-center border-bottom bg-light p-2 px-3 flex-shrink-0">
             <h6 class="mb-0">
-                <i class="fa fa-comments-o me-1"></i> AI Report Assistant
+                <i class="fa fa-comments  me-1"></i> AI Report Assistant
                 <span class="alert alert-info" title="This feature is still in Beta release. You can turn it off from settings" style="font-size: 10pt; padding: 5px; max-width: 350px; white-space: normal; margin-bottom: 0;">
                     <i class="fa fa-info-circle"></i> Beta
                 </span>
@@ -3154,7 +3154,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                             <span data-bind="text: 'Total Records: ' + totalRecords()"></span>
                         </div>
                         <div class="pull-left">
-                            <button class="btn btn-xs" title="Download Excel" data-bind="click: $parent.exportExcel"><span class="fa fa-file-excel-o"></span></button>
+                            <button class="btn btn-xs" title="Download Excel" data-bind="click: $parent.exportExcel"><span class="fa fa-file-excel "></span></button>
                             <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#sqlDrillDownModal" data-bind="visible: $root.adminMode">
                                 <span class="fa fa-code"></span> View Code
                             </button>
@@ -3570,12 +3570,12 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                             <ul class="dropdown-menu small">
                                 <li>
                                     <a href="#" class="dropdown-item" data-bind="click: downloadExcel">
-                                        <span class="fa fa-file-excel-o"></span> Excel
+                                        <span class="fa fa-file-excel "></span> Excel
                                     </a>
                                 </li>
                                 <li data-bind="visible: canDrilldown">
                                     <a href="#" class="dropdown-item" data-bind="click: downloadExcelWithDrilldown">
-                                        <span class="fa fa-file-excel-o"></span> Excel (Expanded)
+                                        <span class="fa fa-file-excel "></span> Excel (Expanded)
                                     </a>
                                 </li>
                                 <li>
@@ -3585,7 +3585,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                 </li>
                                 <li>
                                     <a href="#" class="dropdown-item" data-bind="click: $parent.appSettings.showPageSize ? function() { loadWordModel()} : function() { downloadWord('',''); }">
-                                        <span class="fa fa-file-word-o"></span> Word
+                                        <span class="fa fa-file-word "></span> Word
                                     </a>
                                 </li>
                             </ul>
