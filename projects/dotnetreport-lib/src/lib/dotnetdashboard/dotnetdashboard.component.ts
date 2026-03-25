@@ -24,7 +24,34 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
     public reportTemplates: SafeHtml;
     public dashboardHtml: SafeHtml;
     private queryParams: { [key: string]: string }={};
-  
+  public dateFormatPopoverContent: string = `
+    <table class="table table-sm table-borderless mb-0" style="font-size:12px">
+      <tr><td colspan="2" class="fw-bold text-primary border-bottom pb-1">Day</td></tr>
+      <tr><td><code>d</code></td><td>1, 2 … 31</td></tr>
+      <tr><td><code>dd</code></td><td>01, 02 … 31</td></tr>
+      <tr><td><code>ddd</code></td><td>Mon, Tue …</td></tr>
+      <tr><td><code>dddd</code></td><td>Monday, Tuesday …</td></tr>
+      <tr><td colspan="2" class="fw-bold text-primary border-bottom pb-1 pt-2">Month</td></tr>
+      <tr><td><code>M</code></td><td>1, 2 … 12</td></tr>
+      <tr><td><code>MM</code></td><td>01, 02 … 12</td></tr>
+      <tr><td><code>MMM</code></td><td>Jan, Feb …</td></tr>
+      <tr><td><code>MMMM</code></td><td>January, February …</td></tr>
+      <tr><td colspan="2" class="fw-bold text-primary border-bottom pb-1 pt-2">Year</td></tr>
+      <tr><td><code>yy</code></td><td>26, 27 …</td></tr>
+      <tr><td><code>yyyy</code></td><td>2026, 2027 …</td></tr>
+      <tr><td colspan="2" class="fw-bold text-primary border-bottom pb-1 pt-2">Time</td></tr>
+      <tr><td><code>h</code></td><td>1–12 (12hr)</td></tr>
+      <tr><td><code>hh</code></td><td>01–12 (12hr)</td></tr>
+      <tr><td><code>H</code></td><td>0–23 (24hr)</td></tr>
+      <tr><td><code>HH</code></td><td>00–23 (24hr)</td></tr>
+      <tr><td><code>mm</code></td><td>Minutes (00–59)</td></tr>
+      <tr><td><code>ss</code></td><td>Seconds (00–59)</td></tr>
+      <tr><td><code>tt</code></td><td>AM / PM</td></tr>
+    </table>
+    <div class="text-muted mt-1" style="font-size:11px">
+      <b>Examples:</b> dd/MM/yyyy • MMM dd, yyyy • yyyy-MM-dd HH:mm
+    </div>
+  `;
     constructor(injector: Injector,
       private sanitizer: DomSanitizer,
       private cdref: ChangeDetectorRef,
@@ -92,6 +119,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                         getUsersAndRolesUrl: getUsersAndRolesUrl,
                         samePageOnRun: true,
                     });
+                    vm.dateFormatPopoverContent = this.dateFormatPopoverContent;
                     vm.init(0, result.noAccount).done(()=>{
                     vm.loadDashboard(dashboardId).done(()=>{
                         this.renderKOTemplates();
@@ -1439,8 +1467,14 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                             <div class="input-group">
                                 <input type="text" class="form-control" data-bind="value: customDateFormat" placeholder="dd/MM/yyyy" />
                                 <button type="button" class="btn btn-outline-secondary" tabindex="-1"
-                                        data-bind="bsPopover: { trigger: 'focus', placement: 'bottom', html: true, title: 'Date Format Tokens', content: '<table class=\'table table-sm table-borderless mb-0\' style=\'font-size:12px\'><tr><td colspan=\'2\' class=\'fw-bold text-primary border-bottom pb-1\'>Day</td></tr><tr><td><code>d</code></td><td>1, 2 … 31</td></tr><tr><td><code>dd</code></td><td>01, 02 … 31</td></tr><tr><td><code>ddd</code></td><td>Mon, Tue …</td></tr><tr><td><code>dddd</code></td><td>Monday, Tuesday …</td></tr><tr><td colspan=\'2\' class=\'fw-bold text-primary border-bottom pb-1 pt-2\'>Month</td></tr><tr><td><code>M</code></td><td>1, 2 … 12</td></tr><tr><td><code>MM</code></td><td>01, 02 … 12</td></tr><tr><td><code>MMM</code></td><td>Jan, Feb …</td></tr><tr><td><code>MMMM</code></td><td>January, February …</td></tr><tr><td colspan=\'2\' class=\'fw-bold text-primary border-bottom pb-1 pt-2\'>Year</td></tr><tr><td><code>yy</code></td><td>26, 27 …</td></tr><tr><td><code>yyyy</code></td><td>2026, 2027 …</td></tr><tr><td colspan=\'2\' class=\'fw-bold text-primary border-bottom pb-1 pt-2\'>Time</td></tr><tr><td><code>h</code></td><td>1–12 (12hr)</td></tr><tr><td><code>hh</code></td><td>01–12 (12hr)</td></tr><tr><td><code>H</code></td><td>0–23 (24hr)</td></tr><tr><td><code>HH</code></td><td>00–23 (24hr)</td></tr><tr><td><code>mm</code></td><td>Minutes (00–59)</td></tr><tr><td><code>ss</code></td><td>Seconds (00–59)</td></tr><tr><td><code>tt</code></td><td>AM / PM</td></tr></table><div class=\'text-muted mt-1\' style=\'font-size:11px\'><b>Examples:</b> dd/MM/yyyy • MMM dd, yyyy • yyyy-MM-dd HH:mm</div>' }">
-                                    <i class="fa fa-question-circle"></i>
+                                  data-bind="bsPopover: { 
+                                    trigger: 'focus', 
+                                    placement: 'bottom', 
+                                    html: true, 
+                                    title: 'Date Format Tokens', 
+                                    content:$root.dateFormatPopoverContent 
+                                  }">
+                                  <i class="fa fa-question-circle"></i>
                                 </button>
                             </div>
                         </div>
