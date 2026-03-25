@@ -194,7 +194,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
         <input class="form-control" type="text" data-bind="value: $parent.Value, disable: $parent.Operator() == 'is default',attr: {id: 'ctl-' + $element.closest('[data-parentprefix]').getAttribute('data-parentprefix') + '-' + uiId}" required />
         <!-- /ko -->
         <!-- /ko -->
-        <!-- ko if: hasForeignKey && $parent.Operator() != 'all' -->
+        <!-- ko if: hasForeignKey && $parent.Operator() != 'all' && $parent.Operator() != 'none' -->
         <!-- ko if: hasForeignParentKey && $parent.showParentFilter() -->
         <select multiple class="form-control" data-bind="select2: { dropdownParent: '#filter-'+uiId, placeholder: 'Please Choose', allowClear: true }, options: $parent.ParentList, optionsText: 'text', optionsValue: $parent.IsConditionalFilter ? 'text': 'id', selectedOptions: $parent.ParentIn"></select>
         <!-- /ko -->
@@ -1189,7 +1189,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                         <td class="row">
                             <div class="col-md-6">&nbsp;</div>
                             <div class="col-md-2">
-                                <span style="text-align: right"><button class="btn btn-sm" data-bind="click: $parents[2].RemoveSeries"><span class="fa fa-trash "></span></button></span>
+                                <span style="text-align: right"><button class="btn btn-sm" data-bind="click: $parents[2].RemoveSeries"><span class="fa fa-trash"></span></button></span>
                                 <span class="muted">Compare to</span>
                             </div>
                             <div class="col-md-4">
@@ -1333,7 +1333,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                                                             optionsText: 'displayName',
                                                             optionsValue: 'timeZoneId',
                                                             value: selectedTimezone,
-                                                            select2: {dropdownParent: $('#schedule-builder-div'), allowClear: true, placeholder: 'Set a time zone to send report'}">
+                                                            select2: {dropdownParent: $element.closest('.modal'), allowClear: true, placeholder: 'Set a time zone to send report'}">
                         </select>
                     </div>
                 </div>
@@ -1417,7 +1417,13 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                     <div class="form-group row" data-bind="visible: fieldFormat()=='Date' && dateFormat()==='Custom'">
                         <label class="col-sm-5 col-md-5 control-label">Enter Custom Date Format</label>
                         <div class="col-sm-7 col-md-7">
-                            <input type="text" class="form-control" data-bind="value: customDateFormat" placeholder="dd/mm/yyyy" />
+                            <div class="input-group">
+                                <input type="text" class="form-control" data-bind="value: customDateFormat" placeholder="dd/MM/yyyy" />
+                                <button type="button" class="btn btn-outline-secondary" tabindex="-1"
+                                        data-bind="bsPopover: { trigger: 'focus', placement: 'bottom', html: true, title: 'Date Format Tokens', content: '<table class=\'table table-sm table-borderless mb-0\' style=\'font-size:12px\'><tr><td colspan=\'2\' class=\'fw-bold text-primary border-bottom pb-1\'>Day</td></tr><tr><td><code>d</code></td><td>1, 2 … 31</td></tr><tr><td><code>dd</code></td><td>01, 02 … 31</td></tr><tr><td><code>ddd</code></td><td>Mon, Tue …</td></tr><tr><td><code>dddd</code></td><td>Monday, Tuesday …</td></tr><tr><td colspan=\'2\' class=\'fw-bold text-primary border-bottom pb-1 pt-2\'>Month</td></tr><tr><td><code>M</code></td><td>1, 2 … 12</td></tr><tr><td><code>MM</code></td><td>01, 02 … 12</td></tr><tr><td><code>MMM</code></td><td>Jan, Feb …</td></tr><tr><td><code>MMMM</code></td><td>January, February …</td></tr><tr><td colspan=\'2\' class=\'fw-bold text-primary border-bottom pb-1 pt-2\'>Year</td></tr><tr><td><code>yy</code></td><td>26, 27 …</td></tr><tr><td><code>yyyy</code></td><td>2026, 2027 …</td></tr><tr><td colspan=\'2\' class=\'fw-bold text-primary border-bottom pb-1 pt-2\'>Time</td></tr><tr><td><code>h</code></td><td>1–12 (12hr)</td></tr><tr><td><code>hh</code></td><td>01–12 (12hr)</td></tr><tr><td><code>H</code></td><td>0–23 (24hr)</td></tr><tr><td><code>HH</code></td><td>00–23 (24hr)</td></tr><tr><td><code>mm</code></td><td>Minutes (00–59)</td></tr><tr><td><code>ss</code></td><td>Seconds (00–59)</td></tr><tr><td><code>tt</code></td><td>AM / PM</td></tr></table><div class=\'text-muted mt-1\' style=\'font-size:11px\'><b>Examples:</b> dd/MM/yyyy • MMM dd, yyyy • yyyy-MM-dd HH:mm</div>' }">
+                                    <i class="fa fa-question-circle"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -1651,7 +1657,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                     <div class="form-group row">
                         <label class="col-sm-5 col-md-5 control-label">Link to this Report</label>
                         <div class="col-sm-7 col-md-7">
-                            <select class="form-select" required data-bind="options: $parentContext.$parent.SavedReports, optionsText: 'reportName', optionsValue: 'reportId', value: LinkedToReportId, optionsCaption: 'Choose the Report to link to'"></select>
+                            <select class="form-select" required data-bind="options: savedReportsWithFolder, optionsText: function(r) { return (r.folderName ? r.folderName + ' \u203a ' : '') + r.reportName }, optionsValue: 'reportId', optionsCaption: '', value: LinkedToReportId, select2: { placeholder: 'Search reports or folders...', allowClear: true }"></select>
                         </div>
                     </div>
                     <div class="checkbox" data-bind="if: LinkedToReportId">
@@ -1663,7 +1669,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                     <div class="form-group row" data-bind="if: SendAsFilterParameter">
                         <label class="col-sm-5 col-md-5 control-label">Link to this Report Filter</label>
                         <div class="col-sm-7 col-md-7">
-                            <select class="form-select" required data-bind="options: allFields, optionsText: 'fieldName', optionsValue: 'fieldId', value: SelectedFilterId, optionsCaption: 'Choose the Field to Filter by value'"></select>
+                            <select class="form-select" required data-bind="options: allFields, optionsText: function(f) { return (f.tableName ? f.tableName + ' \u203a ' : '') + f.fieldName }, optionsValue: 'fieldId', value: SelectedFilterId, optionsCaption: 'Choose the Field to Filter by value'"></select>
                         </div>
                     </div>
                 </div>
@@ -1698,7 +1704,8 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 </script>
 
 <script type="text/html" id="designer-choose-visual">
-    <div class="btn-group" role="group" aria-label="Visualization Options">
+    <div style="overflow-x: auto;">
+    <div class="btn-group" role="group" aria-label="Visualization Options" style="flex-wrap: nowrap; min-width: max-content;">
         <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('List'); }, css: { active: ReportType()=='List' }">
             <span class="fa fa-2x fa-list"></span>
             <p>List</p>
@@ -1740,13 +1747,14 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
             <p>KPI</p>
         </button>
         <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('Treemap'); }, css: { active: ReportType()=='Treemap',disabled: hasFunctionField() }">
-            <span class="fas fa-2x fa-window-restore"></span>
+            <span class="fa fa-2x fa-window-restore"></span>
             <p>Treemap</p>
         </button>
         <button class="btn btn-outline-secondary" data-bind="click: function(){ setReportType('Pivot'); }, css: { active: ReportType()=='Pivot',disabled: hasFunctionField() }">
             <span class="fa fa-2x fa-random"></span>
             <p>Transpose</p>
         </button>
+    </div>
     </div>
 </script>
 
@@ -1786,7 +1794,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                 </span>
             </div>
 
-            <div class="data-select-tree" style="max-height:calc(100vh - 200px);overflow-y:auto">
+            <div class="data-select-tree">
                 <!-- ko foreach: CategorizedTables -->
                 <div class="mb-3">
                     <div data-bind="click: function() { isExpanded(!isExpanded()); }, visible: categoryName" style="cursor: pointer;">
@@ -1994,7 +2002,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                     </div>
 
                     <div  style="padding-right: 10px;" data-bind="ifnot: $parent.useStoredProc">
-                        <span class="fa fa-trash " title="Cannot Delete Required Filter" data-bind="visible: forceFilterForTable"></span>
+                        <span class="fa fa-trash" title="Cannot Delete Required Filter" data-bind="visible: forceFilterForTable"></span>
                         <span class="fa fa-trash" style="cursor: pointer;" aria-hidden="true" title="Delete this Field" data-bind="click: $parent.RemoveField, hidden: forceFilterForTable"></span>
                     </div>
                     <!--<div  style="padding-right: 10px;" data-bind="ifnot: $parent.useStoredProc">
@@ -2595,7 +2603,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
             <i class="fa fa-times"></i> Cancel
           </button>
         </div>
-        <div class="card-body p-1">
+        <div class="card-body p-1" style="overflow-x: auto;">
           <div data-bind="template: 'designer-choose-visual'"></div>
         </div>
       </div>
@@ -2746,7 +2754,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 
         <!-- Schedule -->
         <div class="card flex-fill expandable-panel" id="schedulePanel"
-             data-bind="css:{'collapsed-vertical': panels.isCollapsed('schedulePanel')}, visible: SaveReport() && !appSettings.showScheduling()">
+             data-bind="css:{'collapsed-vertical': panels.isCollapsed('schedulePanel')}, visible: SaveReport() && !ko.unwrap(appSettings.showScheduling)">
           <div class="card-header p-1" data-bind="click:function(){panels.togglePanel('schedulePanel')}">
             <i class="fa fa-hourglass"></i> Schedule
           </div>
@@ -2777,7 +2785,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
 
         <div class="d-flex justify-content-between align-items-center border-bottom bg-light p-2 px-3 flex-shrink-0">
             <h6 class="mb-0">
-                <i class="fa fa-comments  me-1"></i> AI Report Assistant
+                <i class="fa fa-comments me-1"></i> AI Report Assistant
                 <span class="alert alert-info" title="This feature is still in Beta release. You can turn it off from settings" style="font-size: 10pt; padding: 5px; max-width: 350px; white-space: normal; margin-bottom: 0;">
                     <i class="fa fa-info-circle"></i> Beta
                 </span>
@@ -2983,7 +2991,7 @@ export class DotnetsetupComponent implements OnInit, OnDestroy {
                             <div data-bind="template: 'designer-sort'"></div>
                         </div>
                         <br />
-                        <div data-bind="visible: SaveReport() && !appSettings.showScheduling()" class="card card-body">
+                        <div data-bind="visible: SaveReport() && !ko.unwrap(appSettings.showScheduling)" class="card card-body">
                             <h5><span class="fa fa-hourglass"></span>&nbsp;Choose Schedule</h5>
 
                             <div style="padding: 10px 10px" data-bind="if: SaveReport">

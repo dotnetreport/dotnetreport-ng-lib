@@ -1,4 +1,10 @@
-.report-chart { min-height: auto !important; }
+.report-chart {
+    min-height: auto !important;
+}
+#dashboard-tabs .tab-hover-icon { visibility: hidden; width: 0; }
+#dashboard-tabs > li:hover .tab-hover-icon { visibility: visible; width: auto; }
+#dashboard-tabs .drop-highlight { border: 2px dashed #dee2e6; border-radius: .25rem .25rem 0 0; background: #f8f9fa; min-width: 80px; min-height: 36px; }
+
 .expanded {
     position: fixed !important;
     padding: 0 !important;
