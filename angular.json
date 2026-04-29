@@ -101,6 +101,7 @@
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
               "node_modules/summernote/dist/summernote-bs5.min.js",
               "node_modules/leaflet/dist/leaflet.js",
+              "node_modules/echarts/dist/echarts.min.js",
               "node_modules/leaflet.heat/dist/leaflet-heat.js",
               "node_modules/knockout/build/output/knockout-latest.js",
               "node_modules/jquery-blockui/jquery.blockUI.js",
