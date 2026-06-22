@@ -132,7 +132,7 @@ export class DotnetreportComponent implements OnInit, OnDestroy {
         <!-- ko if: ['DateTime','Date','Time'].indexOf(fieldType) != -1 -->
         <div style="display: flex; align-items: center; gap: 8px;">
             <!-- ko if: ['=','>','<','>=','<=', 'not equal'].indexOf($parent.Operator()) != -1 -->
-            <input class="form-control" data-bind="datepicker: $parent.fmtValue, datepickerOptions: {value: $parent.Value, dateFormat: dateFormat() === 'Custom' ? customDateFormat().replace(/yyyy/g, 'yy') : $root.dateFormatMappings[dateFormat()]}" required />
+            <input class="form-control" data-bind="datepicker: $parent.fmtValue, datepickerOptions: {value: $parent.Value, dateFormat: (['Date','Date and Time','Time'].indexOf(fieldFormat()) >= 0 && dateFormat() && dateFormat() !== 'Custom') ? $root.dateFormatMappings[dateFormat()] : $root.dateFormatMappings[($root.appSettings && $root.appSettings.defaultDateFormat) || 'United States']}" required />
             <!-- ko if: fieldType=='Time' || fieldFormat()=='Time' || fieldFormat()=='Date and Time'-->
             <input class="form-control" type="time" data-bind="value:$parent.Valuetime" required>
             <!-- /ko -->
@@ -141,14 +141,14 @@ export class DotnetreportComponent implements OnInit, OnDestroy {
         <!-- ko if: ['between'].indexOf($parent.Operator()) != -1 -->
         From
         <div style="display: flex; align-items: center; gap: 8px;">
-            <input required class="form-control from-date" data-bind="datepicker: $parent.fmtValue, datepickerOptions: {value: $parent.Value, dateFormat: dateFormat() === 'Custom' ? customDateFormat().replace(/yyyy/g, 'yy') : $root.dateFormatMappings[dateFormat()]}" />
+            <input required class="form-control from-date" data-bind="datepicker: $parent.fmtValue, datepickerOptions: {value: $parent.Value, dateFormat: (['Date','Date and Time','Time'].indexOf(fieldFormat()) >= 0 && dateFormat() && dateFormat() !== 'Custom') ? $root.dateFormatMappings[dateFormat()] : $root.dateFormatMappings[($root.appSettings && $root.appSettings.defaultDateFormat) || 'United States']}" />
             <!-- ko if:fieldType=='Time' || fieldFormat()=='Time' || fieldFormat()=='Date and Time'-->
             <input class="form-control" type="time" data-bind="value:$parent.Valuetime" required>
             <!-- /ko -->
         </div>
         to
         <div style="display: flex; align-items: center; gap: 8px;">
-            <input data-bind="datepicker: $parent.fmtValue2, datepickerOptions: {value: $parent.Value2, dateFormat: dateFormat() === 'Custom' ? customDateFormat().replace(/yyyy/g, 'yy') : $root.dateFormatMappings[dateFormat()]}" class="form-control to-date" required />
+            <input data-bind="datepicker: $parent.fmtValue2, datepickerOptions: {value: $parent.Value2, dateFormat: (['Date','Date and Time','Time'].indexOf(fieldFormat()) >= 0 && dateFormat() && dateFormat() !== 'Custom') ? $root.dateFormatMappings[dateFormat()] : $root.dateFormatMappings[($root.appSettings && $root.appSettings.defaultDateFormat) || 'United States']}" class="form-control to-date" required />
             <!-- ko if:fieldType=='Time' || fieldFormat()=='Time' || fieldFormat()=='Date and Time'-->
             <input class="form-control" type="time" data-bind="value:$parent.Valuetime2" required>
             <!-- /ko -->
@@ -290,7 +290,7 @@ export class DotnetreportComponent implements OnInit, OnDestroy {
     <th data-bind="attr: { id: !IsPivotField ? fieldId : 'pivot--' + fieldName }, style: {'text-align': fieldAlign() ? fieldAlign() : (IsNumeric ? 'right' : 'left'), 'background-color': headerBackColor }, hidden: outerGroup" style="border-right: 1px solid;">
 
         <!-- ko if: !$parent.IsDrillDown() && !$parent.IsSubReport() -->
-        <div class="float-start" style="padding-right: 5px;">
+        <div class="pull-left" style="padding-right: 5px;">
             <div class="dropup">
                 <a href="#" data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
                     <span class="fa fa-ellipsis-v sortable" title="Drag to reorder"></span>
@@ -3041,7 +3041,7 @@ export class DotnetreportComponent implements OnInit, OnDestroy {
             </div>
             <div class="checkbox" data-bind="visible: adminMode()">
                 <label>
-                    <input type="checkbox" data-bind="checked: showAdminOnly">
+                    <input type="checkbox" data-bind="checked: ShowAdminOnly">
                     Hide from reports unless Admin Mode is enabled
                 </label>
             </div>
@@ -3050,7 +3050,7 @@ export class DotnetreportComponent implements OnInit, OnDestroy {
                     <i class="fa fa-folder-open"></i> Choose Folder
                 </label>
                 <div>
-                    <select class="form-select" style="width: 100%;" data-bind="options: Folders, optionsText: 'FolderName', optionsValue: 'Id', value: FolderID"></select>
+                    <select class="form-select" style="width: 100%;" data-bind="options: Folders, optionsText: 'FolderName', optionsValue: 'Id', value: FolderID, valueAllowUnset: true"></select>
                 </div>
             </div>
             <hr />
@@ -3336,7 +3336,7 @@ export class DotnetreportComponent implements OnInit, OnDestroy {
                                 </div>
                                 <div class="checkbox" data-bind="visible: adminMode()">
                                     <label>
-                                        <input type="checkbox" data-bind="checked: showAdminOnly">
+                                        <input type="checkbox" data-bind="checked: ShowAdminOnly">
                                         Hide from reports unless Admin Mode is enabled
                                     </label>
                                 </div>
@@ -3345,7 +3345,7 @@ export class DotnetreportComponent implements OnInit, OnDestroy {
                                         <i class="fa fa-folder-open"></i> Choose Folder
                                     </label>
                                     <div>
-                                        <select class="form-select" style="width: 100%;" data-bind="options: Folders, optionsText: 'FolderName', optionsValue: 'Id', value: FolderID"></select>
+                                        <select class="form-select" style="width: 100%;" data-bind="options: Folders, optionsText: 'FolderName', optionsValue: 'Id', value: FolderID, valueAllowUnset: true"></select>
                                     </div>
                                 </div>
                             </div>
@@ -3480,13 +3480,13 @@ export class DotnetreportComponent implements OnInit, OnDestroy {
                                         <label><input type="checkbox" data-bind="checked: isSubReportOnly, click: function() { setTimeout(function() { toggleIsSubReportOnly(); }, 0); return true; }"> Only use as sub report</label>
                                     </div>
                                     <div class="checkbox" data-bind="visible: adminMode()">
-                                       <label><input type="checkbox" data-bind="checked: showAdminOnly"> </label>
+                                       <label><input type="checkbox" data-bind="checked: ShowAdminOnly"> </label>
                                         Hide from reports unless Admin Mode is enabled
                                     </div>
                                     <div class="form-group row mb-2" data-bind="visible: SaveReport">
                                         <label class="control-label"><i class="fa fa-folder-open"></i> Folder</label>
                                         <div>
-                                            <select class="form-select form-select-sm" style="width: 100%;" data-bind="options: Folders, optionsText: 'FolderName', optionsValue: 'Id', value: FolderID"></select>
+                                            <select class="form-select form-select-sm" style="width: 100%;" data-bind="options: Folders, optionsText: 'FolderName', optionsValue: 'Id', value: FolderID, valueAllowUnset: true"></select>
                                         </div>
                                     </div>
                                     <hr class="my-1" />
