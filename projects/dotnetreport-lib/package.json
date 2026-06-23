@@ -1,6 +1,6 @@
 {
   "name": "dotnetreport-ng",
-  "version": "6.3.0",
+  "version": "6.3.1-beta.1",
   "description": "Angular Component for dotnetreport",
   "keywords": [
     "dotnet report",
