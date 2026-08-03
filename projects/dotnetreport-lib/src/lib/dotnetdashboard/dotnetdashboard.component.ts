@@ -1548,7 +1548,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                   <i class="fa fa-question-circle"></i>
                                 </button>
                             </div>
-                            </div>
+                    </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-5 col-md-5 control-label">Choose Column Label</label>
@@ -2418,6 +2418,24 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
      </div>
 </script>
 
+<script type="text/html" id="designer-header-footer">
+    <div class="form-group mb-2">
+        <label class="control-label small text-muted"><i class="fa fa-window-maximize"></i> Report Header</label>
+        <select class="form-select form-select-sm" style="width: 100%;"
+                data-bind="options: reportHeadersList, optionsText: 'label', optionsValue: 'id', value: ReportHeaderId"></select>
+    </div>
+    <hr class="my-1" />
+    <div class="form-group">
+        <label class="control-label small text-muted"><i class="fa fa-window-minimize"></i> Report Footer</label>
+        <div class="form-check">
+            <label class="form-check-label small">
+                <input class="form-check-input" type="checkbox" data-bind="checked: UseReportFooterInReport" />
+                Include the report footer in this report
+            </label>
+        </div>
+    </div>
+</script>
+
 <script type="text/html" id="designer-options">
     <div class="row">
         <div class="col-md-5">
@@ -3068,7 +3086,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                     <i class="fa fa-folder-open"></i> Choose Folder
                 </label>
                 <div>
-                    <select class="form-select" style="width: 100%;" data-bind="options: Folders, optionsText: 'FolderName', optionsValue: 'Id', value: FolderID, valueAllowUnset: true"></select>
+                    <select class="form-select" style="width: 100%;" data-bind="options: Folders, optionsText: function(f) { return f.FolderPath || f.FolderName; }, optionsValue: 'Id', value: FolderID, valueAllowUnset: true"></select>
                 </div>
             </div>
             <hr />
@@ -3363,7 +3381,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                         <i class="fa fa-folder-open"></i> Choose Folder
                                     </label>
                                     <div>
-                                        <select class="form-select" style="width: 100%;" data-bind="options: Folders, optionsText: 'FolderName', optionsValue: 'Id', value: FolderID, valueAllowUnset: true"></select>
+                                        <select class="form-select" style="width: 100%;" data-bind="options: Folders, optionsText: function(f) { return f.FolderPath || f.FolderName; }, optionsValue: 'Id', value: FolderID, valueAllowUnset: true"></select>
                                     </div>
                                 </div>
                             </div>
@@ -3504,13 +3522,24 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                     <div class="form-group row mb-2" data-bind="visible: SaveReport">
                                         <label class="control-label"><i class="fa fa-folder-open"></i> Folder</label>
                                         <div>
-                                            <select class="form-select form-select-sm" style="width: 100%;" data-bind="options: Folders, optionsText: 'FolderName', optionsValue: 'Id', value: FolderID, valueAllowUnset: true"></select>
+                                            <select class="form-select form-select-sm" style="width: 100%;" data-bind="options: Folders, optionsText: function(f) { return f.FolderPath || f.FolderName; }, optionsValue: 'Id', value: FolderID, valueAllowUnset: true"></select>
                                         </div>
                                     </div>
                                     <hr class="my-1" />
                                     <div data-bind="visible: !useStoredProc()">
                                         <div data-bind="template: 'designer-options'"></div>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Header & Footer -->
+                            <div class="card mb-1 designer-panel" data-bind="visible: SaveReport">
+                                <div class="card-header p-2" data-bind="click: function(){panels.togglePanel('lp-headerFooterPanel')}" style="cursor:pointer;">
+                                    <i class="fa fa-window-maximize"></i> Header &amp; Footer
+                                    <i class="fa fa-chevron-down float-end panel-chevron" data-bind="css: {'fa-chevron-right': panels.isCollapsed('lp-headerFooterPanel')}"></i>
+                                </div>
+                                <div class="card-body p-2" data-bind="visible: !panels.isCollapsed('lp-headerFooterPanel')">
+                                    <div data-bind="template: 'designer-header-footer'"></div>
                                 </div>
                             </div>
 
@@ -3635,6 +3664,11 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                 <div class="card card-body">
                                     <div data-bind="template: 'designer-options'"></div>
                                 </div>
+                            </div>
+                            <br />
+                            <div data-bind="visible: SaveReport" class="card card-body">
+                                <h5><span class="fa fa-window-maximize"></span>&nbsp;Header &amp; Footer</h5>
+                                <div data-bind="template: 'designer-header-footer'"></div>
                             </div>
                             <br />
                             <div data-bind="visible: adminMode" class="card card-body">
@@ -4504,6 +4538,11 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                                         <span class="fa fa-file-pdf"></span> PDF
                                     </a>
                                 </li>
+                                <li data-bind="visible: canDrilldown && appSettings.useAltPdf && !hasPivotColumn() && ReportType() != 'Single'">
+                                    <a href="#" class="dropdown-item" data-bind="click: $parent.appSettings.showPageSize ? function() { loadPdfModel() } : function() { $parent.appSettings.useAltPdf ? downloadPdfAlt('','',true) : downloadPdf(false,'','') }">
+                                        <i class="fa fa-file-pdf"></i> Pdf (Expanded)
+                                    </a>
+                                </li>
                                 <li>
                                     <a href="#" class="dropdown-item" data-bind="click: $parent.appSettings.showPageSize ? function() { loadWordModel()} : function() { downloadWord('',''); }">
                                         <span class="fa fa-file-word"></span> Word
@@ -4573,7 +4612,7 @@ export class DotnetdashboardComponent implements OnInit, OnDestroy {
                     <div data-bind="template: 'report-template', data: $data"></div>
                 </div>
             </div>
-            <div class="form-inline" data-bind="visible: !noDashboardBorders()">
+            <div class="form-inline report-total" data-bind="visible: !noDashboardBorders()">
                 <div class="small" data-bind="with: pager">
                     <div class="form-group float-start total-records" data-bind="visible: totalRecords()>1 && $parent.ReportType() != 'Single'">
                         <span data-bind="text: 'Total Records: ' + totalRecords()"></span>

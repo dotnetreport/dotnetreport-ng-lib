@@ -28,7 +28,7 @@
                             <span>Manage</span>
                         </button>
                         <ul class="dropdown-menu small">
-                            <li data-bind="visible: hasDashboard() && (currentDashboard().canManage || adminMode())">
+                            <li data-bind="visible: hasDashboard() && (currentDashboard().canManage || adminMode()) && (CanSaveReports() || adminMode())">
                                 <a href="#" class="dropdown-item" data-bind="click: function() { newReport() }" title="Create a new report and add it to the Dashboard">
                                     <span class="fa fa-plus"></span> Add New Report
                                 </a>
@@ -39,7 +39,7 @@
                                     <span>Edit Dashboard</span>
                                 </button>
                             </li>
-                            <li>
+                            <li data-bind="visible: CanCreateDashboards() || adminMode()">
                                 <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#add-dashboard-modal" data-bind="click: newDashboard">
                                     <i class="fa fa-dashboard"></i>
                                     <span>Create a New Dashboard</span>
@@ -70,6 +70,12 @@
                                     <span>Schedule</span>
                                 </button>
                             </li>
+                            <li data-bind="visible: hasDashboard() && adminMode()">
+                                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#add-dashboard-modal" data-bind="click: editDashboard">
+                                    <i class="fa fa-key"></i>
+                                    <span>Manage Access</span>
+                                </button>
+                            </li>
                         </ul>
                     </div>
                     <div class="dropdown" data-bind="visible: hasDashboard()">
@@ -80,6 +86,7 @@
                         <ul class="dropdown-menu small">
                             <li><a class="dropdown-item" href="#" data-bind="click: function() { return appSettings.showPageSize ? ExportAllPdfReportsWithPageOption() : ExportAllPdfReports('',''); }, hidden: appSettings.useAltPdf"><i class="fa fa-file-pdf"></i> Pdf</a></li>
                             <li><a class="dropdown-item" href="#" data-bind="click: function() { return appSettings.showPageSize ? ExportAllPdfAltReportsWithPageOption() : ExportAllPdfAltReports('',''); }, visible: appSettings.useAltPdf"><i class="fa fa-file-pdf"></i> Pdf</a></li>
+                            <li data-bind="visible: canDrilldown"><a class="dropdown-item" href="#" data-bind="click: function() { return appSettings.showPageSize ? ExportAllExpendedPdfAltReportsWithPageOption() : ExportAllExpendedPdfAltReports('',''); }, visible: appSettings.useAltPdf"><i class="fa fa-file-pdf"></i> Pdf (Expanded)</a></li>
                             <li><a class="dropdown-item" href="#" data-bind="click: ExportAllExcelReports"><i class="fa fa-file-excel"></i> Excel</a></li>
                             <li data-bind="visible: canDrilldown"><a class="dropdown-item" href="#" data-bind="click: ExportAllExcelExpandedReports"><i class="fa fa-file-excel"></i> Excel (Expanded)</a></li>
                             <li><a class="dropdown-item" href="#" data-bind="click: function() { return appSettings.showPageSize ? ExportAllWordReportsWithPageOption() : ExportAllWordReports('','');}"><i class="fa fa-file-word"></i> Word</a></li>
@@ -127,7 +134,7 @@
     </div>
 </div>
 
-<div class="centered" style="display: none;" data-bind="visible: dashboards().length == 0 ">
+<div class="centered" style="display: none;" data-bind="visible: dashboards().length == 0 && (CanCreateDashboards() || adminMode())">
     No Dashboards yet. Click below to Start<br />
     <button class="btn btn-lg btn-primary" data-bs-toggle="modal" data-bs-target="#add-dashboard-modal"><i class="fa fa-dashboard"></i> Create a New Dashboard</button>
 </div>
@@ -189,9 +196,10 @@
                         <div data-bind="foreach: $parent.reportsAndFolders">
                             <div class="list-group-item">
                                 <a role="button" class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bind="attr: {href: '#folder-' + folderId }" style="text-decoration: none; font-weight: normal;">
-                                    <div class="d-flex align-items-center">
+                                     <div class="d-flex align-items-center" data-bind="style: { paddingLeft: (depth * 20) + 'px' }">
                                         <i class="fa fa-folder me-2 text-secondary"></i>
                                         <span data-bind="text: folder"></span>
+                                        <span class="text-muted small ms-2" data-bind="visible: depth > 0, text: folderPath"></span>
                                     </div>
                                     <i class="fa fa-chevron-down"></i>
                                 </a>
@@ -311,6 +319,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Templates -->
 <div [innerHtml]="reportTemplates"></div>
