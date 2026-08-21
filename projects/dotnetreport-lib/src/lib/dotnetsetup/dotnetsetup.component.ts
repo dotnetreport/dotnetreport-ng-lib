@@ -221,18 +221,18 @@ public dateFormatPopoverContent: string = `
         </select>
         <!-- /ko -->
         <!-- ko if: ['Int','Money','Float','Double','Date','DateTime','Time','Boolean'].indexOf(fieldType) == -1 && ['is blank', 'is not blank', 'is null', 'is not null'].indexOf($parent.Operator()) == -1 -->
-        <input class="form-control" type="text" data-bind="value: $parent.Value, disable: $parent.Operator() == 'is default',attr: {id: 'ctl-' + $element.closest('[data-parentprefix]').getAttribute('data-parentprefix') + '-' + uiId}" required />
+        <input class="form-control" type="text" data-bind="value: $parent.Value, disable: $parent.Operator() == 'is default',attr: {id: 'ctl-' + $element.closest('[data-parentprefix]').getAttribute('data-parentprefix') + '-' + ($parent.uiId || uiId)}" required />
         <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: hasForeignKey && $parent.Operator() != 'all' && $parent.Operator() != 'none' -->
         <!-- ko if: hasForeignParentKey && $parent.showParentFilter() -->
-        <select multiple class="form-control" data-bind="select2: { dropdownParent: '#filter-'+uiId, placeholder: 'Please Choose', allowClear: true }, options: $parent.ParentList, optionsText: 'text', optionsValue: $parent.IsConditionalFilter ? 'text': 'id', selectedOptions: $parent.ParentIn"></select>
+        <select multiple class="form-control" data-bind="select2: { dropdownParent: '#filter-'+uiId, placeholder: 'Please Choose', allowClear: true }, lookupSearch: $parent.SearchParentList, options: $parent.ParentList, optionsText: 'text', optionsValue: $parent.IsConditionalFilter ? 'text': 'id', selectedOptions: $parent.ParentIn"></select>
         <!-- /ko -->
         <!-- ko if: $parent.Operator()=='='-->
-        <select required class="form-control" data-bind="select2: { dropdownParent: '#filter-'+uiId, placeholder: 'Please Choose', allowClear: true }, options: $parent.LookupList, optionsText: 'text', optionsValue:   $parent.IsConditionalFilter ? 'text': 'id', value: $parent.Value, optionsCaption: 'Please Choose'"></select>
+        <select required class="form-control" data-bind="select2: { dropdownParent: '#filter-'+uiId, placeholder: 'Please Choose', allowClear: true }, lookupSearch: $parent.SearchLookupList, options: $parent.LookupList, optionsText: 'text', optionsValue:   $parent.IsConditionalFilter ? 'text': 'id', value: $parent.Value, optionsCaption: 'Please Choose'"></select>
         <!-- /ko -->
         <!-- ko if: $parent.Operator()=='in' || $parent.Operator()=='not in'-->
-        <select required multiple class="form-control" data-bind="select2: { dropdownParent: '#filter-'+uiId, placeholder: 'Please Choose', allowClear: true }, options: $parent.LookupList, optionsText: 'text', optionsValue: $parent.IsConditionalFilter ? 'text': 'id', selectedOptions: $parent.ValueIn"></select>
+        <select required multiple class="form-control" data-bind="select2: { dropdownParent: '#filter-'+uiId, placeholder: 'Please Choose', allowClear: true }, lookupSearch: $parent.SearchLookupList, options: $parent.LookupList, optionsText: 'text', optionsValue: $parent.IsConditionalFilter ? 'text': 'id', selectedOptions: $parent.ValueIn"></select>
         <!-- /ko -->
         <!-- /ko -->
     </div>
@@ -291,7 +291,7 @@ public dateFormatPopoverContent: string = `
     <th data-bind="attr: { id: !IsPivotField ? fieldId : 'pivot--' + fieldName }, style: {'text-align': fieldAlign() ? fieldAlign() : (IsNumeric ? 'right' : 'left'), 'background-color': headerBackColor }, hidden: outerGroup" style="border-right: 1px solid;">
 
         <!-- ko if: !$parent.IsDrillDown() && !$parent.IsSubReport() -->
-        <div class="pull-left" style="padding-right: 5px;">
+        <div class="float-start" style="padding-right: 5px;">
             <div class="dropup">
                 <a href="#" data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
                     <span class="fa fa-ellipsis-v sortable" title="Drag to reorder"></span>
@@ -1292,37 +1292,43 @@ public dateFormatPopoverContent: string = `
 
 </script>
 
-<script type="text/html" id="filter-parameters">
-    <div class="table-responsive">
-        <span data-bind="hidden: showParameters">No filters available to choose</span>
-        <table class="table table-striped table-hover table-borderless" data-bind="visible: showParameters">
-            <thead>
-                <tr>
-                    <th style="width: 30%">Filter</th>
-                    <th style="width: 20%"></th>
-                    <th style="width: 30%">Value</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody data-bind="foreach: Parameters">
-                <tr data-bind="ifnot: Hidden">
-                    <td data-bind="text: DisplayName">
-                    </td>
-                    <td>
-                        <div class="form-group">
-                            <select class="form-select" style="width: 100%;" data-bind="options: operators, value: Operator" required></select>
-                        </div>
-                    </td>
-                    <td data-bind="with: Field" data-parentprefix="P">
-                        <div data-bind="template: 'report-filter', data: $data"></div>
-                    </td>
-                    <td></td>
-                </tr>
+            <script type="text/html" id="filter-parameters">
+                <div class="table-responsive">
+                        <span data-bind="hidden: showParameters">No filters available to choose</span>
+                        <table class="table table-striped table-hover table-borderless" data-bind="visible: showParameters">
+                                <thead>
+                                        <tr>
+                                                <th style="width: 30%">Filter</th>
+                                                <th style="width: 20%"></th>
+                                                <th style="width: 30%">Value</th>
+                                                <th style="width: 10%">Fly</th>  <!-- CHANGED: added label -->
+                                        </tr>
+                                </thead>
+                                <tbody data-bind="foreach: Parameters">
+                                        <tr data-bind="ifnot: Hidden">
+                                                <td data-bind="text: DisplayName"></td>
+                                                <td>
+                                                        <div class="form-group">
+                                                                <select class="form-select" style="width: 100%;" data-bind="options: operators, value: Operator" required></select>
+                                                        </div>
+                                                </td>
+                                                <td data-bind="with: Field" data-parentprefix="P">
+                                                        <div data-bind="template: 'report-filter', data: $data"></div>
+                                                </td>
+                                                <!-- CHANGED: was empty <td></td>, now has the fly-filter toggle -->
+                                                <td class="text-center">
+                                                        <span class="btn btn-sm" tabindex="0"
+                                                            data-bind="click: function(){ filterOnFly(!filterOnFly()); },
+                                                                             css: {'btn-success': filterOnFly()==true, 'btn-secondary': !filterOnFly()}">
+                                                                <span class="fa fa-filter" aria-hidden="true" title="Filter on Report"></span>
+                                                        </span>
+                                                </td>
+                                        </tr>
 
-            </tbody>
-        </table>
-    </div>
-</script>
+                                </tbody>
+                        </table>
+                </div>
+            </script>
 
 <script type="text/html" id="report-schedule">
     <div data-bind="with: scheduleBuilder" id="schedule-builder-div">
@@ -3046,7 +3052,7 @@ public dateFormatPopoverContent: string = `
                     <textarea class="form-control" style="width: 100%;" rows="3" placeholder="Additional details (optional)" data-bind="value: ReportDescription"></textarea>
                 </div>
             </div>
-            <div class="checkbox" data-bind="visible: CanSaveReports()">
+            <div class="checkbox" data-bind="visible: canSaveCurrentReport()">
                 <label>
                     <input type="checkbox" data-bind="checked: SaveReport">
                     Save Report
@@ -3341,7 +3347,7 @@ public dateFormatPopoverContent: string = `
                                         <textarea class="form-control" style="width: 100%;" rows="3" placeholder="Additional details (optional)" data-bind="value: ReportDescription"></textarea>
                                     </div>
                                 </div>
-                                <div class="checkbox" data-bind="visible: CanSaveReports()">
+                                <div class="checkbox" data-bind="visible: canSaveCurrentReport()">
                                     <label>
                                         <input type="checkbox" data-bind="checked: SaveReport">
                                         Save Report
@@ -3492,7 +3498,7 @@ public dateFormatPopoverContent: string = `
                                             <textarea class="form-control form-control-sm" rows="2" placeholder="Optional" data-bind="value: ReportDescription"></textarea>
                                         </div>
                                     </div>
-                                    <div class="checkbox" data-bind="visible: CanSaveReports()">
+                                    <div class="checkbox" data-bind="visible: canSaveCurrentReport()">
                                         <label><input type="checkbox" data-bind="checked: SaveReport"> Save Report</label>
                                     </div>
                                     <div class="checkbox" data-bind="visible: adminMode() && ReportID()">
@@ -3583,7 +3589,7 @@ public dateFormatPopoverContent: string = `
                             <div class="card card-body">
                                 <div class="row">
                                     <h5 class="col-8 float-start"><span class="fa fa-table"></span>&nbsp;Selected data for the Report</h5>
-                                                                                <div class="col-4 float-end right-align">
+                                    <div class="col-4 float-end right-align">
                                         <a href="#" class="small text-muted" data-bind="visible: SelectedFields().length, click: function() {SelectedFields([]);}">Clear all</a>
                                     </div>
                                 </div>
@@ -3721,13 +3727,13 @@ public dateFormatPopoverContent: string = `
                     <i class="fa fa-refresh"></i> Start Over
                 </button>
                 <a href="#" class="btn btn-danger" data-bind="click: cancelCreateReport">Cancel editing Report</a>
-                <button class="btn btn-primary" type="button" data-bind="visible: SaveReport() && CanSaveReports(), click: SaveWithoutRun, disable: savingReport() || savingAndRunning()" style="padding-right: 10px;">
+                <button class="btn btn-primary" type="button" data-bind="visible: SaveReport() && canSaveCurrentReport(), click: SaveWithoutRun, disable: savingReport() || savingAndRunning()" style="padding-right: 10px;">
                     <!-- ko if: savingReport() --><span class="fa fa-spinner fa-spin me-1"></span>Saving...<!-- /ko -->
                     <!-- ko ifnot: savingReport() -->Save Report<!-- /ko -->
                 </button>
                 <button class="btn btn-primary" type="button" data-bind="click: SaveAndRunReport, visible: !editingSubReportParentId(), disable: savingReport() || savingAndRunning()">
                     <!-- ko if: savingAndRunning() --><span class="fa fa-spinner fa-spin me-1"></span>Saving...<!-- /ko -->
-                    <!-- ko ifnot: savingAndRunning() --><!-- ko text: SaveReport() && CanSaveReports()? 'Save & Run Report': 'Run Report' --><!-- /ko --><!-- /ko -->
+                    <!-- ko ifnot: savingAndRunning() --><!-- ko text: SaveReport() && canSaveCurrentReport()? 'Save & Run Report': 'Run Report' --><!-- /ko --><!-- /ko -->
                 </button>
             </div>
 
@@ -4477,7 +4483,7 @@ public dateFormatPopoverContent: string = `
         </div>
     </div>
 </div>`);
-  this.cdref.detectChanges();
-}
+    this.cdref.detectChanges();
+  }
 
 }

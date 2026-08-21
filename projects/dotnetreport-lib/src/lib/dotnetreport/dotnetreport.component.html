@@ -407,14 +407,12 @@
                                             <div class="col-sm-5 right-align">
                                                 <div class="d-none d-md-block">
                                                     <br />
-                                                    <span data-bind="if: $root.CanSaveReports() || $root.adminMode() ">
-                                                        <button class="btn btn-sm btn-outline-secondary" data-bind="visible: canEdit, click: openReport" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
-                                                            <span class="fa fa-edit" aria-hidden="true"></span> Edit
-                                                        </button>
-                                                        <button class="btn btn-sm btn-outline-secondary" data-bind="click: copyReport, visible:canEdit || $parent.appSettings.canCopyReport" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
-                                                            <span class="fa fa-copy" aria-hidden="true"></span> Copy
-                                                        </button>
-                                                    </span>
+                                                    <button class="btn btn-sm btn-outline-secondary" data-bind="visible: canEdit, click: openReport" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
+                                                        <span class="fa fa-edit" aria-hidden="true"></span> Edit
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-secondary" data-bind="click: copyReport, visible: (canEdit || $parent.appSettings.canCopyReport) && ($root.CanSaveReports() || $root.adminMode())" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
+                                                        <span class="fa fa-copy" aria-hidden="true"></span> Copy
+                                                    </button>
                                                     <div class="btn-group">
                                                         <button type="button" class="btn btn-sm btn-outline-secondary" data-bind="click: runReport">
                                                             <span class="fa fa-gears" aria-hidden="true"></span> Run
@@ -450,14 +448,12 @@
                                                 </div>
 
                                                 <div class="d-block d-md-none">
-                                                    <span data-bind="if: $root.CanSaveReports() || $root.adminMode()">
-                                                        <button class="btn btn-sm btn-outline-secondary" title="Edit" data-bind="visible: canEdit, click: openReport" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
-                                                            <span class="fa fa-edit" aria-hidden="true"></span>
-                                                        </button>
-                                                        <button class="btn btn-sm btn-light" data-bind="click: copyReport, visible:canEdit || $parent.appSettings.canCopyReport" title="Copy Report" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
-                                                            <span class="fa fa-copy" aria-hidden="true"></span>
-                                                        </button>
-                                                    </span>
+                                                    <button class="btn btn-sm btn-outline-secondary" title="Edit" data-bind="visible: canEdit, click: openReport" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
+                                                        <span class="fa fa-edit" aria-hidden="true"></span>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-light" data-bind="click: copyReport, visible: (canEdit || $parent.appSettings.canCopyReport) && ($root.CanSaveReports() || $root.adminMode())" title="Copy Report" data-bs-toggle="modal" data-bs-target="#modal-reportbuilder">
+                                                        <span class="fa fa-copy" aria-hidden="true"></span>
+                                                    </button>
 
                                                     <div class="btn-group">
                                                         <button class="btn btn-sm btn-outline-secondary" data-bind="click: runReport" title="Run Report">
@@ -508,6 +504,7 @@
                                     </li>
                                 </ol>
                             </nav>
+
                             <div data-bind="visible: !SelectedFolder() && !searchReports()">
                                 <div class="container-fluid">
                                     <div class="row fw-bold border-bottom py-2 w-100">
@@ -519,7 +516,7 @@
                                         <div class="row py-2 border-bottom align-items-center w-100 row-hover">
                                             <div class="col-md-3 d-flex align-items-center clickable" data-bind="click: function(){ $parent.SelectedFolder($data); }">
                                                 <span data-bind="visible: $root.selectMode, click: function(d,e){ isSelected(!isSelected()); e.stopPropagation(); },
-                                                    css: isSelected() ? 'fa fa-check-square text-primary me-2' : 'fa fa-square-o me-2'"></span>
+                                                css: isSelected() ? 'fa fa-check-square text-primary me-2' : 'fa fa-square-o me-2'"></span>
                                                 <span class="fa fa-folder text-secondary me-2"></span>
                                                 <span data-bind="text: FolderName"></span>
                                             </div>
@@ -901,12 +898,18 @@
                                         <ul class="dropdown-menu">
                                             <li><a href="#" class="dropdown-item" data-bind="click: downloadExcel">Standard</a></li>
                                             <li><a href="#" class="dropdown-item" data-bind="click: downloadExcelWithDrilldown">Expanded</a></li>
+                                            <li data-bind="visible: hasSubReports()"><a href="#" class="dropdown-item" data-bind="click: downloadExcelWithSubreport">Excel with Subreport</a></li>
                                         </ul>
                                     </li>
                                     <!-- Excel, no drilldown -> flat -->
                                     <li data-bind="visible: !canDrilldown()">
                                         <a href="#" class="dropdown-item" data-bind="click: downloadExcel">
                                             <i class="fas fa-file-excel"></i> Excel
+                                        </a>
+                                    </li>
+                                    <li data-bind="visible:!canDrilldown() && hasSubReports()">
+                                        <a href="#" class="dropdown-item" data-bind="click: downloadExcelWithSubreport">
+                                            <i class="fas fa-file-excel"></i> Excel with Subreport
                                         </a>
                                     </li>
                                     <li data-bind="hidden: appSettings.dontWordExport">
@@ -1108,7 +1111,7 @@
     <div data-bind="template: {name: 'report-link-edit', data: $data}"></div>
 </div>
 
- <!-- Folder Edit Modal -->
+<!-- Folder Edit Modal -->
 <div class="modal" id="manage-access-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
