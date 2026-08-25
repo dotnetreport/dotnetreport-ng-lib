@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { DotnetdashboardComponent, DotnetreportComponent, DotnetsetupComponent } from 'dotnetreport-ng';
 @Component({
@@ -6,6 +6,7 @@ import { DotnetdashboardComponent, DotnetreportComponent, DotnetsetupComponent }
   standalone: true,
   imports: [RouterOutlet,DotnetdashboardComponent,DotnetreportComponent,DotnetsetupComponent],
   templateUrl: './app.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.component.css'
 })
 export class AppComponent {

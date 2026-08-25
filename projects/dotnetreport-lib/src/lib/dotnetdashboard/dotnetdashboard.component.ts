@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, Inject, Injector, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, Injector, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { BASE_URL_TOKEN } from '../dotnetreport-lib.di';
 import { ActivatedRoute, RouterOutlet } from '@angular/router';
@@ -15,6 +15,7 @@ declare var _: any;
   standalone: true,
   imports: [RouterOutlet,CommonModule],
   templateUrl: './dotnetdashboard.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./dotnetdashboard.component.css']
 })
  
