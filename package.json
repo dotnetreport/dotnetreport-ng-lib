@@ -29,7 +29,7 @@
     "@angular/platform-browser": "~22.1.3",
     "@angular/platform-browser-dynamic": "~22.1.3",
     "@angular/router": "~22.1.3",
-    "dotnetreport": "^6.3.3",
+    "dotnetreport": "^6.3.4",
     "dotnetreport-ng": "file:dist/dotnetreport-ng",
     "rxjs": "^7.8.1",
     "tslib": "^2.3.0",

@@ -19,6 +19,7 @@ declare var manageViewModel: any;
 export class DotnetsetupComponent implements OnInit, OnDestroy {
   private baseServiceUrl: string;
   public reportTemplates: SafeHtml;
+  public dotNetSetupHtml: SafeHtml;
   private queryParams: { [key: string]: string }={};
 public dateFormatPopoverContent: string = `
     <table class="table table-sm table-borderless mb-0" style="font-size:12px">
@@ -57,6 +58,7 @@ public dateFormatPopoverContent: string = `
 
       this.baseServiceUrl = this.baseUrl + '/api'; // "http://localhost:39378"; \
       this.reportTemplates = "";
+      this.dotNetSetupHtml = "";
     }
 
 
@@ -83,12 +85,17 @@ public dateFormatPopoverContent: string = `
             getSchedulesUrl: '/ReportApi/GetScheduledReportsAndDashboards',
             deleteScheduleUrl: '/ReportApi/DeleteSchedule',
             saveCategoriesUrl: '/ReportApi/SaveCategoriesData',
+            getEmailQueriesUrl: '/ReportApi/GetDataDrivenQueries',
+            saveEmailQueryUrl: '/ReportApi/SaveDataDrivenQuery',
+            deleteEmailQueryUrl: '/ReportApi/DeleteDataDrivenQuery',
+            previewEmailListUrl: this.baseServiceUrl + '/DotNetReportApi/PreviewEmailList',
             getCategoriesUrl: '/ReportApi/GetCategories',
             getAppSettingUrl: '/ReportApi/GetAccountSettings',
             saveAppSettingUrl: '/ReportApi/ChangeAccountSettings',
             reportsApiUrl:  this.baseServiceUrl + '/DotNetReportApi/CallReportApi',
             runReportApiUrl:  this.baseServiceUrl + '/DotNetReportApi/RunReportApi',
             getUsersAndRoles: this.baseServiceUrl + '/DotNetReportApi/GetUsersAndRoles',
+            sendPasswordSetupUrl: this.baseServiceUrl + '/DotNetReportApi/SendUserPasswordSetup',
             searchProcUrl:  this.baseServiceUrl + '/DotNetReportApi/SearchProcedure',
             getTimeZonesUrl:  this.baseServiceUrl + '/DotNetReportApi/GetAllTimezones',
             getSchemaFromSql:  this.baseServiceUrl + '/DotNetReportApi/GetSchemaFromSql',
@@ -101,6 +108,7 @@ public dateFormatPopoverContent: string = `
         };
 
         this.renderKOTemplates();
+        this.renderKODotNetSetupItems();
         var vm = new manageViewModel(options);
         vm.dateFormatPopoverContent = this.dateFormatPopoverContent;
         vm.LoadJoins();
@@ -224,7 +232,7 @@ public dateFormatPopoverContent: string = `
         <input class="form-control" type="text" data-bind="value: $parent.Value, disable: $parent.Operator() == 'is default',attr: {id: 'ctl-' + $element.closest('[data-parentprefix]').getAttribute('data-parentprefix') + '-' + ($parent.uiId || uiId)}" required />
         <!-- /ko -->
         <!-- /ko -->
-        <!-- ko if: hasForeignKey && $parent.Operator() != 'all' && $parent.Operator() != 'none' -->
+        <!-- ko if: hasForeignKey && $parent.Operator() != 'all' && $parent.Operator() != 'none' && $parent.Operator() != 'no filter' -->
         <!-- ko if: hasForeignParentKey && $parent.showParentFilter() -->
         <select multiple class="form-control" data-bind="select2: { dropdownParent: '#filter-'+uiId, placeholder: 'Please Choose', allowClear: true }, lookupSearch: $parent.SearchParentList, options: $parent.ParentList, optionsText: 'text', optionsValue: $parent.IsConditionalFilter ? 'text': 'id', selectedOptions: $parent.ParentIn"></select>
         <!-- /ko -->
@@ -811,7 +819,7 @@ public dateFormatPopoverContent: string = `
     <div data-bind="foreach: outerGroupData">
         <!-- ko if: rows.length > 0 || ($parent.outerGroupData && $parent.outerGroupData().length == 1) -->
         <br />
-        <h6 style="font-weight: bold;" data-bind="html: display"></h6>
+        <h6 style="font-weight: normal;" data-bind="html: display"></h6>
         <div class="" style="padding-top: 5px;"></div>
 
         <!-- ko if: $parents[1].ReportType() != 'Single'-->
@@ -925,12 +933,42 @@ public dateFormatPopoverContent: string = `
     <div class="panel panel-default panel-body" style="margin-left: 20px;">
 
         <div class="form-group row">
-            <label class="col-md-3 col-sm-3 control-label">Client Id to Restrict Access</label>
-            <div class="col-md-3 col-sm-3">
-                <input class="form-control text-box single-line" type="text" data-bind="value: clientId">
+            <label class="col-md-3 col-sm-3 control-label" data-bind="text: ($root.clientIdLabelText ? $root.clientIdLabelText() : 'Client Id') + ' to Restrict Access'"></label>
+            <div class="col-md-6 col-sm-6">
+                <!-- ko if: $root.clientIdOptions && $root.clientIdOptions().length > 0 -->
+                <select class="form-select form-select-sm"
+                        data-bind="options: $root.clientIdOptions().filter(function(c){ return selectedClientIds().indexOf(c.id) < 0; }),
+                            optionsText: 'text', optionsValue: 'id', optionsCaption: 'Add to restrict access',
+                            value: clientIdToAdd, event: { change: function(){ addClientId(clientIdToAdd()); } }"></select>
+                <!-- ko if: selectedClientIds().length > 0 -->
+                <div class="d-flex flex-wrap gap-1 mt-2">
+                    <!-- ko foreach: selectedClientIds() -->
+                    <span class="badge bg-secondary d-inline-flex align-items-center">
+                        <span data-bind="text: (function(){ var m = _.find($root.clientIdOptions(), function(c){ return c.id == $data; }); return m ? m.text : $data; })()"></span>
+                        <button type="button" class="btn btn-sm btn-link text-white p-0 ms-2 lh-1" title="Remove" data-bind="click: function(){ $parent.removeClientId($data); }"><i class="fa fa-times"></i></button>
+                    </span>
+                    <!-- /ko -->
+                </div>
+                <!-- /ko -->
+                <div class="form-text" data-bind="visible: selectedClientIds().length === 0">Not restricted, available to all.</div>
+                <!-- /ko -->
+                <!-- ko ifnot: $root.clientIdOptions && $root.clientIdOptions().length > 0 -->
+                <input class="form-control text-box single-line" type="text" placeholder="Comma separated, leave blank for all" data-bind="value: clientId">
+                <!-- ko if: selectedClientIds().length > 0 -->
+                <div class="d-flex flex-wrap gap-1 mt-2">
+                    <!-- ko foreach: selectedClientIds() -->
+                    <span class="badge bg-secondary d-inline-flex align-items-center">
+                        <span data-bind="text: $data"></span>
+                        <button type="button" class="btn btn-sm btn-link text-white p-0 ms-2 lh-1" title="Remove" data-bind="click: function(){ $parent.removeClientId($data); }"><i class="fa fa-times"></i></button>
+                    </span>
+                    <!-- /ko -->
+                </div>
+                <!-- /ko -->
+                <div class="form-text" data-bind="visible: selectedClientIds().length === 0">Not restricted, available to all.</div>
+                <!-- /ko -->
             </div>
             <div class="col-md-1 col-sm-1">
-                <span data-bs-toggle="tooltip" data-placement="right" class="fa fa-question-circle helptip" title="Leave blank to give all clients access (Global Reports)"></span>
+                <span data-bs-toggle="tooltip" data-placement="right" class="fa fa-question-circle helptip" title="Leave blank to give Global access"></span>
             </div>
         </div>
         <div class="alert alert-info">
@@ -939,7 +977,8 @@ public dateFormatPopoverContent: string = `
 
         <div class="row small">
             <div class="col-md-6">
-                <i class="toggle-icon fa" data-bind="click: toggleManageUsers,css: { 'fa-chevron-down': showManageUsers(), 'fa-chevron-right': !showManageUsers() }"></i> <b>Manage by User</b> (allow edit)
+                <span class="clickable" data-bind="click: toggleManageUsers"><i class="toggle-icon fa" data-bind="css: { 'fa-chevron-down': showManageUsers(), 'fa-chevron-right': !showManageUsers() }"></i> <b>Manage by User</b> (allow edit)</span>
+                <div data-bind="template: { name: 'access-selected-pills', data: { list: users, open: showManageUsers } }"></div>
                 <div class="row container-fluid" data-bind="visible: showManageUsers">
                     <!-- ko if: groupedUsers().length > 0 -->
                     <!-- ko foreach: groupedUsers -->
@@ -977,7 +1016,8 @@ public dateFormatPopoverContent: string = `
                     </div>
                 </div>
                 <br />
-                <i class="toggle-icon fa" data-bind="click: toggleViewUsers,css: { 'fa-chevron-down': showViewUsers(), 'fa-chevron-right': !showViewUsers() }"></i> <b>View only by User</b> (no edit/delete)
+                <span class="clickable" data-bind="click: toggleViewUsers"><i class="toggle-icon fa" data-bind="css: { 'fa-chevron-down': showViewUsers(), 'fa-chevron-right': !showViewUsers() }"></i> <b>View only by User</b> (no edit/delete)</span>
+                <div data-bind="template: { name: 'access-selected-pills', data: { list: viewOnlyUsers, open: showViewUsers } }"></div>
                 <div class="row container-fluid" data-bind="visible: showViewUsers">
                     <!-- ko if: groupedViewOnlyUsers().length > 0 -->
                     <!-- ko foreach: groupedViewOnlyUsers -->
@@ -1016,7 +1056,8 @@ public dateFormatPopoverContent: string = `
                 </div>
                 <br />
                 <div data-bind="ifnot: isDashboard">
-                    <i class="toggle-icon fa" data-bind="click: toggleDeleteUsers,css: { 'fa-chevron-down': showDeleteUsers(), 'fa-chevron-right': !showDeleteUsers() }"></i><b>Delete by User</b> (allow delete)
+                    <span class="clickable" data-bind="click: toggleDeleteUsers"><i class="toggle-icon fa" data-bind="css: { 'fa-chevron-down': showDeleteUsers(), 'fa-chevron-right': !showDeleteUsers() }"></i> <b>Delete by User</b> (allow delete)</span>
+                    <div data-bind="template: { name: 'access-selected-pills', data: { list: deleteOnlyUsers, open: showDeleteUsers } }"></div>
                     <div class="row container-fluid" data-bind="visible: showDeleteUsers">
                     <!-- ko if: groupedDeleteOnlyUsers().length > 0 -->
                     <!-- ko foreach: groupedDeleteOnlyUsers -->
@@ -1057,7 +1098,8 @@ public dateFormatPopoverContent: string = `
                 </div>
             </div>
             <div class="col-md-6">
-                <i class="toggle-icon fa" data-bind="click: toggleManageRoles,css: { 'fa-chevron-down': showManageRoles(), 'fa-chevron-right': !showManageRoles() }"></i><b>Manage by User Role</b> (allow edit)
+                <span class="clickable" data-bind="click: toggleManageRoles"><i class="toggle-icon fa" data-bind="css: { 'fa-chevron-down': showManageRoles(), 'fa-chevron-right': !showManageRoles() }"></i> <b>Manage by User Role</b> (allow edit)</span>
+                <div data-bind="template: { name: 'access-selected-pills', data: { list: userRoles, open: showManageRoles } }"></div>
                 <div class="row container-fluid" data-bind="visible: showManageRoles">
                     <!-- ko foreach: userRoles -->
                     <div class="float-start">
@@ -1073,7 +1115,8 @@ public dateFormatPopoverContent: string = `
                     </div>
                 </div>
                 <br />
-                <i class="toggle-icon fa" data-bind="click: toggleViewRoles,css: { 'fa-chevron-down': showViewRoles(), 'fa-chevron-right': !showViewRoles() }"></i><b>View only by User Role</b> (no edit/delete)
+                <span class="clickable" data-bind="click: toggleViewRoles"><i class="toggle-icon fa" data-bind="css: { 'fa-chevron-down': showViewRoles(), 'fa-chevron-right': !showViewRoles() }"></i> <b>View only by User Role</b> (no edit/delete)</span>
+                <div data-bind="template: { name: 'access-selected-pills', data: { list: viewOnlyUserRoles, open: showViewRoles } }"></div>
                 <div class="row container-fluid" data-bind="visible: showViewRoles">
                     <!-- ko foreach: viewOnlyUserRoles -->
                     <div class="float-start">
@@ -1089,7 +1132,8 @@ public dateFormatPopoverContent: string = `
                     </div>
                 </div>
                 <div data-bind="ifnot: isDashboard">
-                    <i class="toggle-icon fa" data-bind="click: toggleDeleteRoles,css: { 'fa-chevron-down': showDeleteRoles(), 'fa-chevron-right': !showDeleteRoles() }"></i><b>Delete by User Role</b> (allow delete)
+                    <span class="clickable" data-bind="click: toggleDeleteRoles"><i class="toggle-icon fa" data-bind="css: { 'fa-chevron-down': showDeleteRoles(), 'fa-chevron-right': !showDeleteRoles() }"></i> <b>Delete by User Role</b> (allow delete)</span>
+                    <div data-bind="template: { name: 'access-selected-pills', data: { list: deleteOnlyUserRoles, open: showDeleteRoles } }"></div>
                     <div class="row container-fluid" data-bind="visible: showDeleteRoles">
                         <!-- ko foreach: deleteOnlyUserRoles -->
                         <div class="float-start">
@@ -1107,6 +1151,32 @@ public dateFormatPopoverContent: string = `
                 </div>
             </div>
         </div>
+    </div>
+</script>
+
+<!-- Collapsed view of one access rule: who is selected, or that it is open to everyone. Hidden while the checkboxes are open. -->
+<script type="text/html" id="access-selected-pills">
+    <!-- ko ifnot: ko.unwrap(open) -->
+    <div class="d-flex flex-wrap gap-1 align-items-center my-1 ms-3">
+        <!-- ko foreach: _.filter(list(), function (x) { return x.selected(); }) -->
+        <span class="badge bg-secondary d-inline-flex align-items-center">
+            <span data-bind="text: text"></span>
+            <button type="button" class="btn btn-sm btn-link text-white p-0 ms-2 lh-1" title="Remove" data-bind="click: function(){ selected(false); }"><i class="fa fa-times"></i></button>
+        </span>
+        <!-- /ko -->
+        <span class="text-muted small" data-bind="visible: !_.some(list(), function (x) { return x.selected(); })"><i class="fa fa-globe"></i> Everyone, not restricted</span>
+    </div>
+    <!-- /ko -->
+</script>
+<!-- Access summary badges for a report/folder/dashboard row (admin mode). Grey = restricted, outlined = open to all. -->
+<script type="text/html" id="access-badges">
+    <div class="d-flex flex-wrap gap-1 align-items-center" data-bind="foreach: accessBadges($data, $root)">
+        <span class="badge d-inline-flex align-items-center" data-bind="attr: { title: title }, css: restricted ? 'bg-secondary' : 'bg-light text-muted border'">
+            <!-- ko foreach: icons.split(' ') -->
+            <i class="fa me-1" data-bind="css: $data"></i>
+            <!-- /ko -->
+            <span data-bind="text: text"></span>
+        </span>
     </div>
 </script>
 <script type="text/html" id="filter-group">
@@ -1233,9 +1303,21 @@ public dateFormatPopoverContent: string = `
                                 </div>
                             </div>
                             <div class="col-md-5">
+                                <!-- ko ifnot: $data.useEmailListColumn && $data.useEmailListColumn() -->
                                 <div data-bind="with: Field" data-parentprefix="M">
                                     <div data-bind="template: 'report-filter', data: $data"></div>
                                 </div>
+                                <!-- /ko -->
+                                <!-- ko if: $root.scheduleEmailListColumns && $root.scheduleEmailListColumns().length > 0 -->
+                                <div class="form-check small mt-1">
+                                    <label class="form-check-label text-muted" title="Take this filter's value from the Email List query, one email per row">
+                                        <input class="form-check-input" type="checkbox" data-bind="checked: useEmailListColumn" /> Use value from Email List
+                                    </label>
+                                </div>
+                                <!-- ko if: $data.useEmailListColumn && $data.useEmailListColumn() -->
+                                <select class="form-select" required data-bind="options: $root.scheduleEmailListColumns, optionsCaption: 'Choose Email List column...', value: EmailListColumn"></select>
+                                <!-- /ko -->
+                                <!-- /ko -->
                                 <!-- ko if: Field() && Field().fieldType == 'DateTime' && Operator() == 'range' && $index()==0 -->
                                 <!-- ko if: $parents[$parents.length-2].canAddSeries != undefined && $parents[$parents.length-2].canAddSeries() -->
                                 <button class="btn btn-sm btn-secondary" data-bind="click: $parents[$parents.length-2].AddSeries.bind($data)">Add Comparison</button>
@@ -1253,7 +1335,7 @@ public dateFormatPopoverContent: string = `
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </div>
-                                    <div class="form-group" data-bind="with: Field, hidden: document.querySelector('#filter-panel.card-body.collapse')">
+                                    <div class="form-group" data-bind="with: Field, hidden: document.querySelector('#filter-panel.card-body.collapse') || ($root.scheduleFilterEditing && $root.scheduleFilterEditing())">
                                         <span class="btn btn-sm" tabindex="0" data-bind="click: function(){ filterOnFly(!filterOnFly()); }, css: {'btn-success': filterOnFly()==true, 'btn-secondary': !filterOnFly()}">
                                             <span class="fa fa-filter" aria-hidden="true" title="Filter on Report"></span>
                                         </span>
@@ -1301,7 +1383,7 @@ public dateFormatPopoverContent: string = `
                                                 <th style="width: 30%">Filter</th>
                                                 <th style="width: 20%"></th>
                                                 <th style="width: 30%">Value</th>
-                                                <th style="width: 10%">Fly</th>  <!-- CHANGED: added label -->
+                                                <th style="width: 10%"></th>
                                         </tr>
                                 </thead>
                                 <tbody data-bind="foreach: Parameters">
@@ -1393,13 +1475,30 @@ public dateFormatPopoverContent: string = `
             </div>
             <div class="mb-3">
                 <div class="row g-2 align-items-center">
-                    <label class="col-12 col-sm-3 col-form-label">Email to</label>
+                    <div class="col-12 col-sm-3">
+                        <label class="col-form-label pb-0">Email to</label>
+                        <div class="form-check small">
+                            <label class="form-check-label text-muted" title="Send to a saved Email List instead of typing addresses">
+                                <input class="form-check-input" type="checkbox" data-bind="checked: useEmailQuery" />
+                                Email List
+                            </label>
+                        </div>
+                    </div>
 
                     <div class="col-12 col-sm-6">
+                        <!-- ko ifnot: useEmailQuery -->
                         <input type="text" class="form-control"
                                data-bind="value: emailTo"
-                               placeholder="Enter Email Addresses separated by comma"
-                               required />
+                               placeholder="Enter Email Addresses separated by comma" />
+                        <!-- /ko -->
+                        <!-- ko if: useEmailQuery -->
+                        <div class="d-flex align-items-center gap-2">
+                            <select class="form-select" data-bind="options: emailQueries, optionsText: 'name', optionsValue: 'id', value: emailQueryId, optionsCaption: 'Choose Email List...'"></select>
+                            <button type="button" class="btn btn-light btn-sm text-nowrap"
+                                    data-bind="click: previewRecipients, enable: emailQueryId() > 0"
+                                    title="Show who this Email List currently returns">View</button>
+                        </div>
+                        <!-- /ko -->
                     </div>
 
                     <label class="col-6 col-sm-1 col-form-label">Format</label>
@@ -1922,10 +2021,10 @@ public dateFormatPopoverContent: string = `
 <script type="text/html" id="designer-choose-data">
     <div>
         <div class="float-start btn-group btn-group-toggle" role="group" data-bind="if: ReportID() <= 0">
-            <label class="btn btn-sm btn-light active" style="margin-right: 0px;" title="You can change the Data source only when creating a new report, changing this will clear all selections">
+            <label class="btn btn-sm btn-light" style="margin-right: 0px;" title="You can change the Data source only when creating a new report, changing this will clear all selections" data-bind="css: { active: !useStoredProc() }">
                 <input type="radio" name="dataoption" id="table" checked data-bind="checked: useStoredProc, checkedValue: false"> Dynamic
             </label>
-            <label class="btn btn-sm btn-light active">
+            <label class="btn btn-sm btn-light" data-bind="css: { active: useStoredProc() }">
                 <input type="radio" name="dataoption" id="proc" value="1" data-bind="checked: useStoredProc, checkedValue: true"> Predefined
             </label>
         </div>
@@ -4411,7 +4510,41 @@ public dateFormatPopoverContent: string = `
         </div>
     </div>
 </script>
-
+<script type="text/html" id="users-roles-sql-source">
+    <!-- ko if: $parent.userSource() === 'sql' -->
+    <div class="mb-3" data-bind="if: $parent.userSource() === 'sql'">
+        <div class="d-flex align-items-center mb-2">
+            <button class="btn btn-primary btn-sm" data-bind="visible: savedId() === 0, click: function() { $parent.editSqlSource($data); }">
+                <i class="fa fa-plus"></i> Add <span data-bind="text: title"></span>
+            </button>
+            <span class="ms-3 text-muted small" data-bind="text: hint"></span>
+        </div>
+        <div class="alert alert-info py-2 small" data-bind="visible: savedId() === 0">
+            No <span data-bind="text: title"></span> yet.
+        </div>
+        <table class="table table-striped table-sm" data-bind="visible: savedId() > 0">
+            <thead>
+                <tr>
+                    <th style="width: 22%">Name</th>
+                    <th style="width: 68%">Query</th>
+                    <th style="width: 10%"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-bind="text: title"></td>
+                    <td><code class="small text-truncate d-inline-block" style="max-width: 520px;" data-bind="text: sqlQuery"></code></td>
+                    <td class="text-end text-nowrap">
+                        <button class="btn btn-sm btn-light" title="Show the rows this query returns" data-bind="click: function() { $parent.previewSqlSource($data); }"><i class="fa fa-search"></i></button>
+                        <button class="btn btn-sm btn-light" title="Edit" data-bind="click: function() { $parent.editSqlSource($data); }"><i class="fa fa-pencil"></i></button>
+                        <button class="btn btn-sm btn-light text-danger" title="Delete" data-bind="click: function() { $parent.deleteSqlSource($data); }"><i class="fa fa-trash"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- /ko -->
+</script>
 <!-- Configure Joins Modal -->
 <div class="modal" id="weightedmodal-configure-joins" tabindex="-1" role="dialog" aria-hidden="true" data-bind="with: selectedReport">
     <div class="modal-dialog modal-lg ">
@@ -4482,8 +4615,329 @@ public dateFormatPopoverContent: string = `
             </div>
         </div>
     </div>
-</div>`);
+</div>
+
+`);
     this.cdref.detectChanges();
   }
 
+  private renderKODotNetSetupItems(){
+    this.dotNetSetupHtml =this.sanitizer.bypassSecurityTrustHtml(`<div data-bind="with: usersRoles">
+            <b>Users, Roles &amp; <span data-bind="text: clientIdLabel() || 'Client Id'"></span>s</b>
+            <p>
+                Choose where Dotnet Report gets the Users, Roles and <span data-bind="text: clientIdLabel() || 'Client Id'"></span>s used to control access to Reports, Folders and Dashboards.
+            </p>
+            <div class="d-flex align-items-center flex-wrap gap-2 mb-3">
+                <label class="control-label mb-0">Source</label>
+                <select class="form-select form-select-sm" style="width: 240px;" data-bind="value: userSource">
+                    <option value="code">Application Code</option>
+                    <option value="sql">SQL Query</option>
+                    <option value="portal">Dotnet Report Managed</option>
+                </select>
+                <button class="btn btn-primary btn-sm" data-bind="visible: userSource() === 'portal', click: loadPortal"><i class="fa fa-refresh"></i> Reload</button>
+                <button class="btn btn-primary btn-sm" data-bind="click: saveSourceSettings"><i class="fa fa-save"></i> Save</button>
+                <span class="text-warning" title="You have unsaved changes" data-bind="visible: settingsDirty"><i class="fa fa-exclamation-triangle"></i></span>
+            </div>
+            <hr />
+
+            <div class="alert alert-info py-2 small mb-3" data-bind="visible: userSource() === 'code'">
+                <b><i class="fa fa-code"></i> Application Code</b> - Your app supplies these in <code>GetSettings()</code>, settings are displayed here but can only be managed directly in code.
+            </div>
+            <div class="alert alert-info py-2 small mb-3" data-bind="visible: userSource() === 'sql'">
+                <b><i class="fa fa-database"></i> SQL Query</b> - Read the lists straight from your own database to populate your Users and Roles.
+            </div>
+            <div class="alert alert-info py-2 small mb-3" data-bind="visible: userSource() === 'portal'">
+                <b><i class="fa fa-cloud"></i> Dotnet Report Managed</b> - Setup users and roles in your Dotnet Report Account. You can manage users here or on our 
+                <a href="https://dotnetreport.com/portal/Account/UsersAndRoles" target="_blank" rel="noopener">portal <i class="fa fa-external-link"></i></a>.
+            </div>
+
+            <ul class="nav nav-tabs" id="usersRolesTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#ur-users" type="button" role="tab"><i class="fa fa-user"></i> Users</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ur-roles" type="button" role="tab"><i class="fa fa-shield"></i> Roles</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ur-clients" type="button" role="tab"><i class="fa fa-building-o"></i> <span data-bind="text: clientIdLabel() || 'Client Ids'"></span></button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ur-code" type="button" role="tab"><i class="fa fa-sign-in"></i> Login</button>
+                </li>
+            </ul>
+            <div class="tab-content pt-3">
+                <!-- USERS -->
+                <div class="tab-pane active" id="ur-users" role="tabpanel">
+                    <p class="text-muted small">Set the currently logged in user id or email in <code>settings.UserId</code>.</p>
+                    <div data-bind="template: { name: 'users-roles-sql-source', data: sqlUsers }"></div>
+                    <div class="alert alert-light border py-2 small" data-bind="visible: userSource() === 'portal'">
+                        <i class="fa fa-info-circle"></i> Users are created here without a password, set one via <b>Forgot Password</b> email.
+                    </div>
+                    <div data-bind="visible: userSource() === 'portal'">
+                        <button class="btn btn-primary btn-sm mb-2" data-bind="click: newUser"><i class="fa fa-plus"></i> Add User</button>
+                        <div class="card card-body mb-3" data-bind="visible: editingUser() !== null, with: editingUser">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="small fw-bold">Name</label>
+                                    <input class="form-control form-control-sm" placeholder="Name" data-bind="value: name">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="small fw-bold">Email</label>
+                                    <input class="form-control form-control-sm" placeholder="Email" data-bind="value: email, enable: !id()">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="small fw-bold">Roles</label>
+                                    <div data-bind="foreach: roles">
+                                        <label class="d-block small"><input type="checkbox" data-bind="checked: isSelected"> <span data-bind="text: text"></span></label>
+                                    </div>
+                                    <div class="small text-muted" data-bind="visible: roles.length === 0">No roles defined yet</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="small fw-bold" data-bind="text: $parent.clientIdLabel() || 'Client Ids'"></label>
+                                    <div data-bind="foreach: clients">
+                                        <label class="d-block small"><input type="checkbox" data-bind="checked: isSelected"> <span data-bind="text: text"></span></label>
+                                    </div>
+                                    <div class="small text-muted" data-bind="visible: clients.length === 0">None defined yet</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-primary me-2" data-bind="click: $parent.saveUser">Save User</button>
+                                <button class="btn btn-sm btn-secondary" data-bind="click: function() { $parent.editingUser(null); }">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center py-3" data-bind="visible: loadingUsers"><span class="fa fa-spinner fa-spin fa-2x text-muted"></span></div>
+                    <table class="table table-sm align-middle" data-bind="visible: !loadingUsers()">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Email / Id</th>
+                                <th>Name</th>
+                                <th>Roles</th>
+                                <th data-bind="text: clientIdLabel() || 'Client Ids'"></th>
+                                <th style="width: 130px;"></th>
+                            </tr>
+                        </thead>
+                        <!-- ko if: userSource() === 'portal' -->
+                        <tbody data-bind="foreach: portalUsers">
+                            <tr>
+                                <td data-bind="text: email"></td>
+                                <td data-bind="text: name"></td>
+                                <td class="small" data-bind="text: (roles || []).join(', ')"></td>
+                                <td class="small" data-bind="text: $parent.clientNames(clientIds)"></td>
+                                <td class="text-end text-nowrap" style="width: 130px;">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" class="btn btn-outline-secondary" title="Edit User" data-bind="click: $parent.editUser"><i class="fa fa-pencil"></i></button>
+                                        <button type="button" class="btn btn-outline-secondary" title="Email a link to set their portal password" data-bind="click: $parent.sendPasswordSetup"><i class="fa fa-envelope-o"></i></button>
+                                        <button type="button" class="btn btn-outline-danger" data-bind="click: $parent.deleteUser, disable: isPrimary, attr: { title: isPrimary ? 'The primary account user cannot be deleted' : 'Delete User' }"><i class="fa fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <!-- /ko -->
+                        <!-- ko if: userSource() === 'sql' -->
+                        <tbody data-bind="foreach: sqlUsers.rows">
+                            <tr>
+                                <td data-bind="text: id"></td>
+                                <td data-bind="text: text"></td>
+                                <td class="small text-muted"></td>
+                                <td class="small text-muted"></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                        <!-- /ko -->
+                        <!-- ko if: userSource() === 'code' -->
+                        <tbody data-bind="foreach: codeUsers">
+                            <tr>
+                                <td data-bind="text: (typeof $data === 'object') ? ($data.id || '') : $data"></td>
+                                <td data-bind="text: (typeof $data === 'object') ? ($data.text || '') : ''"></td>
+                                <td class="small text-muted"></td>
+                                <td class="small text-muted"></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                        <!-- /ko -->
+                    </table>
+                    <div class="text-muted" data-bind="visible: !loadingUsers() && userSource() === 'portal' && portalUsers().length === 0">
+                        <i class="fa fa-exclamation-circle"></i> No Users found, click <b>Add User</b> to create one.
+                    </div>
+                    <!-- ko if: userSource() === 'sql' -->
+                    <div class="text-muted" data-bind="visible: sqlUsers.loading"><i class="fa fa-spinner fa-spin"></i> Running the Users Query...</div>
+                    <div class="text-danger small" data-bind="visible: sqlUsers.error, text: 'Users Query error: ' + sqlUsers.error()"></div>
+                    <div class="text-muted" data-bind="visible: !sqlUsers.loading() && !sqlUsers.error() && sqlUsers.rows().length === 0">
+                        <i class="fa fa-exclamation-circle"></i> No Users found, add a <b>Users Query</b> above.
+                    </div>
+                    <div class="text-muted small" data-bind="visible: sqlUsers.rows().length > 0">
+                        <span data-bind="text: sqlUsers.rows().length"></span> users returned by the Users Query.
+                    </div>
+                    <!-- /ko -->
+                    <div class="text-muted" data-bind="visible: !loadingUsers() && userSource() === 'code' && codeUsers().length === 0">
+                        <i class="fa fa-exclamation-circle"></i> No Users found, populate <code>settings.Users</code> in your code.
+                    </div>
+                </div>
+                <!-- ROLES -->
+                <div class="tab-pane" id="ur-roles" role="tabpanel">
+                    <p class="text-muted small">Set the currently logged in user role in <code>settings.CurrentUserRole</code>.</p>
+                    <div data-bind="template: { name: 'users-roles-sql-source', data: sqlRoles }"></div>
+                    <!-- ko if: userSource() === 'portal' -->
+                    <div class="input-group input-group-sm mb-3" style="max-width: 320px;">
+                        <input class="form-control" placeholder="New role name" data-bind="value: newRoleName">
+                        <button class="btn btn-primary btn-sm" data-bind="click: addRole"><i class="fa fa-plus"></i> Add Role</button>
+                    </div>
+                    <!-- /ko -->
+                    <!-- ko if: userSource() === 'portal' -->
+                    <div class="d-flex flex-wrap gap-2">
+                        <!-- ko foreach: portalRoles -->
+                        <span class="badge bg-light text-dark border py-2 d-inline-flex align-items-center">
+                            <span data-bind="text: text"></span>
+                            <button type="button" class="btn btn-sm btn-link text-danger p-0 ms-2 lh-1" title="Delete Role" data-bind="click: $parent.deleteRole"><i class="fa fa-times"></i></button>
+                        </span>
+                        <!-- /ko -->
+                    </div>
+                    <div class="text-muted" data-bind="visible: portalRoles().length === 0"><i class="fa fa-exclamation-circle"></i> No Roles found, add one above.</div>
+                    <!-- /ko -->
+                    <!-- ko if: userSource() === 'sql' -->
+                    <div class="d-flex flex-wrap gap-2">
+                        <!-- ko foreach: sqlRoles.rows -->
+                        <span class="badge bg-light text-dark border py-2" data-bind="text: text"></span>
+                        <!-- /ko -->
+                    </div>
+                    <div class="text-muted" data-bind="visible: sqlRoles.loading"><i class="fa fa-spinner fa-spin"></i> Running the Roles Query...</div>
+                    <div class="text-danger small" data-bind="visible: sqlRoles.error, text: 'Roles Query error: ' + sqlRoles.error()"></div>
+                    <div class="text-muted" data-bind="visible: !sqlRoles.loading() && !sqlRoles.error() && sqlRoles.rows().length === 0">
+                        <i class="fa fa-exclamation-circle"></i> No Roles found, add a <b>Roles Query</b> above.
+                    </div>
+                    <!-- /ko -->
+                    <!-- ko if: userSource() === 'code' -->
+                    <div class="d-flex flex-wrap gap-2">
+                        <!-- ko foreach: codeRoles -->
+                        <span class="badge bg-light text-dark border py-2" data-bind="text: $data"></span>
+                        <!-- /ko -->
+                    </div>
+                    <div class="text-muted" data-bind="visible: codeRoles().length === 0"><i class="fa fa-exclamation-circle"></i> No Roles found, populate <code>settings.UserRoles</code> in your code.</div>
+                    <!-- /ko -->
+                </div>
+
+                <!-- CLIENT IDS -->
+                <div class="tab-pane" id="ur-clients" role="tabpanel">
+                    <p class="text-muted small">Restrict Reports, Folders and Dashboards by <span data-bind="text: (clientIdLabel() || 'Client Id').toLowerCase()"></span>, set the currently logged in user's <span data-bind="text: (clientIdLabel() || 'Client Id').toLowerCase()"></span> in <code>settings.ClientId</code>.</p>
+                    <div data-bind="template: { name: 'users-roles-sql-source', data: sqlClients }"></div>
+                    <div class="alert alert-warning py-2 small" data-bind="visible: userSource() === 'portal'">
+                        <i class="fa fa-exclamation-triangle"></i> Clients are not stored in your Dotnet Report account.
+                        Keep managing them here, or switch the source to SQL Query or Application Code.
+                    </div>
+                    <div class="mb-3 d-flex align-items-center gap-2 small">
+                        <!-- ko ifnot: editingLabel -->
+                        <span class="text-muted">Called</span>
+                        <b data-bind="text: clientIdLabel() || 'Client Id'"></b>
+                        <span class="text-muted">across the app.</span>
+                        <button type="button" class="btn btn-sm btn-link p-0" title="Change this wording" data-bind="click: startEditLabel"><i class="fa fa-pencil"></i> Change</button>
+                        <!-- /ko -->
+                        <!-- ko if: editingLabel -->
+                        <input class="form-control form-control-sm" style="width: 200px;" placeholder="Client Id / Tenant" data-bind="value: labelDraft, hasFocus: true">
+                        <button type="button" class="btn btn-sm btn-primary" data-bind="click: applyLabel">Save</button>
+                        <button type="button" class="btn btn-sm btn-secondary" data-bind="click: cancelLabel">Cancel</button>
+                        <!-- /ko -->
+                    </div>
+
+                    <!-- ko if: userSource() === 'portal' -->
+                    <button class="btn btn-primary btn-sm mb-2" data-bind="click: newClient"><i class="fa fa-plus"></i> Add <span data-bind="text: clientIdLabel() || 'Client Id'"></span></button>
+                    <div class="card card-body mb-3" style="max-width: 520px;" data-bind="visible: editingClient() !== null, with: editingClient">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="small fw-bold">Id</label>
+                                <input class="form-control form-control-sm" placeholder="ACME" data-bind="value: id, enable: !original">
+                                <div class="form-text">The value your app passes as <code>settings.ClientId</code>.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small fw-bold">Display Name</label>
+                                <input class="form-control form-control-sm" placeholder="Acme Corporation" data-bind="value: text">
+                                <div class="form-text">Optional, defaults to the Id.</div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-sm btn-primary me-2" data-bind="click: $parent.saveClient, text: original ? 'Save' : 'Add'">Add</button>
+                            <button class="btn btn-sm btn-secondary" data-bind="click: $parent.cancelClient">Cancel</button>
+                        </div>
+                    </div>
+                    <label class="form-label mb-1"></label>
+                    <table class="table table-sm align-middle" style="max-width: 520px;" data-bind="visible: clientIds().length > 0">
+                        <thead class="table-light"><tr><th>Id</th><th>Display Name</th><th></th></tr></thead>
+                        <tbody data-bind="foreach: clientIds">
+                            <tr>
+                                <td data-bind="text: $parent.clientKey($data)"></td>
+                                <td data-bind="text: $parent.clientText($data)"></td>
+                                <td class="text-end text-nowrap" style="width: 90px;">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" class="btn btn-outline-secondary" title="Edit" data-bind="click: function() { $parent.editClient($data); }"><i class="fa fa-pencil"></i></button>
+                                        <button type="button" class="btn btn-outline-danger" title="Remove" data-bind="click: function() { $parent.removeClientId($data); }"><i class="fa fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-muted mb-3" data-bind="visible: clientIds().length === 0"><i class="fa fa-exclamation-circle"></i> None added yet.</div>
+
+                    <!-- /ko -->
+
+                    <!-- ko if: userSource() === 'sql' -->
+                    <label class="form-label mb-1">Current <span data-bind="text: clientIdLabel() || 'Client Ids'"></span> <span class="text-muted fw-normal small">from your query</span></label>
+                    <div class="d-flex flex-wrap gap-2">
+                        <!-- ko foreach: sqlClients.rows -->
+                        <span class="badge bg-light text-dark border py-2" data-bind="text: text"></span>
+                        <!-- /ko -->
+                    </div>
+                    <div class="text-muted" data-bind="visible: sqlClients.loading"><i class="fa fa-spinner fa-spin"></i> Running the Clients Query...</div>
+                    <div class="text-danger small" data-bind="visible: sqlClients.error, text: 'Clients Query error: ' + sqlClients.error()"></div>
+                    <div class="text-muted" data-bind="visible: !sqlClients.loading() && !sqlClients.error() && sqlClients.rows().length === 0">
+                        <i class="fa fa-exclamation-circle"></i> No <span data-bind="text: clientIdLabel() || 'Client Ids'"></span> found, add a <b>Clients Query</b> above.
+                    </div>
+                    <!-- /ko -->
+
+                    <!-- ko if: userSource() === 'code' -->
+                    <label class="form-label mb-1">Current <span data-bind="text: clientIdLabel() || 'Client Ids'"></span> <span class="text-muted fw-normal small">from your code</span></label>
+                    <div class="d-flex flex-wrap gap-2">
+                        <!-- ko foreach: codeClientIds -->
+                        <span class="badge bg-light text-dark border py-2" data-bind="text: (typeof $data === 'object') ? ($data.text || $data.id) : $data"></span>
+                        <!-- /ko -->
+                    </div>
+                    <div class="text-muted" data-bind="visible: codeClientIds().length === 0"><i class="fa fa-exclamation-circle"></i> No <span data-bind="text: clientIdLabel() || 'Client Ids'"></span> found, populate <code>settings.ClientIds</code> in your code.</div>
+                    <!-- /ko -->
+                </div>
+                <!-- SETUP CODE -->
+                <div class="tab-pane" id="ur-code" role="tabpanel">
+                    <div class="card mb-3" data-bind="css: { 'border-primary': loginMode() === 'embedded' }">
+                        <div class="card-body py-3">
+                            <div>
+                                <label class="form-check-label">
+                                    <b><i class="fa fa-code"></i> Embedded in your app <span class="badge bg-secondary ms-1">Default</span></b>
+                                    <div class="small text-muted">Your application already has a login. Dotnet Report runs inside it and trusts it, you specify who is signed in from C# and switch on <code>[Authorize]</code>.</div>
+                                    <div class="small mt-1"><span class="text-muted">Works with:</span> any source</div>
+                                </label>
+                            </div>
+                            <!-- ko if: loginMode() === 'embedded' -->
+                            <div class="mt-3 ps-4">
+                                <div class="alert alert-warning py-2 small mb-2">
+                                    <i class="fa fa-exclamation-triangle"></i> <b>Turn authorization on.</b> <code>[Authorize]</code> ships commented out on
+                                    <code>DotNetReportController</code> and <code>DotNetReportApiController</code>, and <code>[Authorize(Roles = "Administrator")]</code> on
+                                    <code>DotNetSetupController</code>, so the default runs without a login. Uncomment them so only signed-in users reach reports
+                                    and only administrators reach this page.
+                                </div>
+                                <p class="text-muted small mb-1">Tell Dotnet Report who is signed in, from <code>GetSettings()</code> in <code>Controllers/DotNetReportApiController.cs</code>:</p>
+                                <pre class="bg-light border rounded p-3 small mb-0">
+                                settings.UserId          = User.Identity.Name;                          // currently logged in user
+                                settings.CurrentUserRole = new List&lt;string&gt; { "Admin" };          // currently logged in user's roles
+                                settings.ClientId        = "ACME";                                      // currently logged in user's tenant
+                                <!-- ko if: userSource() === 'code' -->
+                                settings.Users     = new List&lt;dynamic&gt; { "jane@co.com", "joe@co.com" }; // all users
+                                settings.UserRoles = new List&lt;string&gt; { "Admin", "Viewer" };            // all roles
+                                settings.ClientIds = new List&lt;string&gt; { "ACME", "CONTOSO" };            // all tenants<!-- /ko --></pre>
+                            </div>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`);
+    this.cdref.detectChanges();
+  }
 }
