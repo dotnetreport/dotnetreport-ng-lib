@@ -1036,7 +1036,7 @@
                                 </div>
                                 <div class="report-canvas" data-bind="hidden: DontExecuteOnRun() && !reportRan()">
                                     <div class="report-container bg-light">
-                                           <div class="report-inner" data-bind="style: { backgroundColor: tableSettings().backColor || (ReportResult() && ReportResult().ReportData() && ReportResult().ReportData().BackColor ? ReportResult().ReportData().BackColor() : '#fff') }">
+                                           <div class="report-inner" data-bind="style: { backgroundColor: (ReportResult() && ReportResult().ReportData() && ReportResult().ReportData().BackColor ? ReportResult().ReportData().BackColor() : '') || pageBackColor() || '#fff' }">
                                             <div data-bind="if: $root.CanEdit() && ReportType()!='Html' && ReportType()!='Single'">
                                                 <div data-bind="template: 'chart-settings', data: $data"></div>
                                             </div>
@@ -1046,7 +1046,7 @@
                                             <div data-bind="visible: headerDesigner.UseReportHeader">
                                                 <div id="report-header" width="900" height="120" data-bind="html: $root.substituteReportPlaceholders($root.headerDesigner.headerHtml())"></div>
                                             </div>
-                                            <h2 data-bind="text: ReportName"></h2>
+                                            <div class="dr-report-title" data-bind="visible: !HideReportName()"><h2 data-bind="text: ReportName"></h2><!-- ko if: CanEdit() --><a href="#" class="dr-title-hide" title="Hide report name" data-bind="click: function () { HideReportName(true); }"><i class="fa fa-times"></i></a><!-- /ko --></div>
                                             <p data-bind="html: ReportDescription">
                                             </p>
                                             <div data-bind="template: 'filter-details-summary'"></div>
@@ -1111,7 +1111,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="fa fa-key"></i> Manage Access <span class="text-muted ms-1" data-bind="text: accessModalReport() ? accessModalReport().reportName : ''"></span></h5>
+                <h5 class="modal-title"><i class="fa fa-key"></i> Manage Access <span class="text-muted ms-1" data-bind="text: accessModalTitle"></span></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
