@@ -118,6 +118,7 @@
               "node_modules/dotnetreport/src/dotnetreport.js",
               "node_modules/dotnetreport/src/dotnetreport-helper.js",
               "node_modules/dotnetreport/src/dotnetreport-setup.js",
+              "node_modules/dotnetreport/src/dotnetreport-users.js",
               "node_modules/gridstack/dist/gridstack-all.js"
             ]
           },
@@ -147,6 +148,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "projects/dotnetreport-app/proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "dotnetreport-app:build:production"

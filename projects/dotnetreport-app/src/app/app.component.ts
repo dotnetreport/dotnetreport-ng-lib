@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { DotnetdashboardComponent, DotnetreportComponent, DotnetsetupComponent } from 'dotnetreport-ng';
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet,DotnetdashboardComponent,DotnetreportComponent,DotnetsetupComponent],
+  imports: [RouterOutlet],
   templateUrl: './app.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.component.css'

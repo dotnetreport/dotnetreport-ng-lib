@@ -1,6 +1,6 @@
 @echo off
 
-cd C:\Users\GamingPC\source\repos\DotnetReport.Angular-Lib
+cd /d "%~dp0"
 echo Building dotnetreport-lib...
 ng build dotnetreport-lib
 if %errorlevel% neq 0 goto error
@@ -10,10 +10,10 @@ npm uninstall dotnetreport-ng
 if %errorlevel% neq 0 goto error
 
 echo Installing dotnetreport-ng...
-npm install file:dist/dotnetreport-ng
+npm install file:dist/dotnetreport-ng --no-save
 if %errorlevel% neq 0 goto error
 
-cd C:\Users\GamingPC\source\repos\DotnetReport.Angular-Lib\projects\dotnetreport-app
+cd /d "%~dp0projects\dotnetreport-app"
 echo Starting ng serve...
 ng serve
 if %errorlevel% neq 0 goto error
@@ -22,9 +22,9 @@ echo All done.
 goto end
 
 :error
-cd C:\Users\GamingPC\source\repos\DotnetReport.Angular-Lib
+cd /d "%~dp0"
 echo An error occurred. Exiting.
 exit /b 1
 
 :end
-cd C:\Users\GamingPC\source\repos\DotnetReport.Angular-Lib
+cd /d "%~dp0"

@@ -13,6 +13,6 @@ bootstrapApplication(AppComponent, {
     provideZoneChangeDetection(),provideRouter(routes),
     provideAnimations(),
     provideHttpClient(withXhr(), withInterceptorsFromDi()),
-    ...provideDotNetReport('https://localhost:52107')
+    ...provideDotNetReport('')  // proxy.conf.json forwards /api to the main app
   ]
 });

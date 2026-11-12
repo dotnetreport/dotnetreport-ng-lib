@@ -1,28 +1,24 @@
 const gulp = require('gulp');
 const { series } = require('gulp');
 const { exec } = require('child_process');
-const fs = require('fs');
-const replace = require('gulp-replace');
+const path = require('path');
 
-// Define the paths
-const rootPath = 'C:/Users/GamingPC/source/repos/DotnetReport.Angular-Lib';
-const appPath = 'C:/Users/GamingPC/source/repos/DotnetReport.Angular-Lib/projects/dotnetreport-app';
-const libPath = 'C:/Users/GamingPC/source/repos/DotnetReport.Angular-Lib/projects/dotnetreport-lib';
-const packageJsonPath = './projects/dotnetreport-lib/package.json';
-const packageJson = require(packageJsonPath);
+// Paths are relative to this file, so the workspace builds wherever it is cloned
+const rootPath = __dirname;
+const appPath = path.join(__dirname, 'projects/dotnetreport-app');
+const libPath = path.join(__dirname, 'projects/dotnetreport-lib');
+const packageJson = require('./projects/dotnetreport-lib/package.json');
 
-// Define the commands
+// The demo app uses the dotnetreport scripts at the version the library asks for
+const dotnetreportVersion = packageJson.peerDependencies.dotnetreport;
+
 const buildLibCommand = 'ng build dotnetreport-lib';
 const uninstallPackageCommand = 'npm uninstall dotnetreport-ng';
-const installPackageCommand = 'npm install file:dist/dotnetreport-ng';
-
-
+const installPackageCommand = 'npm install file:dist/dotnetreport-ng --no-save';
 const uninstalldnrPackageCommand = 'npm uninstall dotnetreport';
-const installdnrPackageCommand = 'npm install file:../../../DotnetReport.Npm/dotnetreport-5.0.4.tgz --save-peer';
-
+const installdnrPackageCommand = `npm install dotnetreport@${dotnetreportVersion} --save-peer`;
 const serveCommand = 'ng serve';
 
-// Define the tasks
 function buildLib(cb) {
   exec(buildLibCommand, { cwd: rootPath }, cb);
 }
@@ -38,37 +34,26 @@ function uninstallPackage(cb) {
 function installDnrPackage(cb) {
   exec(installdnrPackageCommand, { cwd: libPath }, cb);
 }
+
 function installPackage(cb) {
   exec(installPackageCommand, { cwd: rootPath }, cb);
 }
 
 function serve(cb) {
   const child = exec(serveCommand, { cwd: appPath });
-
   child.stdout.pipe(process.stdout);
   child.stderr.pipe(process.stderr);
-
   child.on('close', cb);
 }
 
-function buildRelease() {
-  // Get the desired version from the file path and extension
-  const versionRegex = /dotnetreport-(\d+\.\d+\.\d+)/;
-  const version = packageJson.peerDependencies.dotnetreport.match(versionRegex)[1];
-  console.log(`Building dotnetreport-ng with version ${version}`);
-
-  // Replace the dotnetreport dependency with the desired version
-  gulp.src(packageJsonPath)
-    .pipe(replace(/"dotnetreport": "file:..\/..\/..\/DotnetReport.Npm\/dotnetreport-\d+\.\d+\.\d+-beta\.1.tgz"/, `"dotnetreport": "^${version}"`))
-    .pipe(gulp.dest('dist/dotnetreport-ng'));
-
-  // Build the dotnetreport-ng package
-  return exec('npm pack', { cwd: 'dist/dotnetreport-ng' });
+// Packs dist/dotnetreport-ng into a .tgz. ng-packagr already writes the package.json with the
+// version and dependencies from projects/dotnetreport-lib/package.json.
+function buildRelease(cb) {
+  console.log(`Packing dotnetreport-ng ${packageJson.version}`);
+  exec('npm pack', { cwd: path.join(rootPath, 'dist/dotnetreport-ng') }, cb);
 }
 
-
-// Export the tasks
 exports.default = series(uninstallDnrPackage, installDnrPackage, buildLib, uninstallPackage, installPackage);
 exports.serve = serve;
 exports.buildDev = buildLib;
-exports.buildRelease = buildRelease;
+exports.buildRelease = series(buildLib, buildRelease);

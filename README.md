@@ -1,36 +1,41 @@
-## dotnet report www.dotnetreport.com
-**dotnet Report Builder** is an Ad hoc Reporting software that allows programmers to easily add Reporting functionality to their ASP .NET Web Application. 
+# dotnetreport-ng workspace
 
-This repository is for using dotnet report as an angular io component.
+Source for [`dotnetreport-ng`](https://www.npmjs.com/package/dotnetreport-ng), the Angular components for [Dotnet Report](https://dotnetreport.com). To use the package in your app, see its [README](projects/dotnetreport-lib/README.md) and the [Install with Angular](https://dotnetreport.com/docs/#installation-angular) guide.
 
-It features an easy and intutive Report Builder for end users, and all the tools you need to different type of List or Summary Repots. It can also handle Pie Charts, Bar Charts and Line Charts. Users can also select functions like Sorting, Formatting, Filtering, Grouping and apply Aggregate functions like COUNT, SUM, MIN, MAX and AVERAGE.
+The source lives in the Dotnet Report repository under `angular/`, next to the .NET front end it shares its markup with, and is published to npm by the release pipeline. The [GitHub repository](https://github.com/dotnetreport/dotnetreport-ng-lib) is a public copy.
 
-![Report Builder](https://dotnetreport.com/wp-content/uploads/2021/12/mk-7-1024x775.png)
+## Layout
 
-For more details, see
+| Path | What it is |
+|---|---|
+| `projects/dotnetreport-lib` | The library: one component per screen (report, dashboard, setup, users) |
+| `projects/dotnetreport-lib/src/lib/templates.ts` | Generated: the screens' markup and Knockout templates |
+| `projects/dotnetreport-app` | Demo app with a route per screen |
+| `scripts/sync-templates.mjs` | Generates `templates.ts` from the main app's Razor views |
+| `scripts/set-version.js`, `scripts/check-release.js` | Used by the release pipeline |
 
- * Feature details on [the project's website](http://www.dotnetreport.com)
- * Online examples at [https://dotnetreport.com/demo/Report)
+The markup is never edited here. `sync-templates.mjs` reads `Views/DotNetReport/Index.cshtml`, `Dashboard.cshtml`, `Views/DotNetSetup/Index.cshtml`, `Users.cshtml` and `_DotnetReportTemplatesPartial.cshtml` from the main app, strips the Razor, and writes `templates.ts`. Change the views, then run `npm run sync-templates`. The React package uses the same script.
 
-## Getting started
+## Building
 
-The easiest way to add .Net Report Builder to your application is to install the [Nuget Package](https://www.nuget.org/packages/dotNetReport/). For complete details, please see the [getting started guide](https://dotnetreport.com/blog/getting-started-with-dotnet-report/). 
+Angular 22 needs Node 22.22.3 or newer (24 recommended).
 
-## Documentation
+```bash
+npm install
+npm run build:lib     # sync the templates, then build dist/dotnetreport-ng
+```
 
-Please see our [knowledgebase](https://dotnetreport.com/knowledgebase/) for detailed documentation. 
+## Running the demo
 
-## License
-dotnet Report Builder is licensed under [LGPL](https://github.com/dotnetreport/ReportBuilder.Web/blob/master/LICENSE) and EULA. 
+The demo serves on http://localhost:4200 and forwards `/api` and `/DotNetReport` to the .NET app at `https://localhost:52107` (see `projects/dotnetreport-app/proxy.conf.json`).
 
-# DotnetReport.Angular
+```bash
+npm install ./dist/dotnetreport-ng --no-save   # use the library you just built
+npx ng serve dotnetreport-app
+```
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.1.0.
+Before a release is on npm, install the `dotnetreport` package from a local pack of the main app (`node npm/build.js`, then `npm pack` in `dist/npm`) so the demo gets the current scripts.
 
-## Development server
+## Releasing
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Set `<version>` in the main app's `.nuspec` files and push `net6/deploy/nuget`. The pipeline publishes the `dotnetreport` npm package first, then sets this package to the same version, builds it and publishes it.
